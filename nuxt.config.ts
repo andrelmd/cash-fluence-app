@@ -2,4 +2,5 @@
 export default defineNuxtConfig({
     buildDir: 'dist', 
     ssr: false,
+    modules:['@nuxtjs/tailwindcss']
 })

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Visão Geral</h2>
+    <h2>Saídas</h2>
   </div>
 </template>
 
