@@ -2,26 +2,26 @@
   <div>
     <h1>Visão Geral</h1>
     <div>
-      <form class="flex flex-direction-column" @submit.prevent="insertEntry">
-        <input :v-model="newEntry.name" class="mx-4" placeholder="Nome" />
-        <input :v-model="newEntry.value" class="mx-4" placeholder="Valor" />
-        <select :v-model="newEntry.entryTypeId" class="mx-4" name="entryTypes">
-          <option v-for="entryType of entryTypes" :v-model="entryType.id">
+      <form @submit.prevent="handleInsertEntry">
+        <input v-model="newEntry.name" placeholder="Nome" />
+        <input v-model="newEntry.value" placeholder="Valor" />
+        <select v-model="newEntry.entryTypeId" name="entryTypes">
+          <option v-for="entryType of entryTypes" :value="entryType.id">
             {{ entryType.name }}
           </option>
         </select>
-        <button class="btn mx-4" @click="insertEntry">Adicionar</button>
+        <button @click="handleSave">Adicionar</button>
       </form>
       <div>
         <h2>Entradas</h2>
-        <div v-for="entry of positiveEntries">
-          <EntryCard :entry="entry" />
+        <div v-for="entry of positiveEntries" :key="`entry-${entry.id}`">
+          <EntryCard :entry="entry" @deleteEntry="handleDelete" />
         </div>
       </div>
       <div>
         <h2>Saídas</h2>
-        <div v-for="entry of negativeEntries">
-          <EntryCard :entry="entry" />
+        <div v-for="entry of negativeEntries" :key="`entry-${entry.id}`">
+          <EntryCard :entry="entry" @deleteEntry="handleDelete" />
         </div>
       </div>
     </div>
@@ -29,18 +29,37 @@
 </template>
 
 <script setup lang="ts">
-import { entryRepository } from "@/database/EntryRepository";
-import { entryTypeRepository } from "@/database/EntryTypeRepository";
-import EntryCard from "~/components/EntryCard.vue";
-import { Entry } from "~/entities/Entry";
-const entries = await entryRepository.getEntries();
-const positiveEntries = entries.filter((it) => it.entryTypeId === 1);
-const negativeEntries = entries.filter((it) => it.entryTypeId === 2);
-const entryTypes = await entryTypeRepository.getEntryTypes();
-const newEntry: Partial<Entry> = {createdAt:new Date()};
+  import { entryRepository } from '@/database/EntryRepository'
+  import { entryTypeRepository } from '@/database/EntryTypeRepository'
+  import { Entry } from '~/entities/Entry'
+  const newEntry = ref<Partial<Entry>>({})
+  const entries = ref<Array<Entry>>([])
 
-const insertEntry = () =>
-  useState<void>("insertEntry", () => {
-    console.log(newEntry);
-  });
+  const positiveEntries = ref<Array<Entry>>([])
+  const negativeEntries = ref<Array<Entry>>([])
+
+  const entryTypes = await entryTypeRepository.getEntryTypes()
+
+  const handleSave = async () => {
+    const savedEntry = await entryRepository.save(new Entry(newEntry.value))
+    if (savedEntry) entries.value.push(...savedEntry)
+
+    newEntry.value = {}
+  }
+
+  const handleDelete = async (entryId: number) => {
+    await entryRepository.delete({ id: entryId })
+    entries.value = entries.value.filter((it) => it.id !== entryId)
+  }
+
+  watch(
+    entries,
+    (entries) => {
+      positiveEntries.value = entries.filter((it) => it.entryTypeId === 1)
+      negativeEntries.value = entries.filter((it) => it.entryTypeId === 2)
+    },
+    { deep: true },
+  )
+
+  entries.value = await entryRepository.findMany()
 </script>
