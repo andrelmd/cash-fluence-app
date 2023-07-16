@@ -1,15 +1,15 @@
 <template>
   <div>
-    <header class="shadow-sm bg-white">
-      <nav class="container mx-auto p-4 flex justify-between">
-        <ul class="flex gap-4">
-          <li><NuxtLink to="/" class="btn">Visão Geral</NuxtLink></li>
-          <li><NuxtLink to="/entries/in" class="btn">Entradas</NuxtLink></li>
-          <li><NuxtLink to="/entries/out" class="btn">Saídas</NuxtLink></li>
+    <header>
+      <nav>
+        <ul>
+          <li><NuxtLink to="/">Visão Geral</NuxtLink></li>
+          <li><NuxtLink to="/incomes">Entradas</NuxtLink></li>
+          <li><NuxtLink to="/expenses">Saídas</NuxtLink></li>
         </ul>
       </nav>
     </header>
-    <div class="container mx-auto p-4">
+    <div>
       <slot />
     </div>
   </div>

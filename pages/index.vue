@@ -3,9 +3,14 @@
     <h1>Visão Geral</h1>
     <div>
       <form @submit.prevent="handleInsertEntry">
-        <input v-model="newEntry.name" placeholder="Nome" />
-        <input v-model="newEntry.value" placeholder="Valor" />
-        <select v-model="newEntry.entryTypeId" name="entryTypes">
+        <input v-model="transactionToSave.name" placeholder="Nome" />
+        <input v-model="transactionToSave.value" placeholder="Valor" />
+        <input
+          v-model="transactionToSave.date"
+          type="date"
+          :placeholder="new Date().toLocaleString()"
+        />
+        <select v-model="transactionToSave.transactioTypeId" name="entryTypes">
           <option v-for="entryType of entryTypes" :value="entryType.id">
             {{ entryType.name }}
           </option>
@@ -14,14 +19,14 @@
       </form>
       <div>
         <h2>Entradas</h2>
-        <div v-for="entry of positiveEntries" :key="`entry-${entry.id}`">
-          <EntryCard :entry="entry" @deleteEntry="handleDelete" />
+        <div v-for="transaction of incomes" :key="`entry-${transaction.id}`">
+          <EntryCard :transaction="transaction" @deleteEntry="handleDelete" />
         </div>
       </div>
       <div>
         <h2>Saídas</h2>
-        <div v-for="entry of negativeEntries" :key="`entry-${entry.id}`">
-          <EntryCard :entry="entry" @deleteEntry="handleDelete" />
+        <div v-for="transaction of expenses" :key="`entry-${transaction.id}`">
+          <EntryCard :transaction="transaction" @deleteEntry="handleDelete" />
         </div>
       </div>
     </div>
@@ -29,37 +34,67 @@
 </template>
 
 <script setup lang="ts">
-  import { entryRepository } from '@/database/EntryRepository'
-  import { entryTypeRepository } from '@/database/EntryTypeRepository'
-  import { Entry } from '~/entities/Entry'
-  const newEntry = ref<Partial<Entry>>({})
-  const entries = ref<Array<Entry>>([])
+  import { Transaction } from '~/entities/Transaction'
+  import { TransactionTypes } from '~/enums/TransactionTypes'
+  import { transactionRepository } from '~/repositories/TransactionRepository'
+  const transactionToSave = ref<Partial<Transaction>>({})
+  const transactions = ref<Array<Transaction>>([])
 
-  const positiveEntries = ref<Array<Entry>>([])
-  const negativeEntries = ref<Array<Entry>>([])
+  const incomes = ref<Array<Transaction>>([])
+  const expenses = ref<Array<Transaction>>([])
 
-  const entryTypes = await entryTypeRepository.getEntryTypes()
+  const entryTypes = [
+    {
+      id: TransactionTypes.INCOME,
+      name: 'Entrada',
+    },
+    {
+      id: TransactionTypes.EXPENSE,
+      name: 'Saída',
+    },
+  ]
 
   const handleSave = async () => {
-    const savedEntry = await entryRepository.save(new Entry(newEntry.value))
-    if (savedEntry) entries.value.push(...savedEntry)
+    if (!transactionToSave.value.transactioTypeId) {
+      return
+    }
+    if (!transactionToSave.value.date) {
+      return
+    }
+    if (!transactionToSave.value.name) {
+      return
+    }
+    if (!transactionToSave.value.value) {
+      return
+    }
+    const savedTransaction = await transactionRepository.save({
+      date: new Date(transactionToSave.value.date),
+      name: transactionToSave.value.name,
+      value: transactionToSave.value.value,
+      transactioTypeId: transactionToSave.value.transactioTypeId,
+    })
+    if (savedTransaction) transactions.value.push(...savedTransaction)
 
-    newEntry.value = {}
+    transactionToSave.value = {}
   }
 
   const handleDelete = async (entryId: number) => {
-    await entryRepository.delete({ id: entryId })
-    entries.value = entries.value.filter((it) => it.id !== entryId)
+    await transactionRepository.delete({ id: entryId })
+    transactions.value = transactions.value.filter((it) => it.id !== entryId)
   }
 
   watch(
-    entries,
+    transactions,
     (entries) => {
-      positiveEntries.value = entries.filter((it) => it.entryTypeId === 1)
-      negativeEntries.value = entries.filter((it) => it.entryTypeId === 2)
+      incomes.value = entries.filter(
+        (it) => it.transactioTypeId === TransactionTypes.INCOME,
+      )
+      expenses.value = entries.filter(
+        (it) => it.transactioTypeId === TransactionTypes.EXPENSE,
+      )
     },
     { deep: true },
   )
 
-  entries.value = await entryRepository.findMany()
+  transactions.value = await transactionRepository.findMany()
 </script>
