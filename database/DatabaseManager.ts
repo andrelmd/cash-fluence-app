@@ -1,101 +1,71 @@
-import { invoke } from '@tauri-apps/api'
 import { appConfigDir } from '@tauri-apps/api/path'
 import Database from 'tauri-plugin-sql-api'
 import { LogLevels } from '~/enums/LogLevels'
+import Logger from '~/helpers/Logger'
 
-export default class DatabaseManager {
-  private static db: Database | undefined
+class DatabaseManager {
+  private db: Database
   private static initPromise: Promise<Database> | undefined = undefined
-  private constructor() {}
-  static async init() {
-    if (this.db) return this.db
-    else {
-      invoke('log', {
-        level: LogLevels.info,
-        message: `connecting to database at ${await appConfigDir()}`,
-      })
-      if (!this.initPromise)
-        this.initPromise = Database.load('sqlite:fin_app.db')
-      this.db = await this.initPromise
-      return this.db
-    }
+  private constructor(db: Database) {
+    this.db = db
   }
-  static async close() {
-    if (this.db) {
-      await this.db.close()
-      this.db = undefined
+  static async init() {
+    let db: Database
+    Logger.log(LogLevels.debug, 'initializing database')
+    Logger.log(LogLevels.debug, `app config dir is ${await appConfigDir()}`)
+
+    if (!this.initPromise) this.initPromise = Database.load('sqlite:fin_app.db')
+    db = await this.initPromise
+    if (!db) {
+      Logger.log(LogLevels.error, 'database could not be initialized')
+      throw new Error('database could not be initialized')
     }
+    Logger.log(LogLevels.debug, 'database initialized')
+    return new DatabaseManager(db)
   }
 
-  static async transaction<T>(callback: () => Promise<T>) {
-    if (!this.db) await this.init()
-    if (!this.db) {
-      invoke('log', {
-        level: LogLevels.error,
-        message: `Database could not be initialized`,
-      })
-      throw new Error('Database could not be initialized')
-    }
+  async transaction<T>(callback: () => Promise<T>) {
+    const startTransactionQuery = 'BEGIN TRANSACTION;'
     try {
-      invoke('log', {
-        level: LogLevels.info,
-        message: `Starting transaction`,
-      })
-      await this.db.execute('BEGIN TRANSACTION;').then(() =>
-        invoke('log', {
-          level: LogLevels.info,
-          message: `Transaction started`,
-        }),
+      Logger.log(LogLevels.debug, 'starting transaction')
+      await this.execute(startTransactionQuery).then(() =>
+        Logger.log(LogLevels.debug, 'transaction started'),
       )
       const result = await callback().then((result) => {
-        invoke('log', {
-          level: LogLevels.info,
-          message: `callback executed with result ${JSON.stringify(result)}`,
-        })
+        Logger.log(
+          LogLevels.debug,
+          `callback executed with result ${JSON.stringify(result)}`,
+        )
         return result
       })
-      await this.db.execute('COMMIT;').then(() =>
-        invoke('log', {
-          level: LogLevels.info,
-          message: `Transaction commited`,
-        }),
+      const commitTransactionQuery = 'COMMIT;'
+      await this.execute(commitTransactionQuery).then(() =>
+        Logger.log(LogLevels.debug, 'transaction commited'),
       )
       return result
     } catch (error) {
-      invoke('log', {
-        level: LogLevels.error,
-        message: `Transaction failed with error ${error}`,
-      })
-      await this.db.execute('ROLLBACK;').then(() =>
-        invoke('log', {
-          level: LogLevels.info,
-          message: `Transaction rolled back`,
-        }),
+      Logger.log(
+        LogLevels.error,
+        `transaction failed with error ${error}, rolling back`,
+      )
+
+      const rollbackTransactionQuery = 'ROLLBACK;'
+      await this.execute(rollbackTransactionQuery).then(() =>
+        Logger.log(LogLevels.debug, 'transaction rolled back'),
       )
     }
   }
 
-  async execute(query: string) {
-    if (!DatabaseManager.db) await DatabaseManager.init()
-    if (!DatabaseManager.db) {
-      invoke('log', {
-        level: LogLevels.error,
-        message: `Database could not be initialized`,
-      })
-      throw new Error('Database could not be initialized')
-    }
-    return DatabaseManager.db.execute(query)
+  async execute(query: string): Promise<any> {
+    Logger.log(LogLevels.query, query)
+    return this.db.execute(query)
   }
 
-  async select<T>(query: string) {
-    if (!DatabaseManager.db) await DatabaseManager.init()
-    if (!DatabaseManager.db) {
-      invoke('log', {
-        level: LogLevels.error,
-        message: `Database could not be initialized`,
-      })
-      throw new Error('Database could not be initialized')
-    }
-    return DatabaseManager.db.select<T>(query)
+  async select<T>(query: string): Promise<T> {
+    Logger.log(LogLevels.query, query)
+    return this.db.select<T>(query)
   }
 }
+
+export default DatabaseManager
+export const databaseManager = await DatabaseManager.init()

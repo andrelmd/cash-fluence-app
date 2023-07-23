@@ -1,8 +1,8 @@
-import { invoke } from '@tauri-apps/api'
+import { QueryResult } from 'tauri-plugin-sql-api'
+import DatabaseManager, { databaseManager } from '~/database/DatabaseManager'
 import { ITransaction, Transaction } from '~/entities/Transaction'
 import { LogLevels } from '~/enums/LogLevels'
-import DatabaseManager from '../database/DatabaseManager'
-import { QueryResult } from 'tauri-plugin-sql-api'
+import Logger from '~/helpers/Logger'
 
 class TransactionRepository {
   private tableName = 'transactions'
@@ -14,11 +14,8 @@ class TransactionRepository {
   }
 
   private async initEntries() {
-    invoke('log', {
-      level: LogLevels.info,
-      message: `Initializing table ${this.tableName}`,
-    })
-    await DatabaseManager.transaction<QueryResult>(() =>
+    Logger.log(LogLevels.debug, `initializing table ${this.tableName} `)
+    await this.databaseManager.transaction<QueryResult>(() =>
       this.databaseManager.execute(
         `CREATE TABLE IF NOT EXISTS ${this.tableName} (${[
           '"id" INTEGER PRIMARY KEY AUTOINCREMENT',
@@ -30,25 +27,22 @@ class TransactionRepository {
       ),
     )
   }
-  async findMany(where?: { [key: string]: string | number }) {
-    const selectQuery = `SELECT * FROM ${this.tableName}`
+  async findMany(where?: Partial<ITransaction>): Promise<Array<Transaction>> {
+    const queries = new Array(`SELECT * FROM ${this.tableName}`)
     if (where) {
       const whereQuery = Object.entries(where)
         .map(([key, value]) => `${key} = ${value}`)
         .join(' AND ')
-      const entries = await this.databaseManager.select<Array<ITransaction>>(
-        `${selectQuery} WHERE ${whereQuery}`,
-      )
-      return entries.map((it) => new Transaction(it))
+      queries.push(`WHERE ${whereQuery}`)
     }
     const entries = await this.databaseManager.select<Array<ITransaction>>(
-      `SELECT * FROM ${this.tableName}`,
+      queries.join(' ') + ';',
     )
     return entries.map((it) => new Transaction(it))
   }
 
   async save(entities: Array<Partial<Transaction>> | Partial<Transaction>) {
-    return await DatabaseManager.transaction(async () => {
+    return this.databaseManager.transaction(async () => {
       const insertQuery = Array.isArray(entities)
         ? `INSERT INTO ${
             this.tableName
@@ -66,20 +60,19 @@ class TransactionRepository {
             entities.value
           }, '${entities.name}', ${
             entities.transactioTypeId
-          }, '${entities.date?.toISOString()}')`
+          }, '${entities.date?.toISOString()}');`
 
-      return (
-        await this.databaseManager.select<Array<ITransaction>>(
-          `${insertQuery} RETURNING *;`,
-        )
-      ).map((it) => new Transaction(it))
+      const result = await this.databaseManager.select<Array<ITransaction>>(
+        `${insertQuery} RETURNING *;`,
+      )
+      return result.map((it) => new Transaction(it))
     })
   }
 
   async delete(
     transaction: Partial<Transaction> | Array<Partial<Transaction>>,
   ) {
-    return await DatabaseManager.transaction(async () => {
+    return this.databaseManager.transaction(async () => {
       const deleteQuery = Array.isArray(transaction)
         ? `DELETE FROM ${this.tableName} WHERE id IN (${transaction
             .filter((it) => it.id !== undefined && it.id !== null)
@@ -91,6 +84,4 @@ class TransactionRepository {
   }
 }
 
-export const transactionRepository = new TransactionRepository(
-  await DatabaseManager.init(),
-)
+export const transactionRepository = new TransactionRepository(databaseManager)

@@ -1,5 +1,4 @@
 <template>
-  {{ transactions }}
   <div><h2>Entradas</h2></div>
   <div v-for="entry of transactions">
     <EntryCard :transaction="entry" />

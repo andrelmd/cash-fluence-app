@@ -5,11 +5,7 @@
       <form @submit.prevent="handleInsertEntry">
         <input v-model="transactionToSave.name" placeholder="Nome" />
         <input v-model="transactionToSave.value" placeholder="Valor" />
-        <input
-          v-model="transactionToSave.date"
-          type="date"
-          :placeholder="new Date().toLocaleString()"
-        />
+        <input v-model="transactionToSave.date" type="date" />
         <select v-model="transactionToSave.transactioTypeId" name="entryTypes">
           <option v-for="entryType of entryTypes" :value="entryType.id">
             {{ entryType.name }}
@@ -37,7 +33,10 @@
   import { Transaction } from '~/entities/Transaction'
   import { TransactionTypes } from '~/enums/TransactionTypes'
   import { transactionRepository } from '~/repositories/TransactionRepository'
-  const transactionToSave = ref<Partial<Transaction>>({})
+  const transactionToSave = ref<Partial<Transaction>>({
+    transactioTypeId: TransactionTypes.INCOME,
+    date: new Date(),
+  })
   const transactions = ref<Array<Transaction>>([])
 
   const incomes = ref<Array<Transaction>>([])
@@ -58,13 +57,12 @@
     if (!transactionToSave.value.transactioTypeId) {
       return
     }
-    if (!transactionToSave.value.date) {
-      return
-    }
-    if (!transactionToSave.value.name) {
-      return
-    }
-    if (!transactionToSave.value.value) {
+    if (
+      !transactionToSave.value.date ||
+      !transactionToSave.value.name ||
+      !transactionToSave.value.value ||
+      !transactionToSave.value.transactioTypeId
+    ) {
       return
     }
     const savedTransaction = await transactionRepository.save({
