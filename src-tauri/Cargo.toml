@@ -1,11 +1,11 @@
 [package]
-name = "app"
+name = "cash-fluence"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
-default-run = "app"
+description = "A expenses management app"
+authors = ["André Luís Maldonado Daniel"]
+license = "MIT"
+repository = "https://github.com/andrelmd/cash-fluence-app"
+default-run = "cash-fluence"
 edition = "2021"
 rust-version = "1.59"
 

@@ -1,6 +1,11 @@
 {
   "name": "cash-fluence",
   "private": true,
+  "author": {
+    "name": "André Luís Maldonado Daniel",
+    "email": "andre_lmd2@hotmail.com"
+  },
+  "license": "MIT",
   "scripts": {
     "build": "nuxt build",
     "dev": "tauri dev",
