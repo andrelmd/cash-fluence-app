@@ -1,73 +1,44 @@
 {
-  "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
-    "beforeBuildCommand": "nuxt generate",
-    "beforeDevCommand": "nuxt dev",
-    "devPath": "http://localhost:3000",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devPath": "http://localhost:1420",
     "distDir": "../dist"
   },
   "package": {
-    "productName": "finApp",
-    "version": "0.1.0"
+    "productName": "tauri-app",
+    "version": "0.0.0"
   },
   "tauri": {
     "allowlist": {
-      "path": {
-        "all": true
-      },
-      "dialog": {
-        "save": true
-      },
-      "fs": {
-        "readFile": true
+      "all": false,
+      "shell": {
+        "all": false,
+        "open": true
       }
     },
     "bundle": {
       "active": true,
-      "category": "DeveloperTool",
-      "copyright": "",
-      "deb": {
-        "depends": []
-      },
-      "externalBin": [],
+      "targets": "all",
+      "identifier": "com.tauri.dev",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
         "icons/128x128@2x.png",
         "icons/icon.icns",
         "icons/icon.ico"
-      ],
-      "identifier": "fin_app",
-      "longDescription": "",
-      "macOS": {
-        "entitlements": null,
-        "exceptionDomain": "",
-        "frameworks": [],
-        "providerShortName": null,
-        "signingIdentity": null
-      },
-      "resources": [],
-      "shortDescription": "",
-      "targets": "all",
-      "windows": {
-        "certificateThumbprint": null,
-        "digestAlgorithm": "sha256",
-        "timestampUrl": ""
-      }
+      ]
     },
     "security": {
       "csp": null
     },
-    "updater": {
-      "active": false
-    },
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
         "resizable": true,
-        "title": "FinApp",
-        "width": 800
+        "title": "tauri-app",
+        "width": 800,
+        "height": 600
       }
     ]
   }
