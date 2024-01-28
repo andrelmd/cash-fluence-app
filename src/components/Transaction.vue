@@ -1,35 +1,47 @@
 <script async setup lang="ts">
-import { TransactionModel } from "../models/TransactionModel";
-import { categories } from "../helpers/Categories";
 import { CurrencyFormatter } from "../utils/CurrencyFormatter";
-import { databaseManager } from "../configurations/DatabaseManager";
 import Logger from "../helpers/Logger";
-
+import { TransactionEntity } from "../domain/entity/transaction.entity";
+import { transactionPluginAdapter } from "../infrastruct/adapter/plugin/transaction/transaction-plugin.adapter";
+import { RemoveTransactionUseCase } from "../domain/usecases/transaction/remove-transaction.use-case.ts";
+import { GetCategoryByIdUseCase } from "../domain/usecases/category/get-category-by-id.use-case.ts";
+import { categoryPluginAdapter } from "../infrastruct/adapter/plugin/category-plugin.adapter.ts";
+const componentLogPrefix = "Transaction.vue -";
 const props = defineProps<{
-  transactionModel: TransactionModel;
-  onTransactionDeleted: () => void;
+  transaction: TransactionEntity;
+  onTransactionDeleted: (transaction: TransactionEntity) => void;
 }>();
 
+const getCategoryByIdUseCase = new GetCategoryByIdUseCase(
+  categoryPluginAdapter,
+);
+
+const category = await getCategoryByIdUseCase.execute(props.transaction.id);
 const deleteTransaction = async () => {
-  Logger.debug(
-    `Transaction.vue - deleteTransaction() - init: ${JSON.stringify(
-      props.transactionModel,
-    )}`,
+  const logPrefix = `${componentLogPrefix} deleteTransaction() -`;
+  Logger.info(
+    `${logPrefix} deleting transaction ${JSON.stringify(props.transaction)}`,
   );
-  if (!props.transactionModel.id) return;
+  try {
+    const removeTransactionUseCase = new RemoveTransactionUseCase(
+      transactionPluginAdapter,
+    );
+    await removeTransactionUseCase.execute(props.transaction.id);
 
-  await databaseManager.deleteTransaction(props.transactionModel.id);
-
-  props.onTransactionDeleted();
+    Logger.info(
+      `${logPrefix} transaction ${JSON.stringify(props.transaction)} deleted`,
+    );
+    props.onTransactionDeleted(props.transaction);
+  } catch (error) {}
 };
 </script>
 
 <template>
   <tr>
-    <td>{{ transactionModel.title }}</td>
-    <td>{{ CurrencyFormatter.format(transactionModel.value) }}</td>
-    <td>{{ new Date(transactionModel.date).toLocaleDateString() }}</td>
-    <td>{{ categories.get(transactionModel.category_id)?.title }}</td>
+    <td>{{ transaction.title }}</td>
+    <td>{{ CurrencyFormatter.format(transaction.value) }}</td>
+    <td>{{ transaction.date.toLocaleDateString() }}</td>
+    <td>{{ category.id }}</td>
 
     <td>
       <button type="button" class="btn btn-danger" @click="deleteTransaction">

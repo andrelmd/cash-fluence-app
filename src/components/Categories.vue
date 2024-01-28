@@ -1,13 +1,19 @@
 <script async setup lang="ts">
 import { ref } from "vue";
-import { databaseManager } from "../configurations/DatabaseManager";
-import { CategoryModel } from "../models/CategoryModel";
 import Logger from "../helpers/Logger";
+import { CategoryEntity } from "../domain/entity/category.entity";
+import { GetAllCategoriesUseCase } from "../domain/usecases/category/get-all-categories.use-case";
+import { categoryPluginAdapter } from "../infrastruct/adapter/plugin/category-plugin.adapter";
+import { AddCategoryUseCase } from "../domain/usecases/category/add-category.use-case.ts";
 
-const categories = ref<CategoryModel[]>([]);
+const categories = ref(new Array<CategoryEntity>());
 
 try {
-  categories.value = await databaseManager.getCategories();
+  const getAllCategoriesUseCase = new GetAllCategoriesUseCase(
+    categoryPluginAdapter,
+  );
+
+  categories.value = await getAllCategoriesUseCase.execute();
 } catch (error) {
   Logger.error(`Categories.vue - setup() - error: ${JSON.stringify(error)}`);
 }
@@ -15,9 +21,13 @@ try {
 const newTitle = ref("");
 
 const addCategory = async () => {
-  const addCategorySQL = `INSERT INTO categories (title) VALUES ('${newTitle.value}')`;
-  await databaseManager.insert(addCategorySQL);
-  categories.value = await databaseManager.getCategories();
+  const addCategoryUseCase = new AddCategoryUseCase(categoryPluginAdapter);
+
+  try {
+    await addCategoryUseCase.execute(
+      new CategoryEntity({ title: newTitle.value }),
+    );
+  } catch (error) {}
 };
 </script>
 

@@ -1,35 +1,53 @@
 <script async setup lang="ts">
 import { ref } from "vue";
-import { databaseManager } from "../configurations/DatabaseManager";
 import Logger from "../helpers/Logger";
-import { TransactionModel } from "../models/TransactionModel";
-import { TransactionClass } from "../classes/Transaction";
-import { categories } from "../helpers/Categories";
+import { TransactionEntity } from "../domain/entity/transaction.entity";
+import { AddTransactionUseCase } from "../domain/usecases/transaction/add-transaction.use-case";
+import { transactionPluginAdapter } from "../infrastruct/adapter/plugin/transaction/transaction-plugin.adapter";
+import { CategoryEntity } from "../domain/entity/category.entity";
+import { categoryPluginAdapter } from "../infrastruct/adapter/plugin/category-plugin.adapter";
+import { GetAllCategoriesUseCase } from "../domain/usecases/category/get-all-categories.use-case";
 
+const componentLogPrefix = "AddTransaction.vue -";
 const props = defineProps<{
   transactionTypeId: number;
   onTransactionAdded: () => void;
 }>();
 
 const newTransaction = ref(
-  new TransactionClass({
+  new TransactionEntity({
     typeId: props.transactionTypeId,
   }),
 );
 
+const categories = ref(new Array<CategoryEntity>());
+
+try {
+  const getAllCategoriesUseCase = new GetAllCategoriesUseCase(
+    categoryPluginAdapter,
+  );
+  categories.value = await getAllCategoriesUseCase.execute();
+} catch (error) {
+  throw error;
+}
+
 const saveTransaction = async () => {
-  Logger.debug(
-    `AddTransaction.vue - saveTransaction() - newTransactionModel: ${JSON.stringify(
-      newTransaction.value,
-    )}`,
+  const logPrefix = `${componentLogPrefix} saveTransaction() -`;
+  const addTransactionUseCase = new AddTransactionUseCase(
+    transactionPluginAdapter,
   );
   try {
-    await databaseManager.saveTransaction(
-      new TransactionModel(newTransaction.value),
+    Logger.info(
+      `${logPrefix} Adding transaction ${JSON.stringify(newTransaction.value)}`,
     );
-    props.onTransactionAdded();
+    newTransaction.value = await addTransactionUseCase.execute(
+      newTransaction.value,
+    );
+    Logger.info(
+      `${logPrefix} transaction ${JSON.stringify(newTransaction.value)} added`,
+    );
   } catch (error) {
-    Logger.error(`AddTransaction.vue - saveTransaction() - error: ${error}`);
+    Logger.info(`${logPrefix} Error while adding transaction: ${error}`);
   }
 };
 </script>

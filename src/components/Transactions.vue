@@ -1,44 +1,27 @@
 <script async setup lang="ts">
 import { ref } from "vue";
 import Logger from "../helpers/Logger";
-import { databaseManager } from "../configurations/DatabaseManager";
 import { TransactionTypes } from "../enums/TransactionTypes";
 import AddTransaction from "./AddTransaction.vue";
-import { TransactionClass } from "../classes/Transaction";
-import { typesIdByTitle } from "../helpers/TypesIdByTitle";
 import Transaction from "./Transaction.vue";
-import { TransactionModel } from "../models/TransactionModel";
+import { GetIncomeTransactionsUseCase } from "../domain/usecases/transaction/get-income-transactions.use-case.ts";
+import { GetExpenseTransactionUseCase } from "../domain/usecases/transaction/get-expense-transactions.use-case.ts";
+import { transactionPluginAdapter } from "../infrastruct/adapter/plugin/transaction/transaction-plugin.adapter";
+import { TransactionEntity } from "../domain/entity/transaction.entity";
 
-const incomes = ref(new Array<TransactionClass>());
-const expenses = ref(new Array<TransactionClass>());
-
-const getIncomes = async () => {
-  try {
-    const incomeEntities = await databaseManager.getTransactions({
-      where: { type_id: typesIdByTitle.get(TransactionTypes.INCOME) },
-    });
-    return incomeEntities.map((it) => new TransactionClass(it));
-  } catch (error) {
-    Logger.error(`Transactions.vue - getIncomes() - error: ${error}`);
-    throw error;
-  }
-};
-const getExpenses = async () => {
-  try {
-    const expenseEntities = await databaseManager.getTransactions({
-      where: { type_id: typesIdByTitle.get(TransactionTypes.EXPENSE) },
-    });
-    return expenseEntities.map((it) => new TransactionClass(it));
-  } catch (error) {
-    Logger.error(`Transactions.vue - getExpenses() - error: ${error}`);
-    throw error;
-  }
-};
+const getIncomeTransactionsUseCase = new GetIncomeTransactionsUseCase(
+  transactionPluginAdapter,
+);
+const getExpenseTransactionUseCase = new GetExpenseTransactionUseCase(
+  transactionPluginAdapter,
+);
+const incomes = ref(new Array<TransactionEntity>());
+const expenses = ref(new Array<TransactionEntity>());
 
 try {
   Logger.debug("Transactions.vue - setup() - init");
-  incomes.value = await getIncomes();
-  expenses.value = await getExpenses();
+  incomes.value = await getIncomeTransactionsUseCase.execute();
+  expenses.value = await getExpenseTransactionUseCase.execute();
 
   Logger.debug(
     `Transactions.vue - setup() - init - incomes: ${JSON.stringify(
@@ -55,13 +38,13 @@ try {
 }
 
 const onTransactionAdded = async () => {
-  incomes.value = await getIncomes();
-  expenses.value = await getExpenses();
+  incomes.value = await getIncomeTransactionsUseCase.execute();
+  expenses.value = await getExpenseTransactionUseCase.execute();
 };
 
 const onTransactionDeleted = async () => {
-  incomes.value = await getIncomes();
-  expenses.value = await getExpenses();
+  incomes.value = await getIncomeTransactionsUseCase.execute();
+  expenses.value = await getExpenseTransactionUseCase.execute();
 };
 
 try {
@@ -76,7 +59,7 @@ try {
     <h2>Receitas</h2>
     <div>
       <AddTransaction
-        :transactionTypeId="typesIdByTitle.get(TransactionTypes.INCOME)!"
+        :transactionTypeId="TransactionTypes.INCOME"
         :onTransactionAdded="onTransactionAdded"
       />
       <table>
@@ -88,7 +71,7 @@ try {
         </thead>
         <tbody v-for="income in incomes" :key="income.id">
           <Transaction
-            :transactionModel="new TransactionModel(income)"
+            :transaction="income"
             :onTransactionDeleted="onTransactionDeleted"
           />
         </tbody>
@@ -97,7 +80,7 @@ try {
     <h2>Despesas</h2>
     <div>
       <AddTransaction
-        :transactionTypeId="typesIdByTitle.get(TransactionTypes.EXPENSE)!"
+        :transactionTypeId="TransactionTypes.EXPENSE"
         :onTransactionAdded="onTransactionAdded"
       />
     </div>
@@ -110,7 +93,7 @@ try {
       </thead>
       <tbody v-for="expense in expenses" :key="expense.id">
         <Transaction
-          :transactionModel="new TransactionModel(expense)"
+          :transaction="expense"
           :onTransactionDeleted="onTransactionDeleted"
         />
       </tbody>

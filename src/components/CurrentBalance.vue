@@ -1,23 +1,18 @@
 <script async setup lang="ts">
 import { ref } from "vue";
-import { databaseManager } from "../configurations/DatabaseManager";
 import { CurrencyFormatter } from "../utils/CurrencyFormatter";
-import Logger from "../helpers/Logger";
+import { transactionPluginAdapter } from "../infrastruct/adapter/plugin/transaction/transaction-plugin.adapter";
+import { GetCurrentBalanceUseCase } from "../domain/usecases/transaction/get-current-balance.use-case.ts";
+const currentBalance = ref(0);
 
-const sumTransactionsSQL = `
-  SELECT SUM(CASE WHEN t.type_id = out_type.id THEN -t.value ELSE t.value END) as total_value
-  FROM transactions t
-  JOIN types out_type ON out_type.title = 'Saída';
-`;
-const currentBalance = ref<number>(0);
 try {
-  const result = await databaseManager.selectOne<{ total_value: number }>(
-    sumTransactionsSQL,
+  const getCurrentBalanceUseCase = new GetCurrentBalanceUseCase(
+    transactionPluginAdapter,
   );
 
-  if (result.total_value !== null) currentBalance.value = result.total_value;
+  currentBalance.value = await getCurrentBalanceUseCase.execute();
 } catch (error) {
-  Logger.error(JSON.stringify(error));
+  throw error;
 }
 </script>
 
