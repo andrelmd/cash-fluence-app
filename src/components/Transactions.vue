@@ -1,67 +1,22 @@
 <script async setup lang="ts">
 import { ref } from "vue";
-import Logger from "../helpers/Logger";
 import { TransactionTypes } from "../enums/TransactionTypes";
+import { useTransactionStore } from "../stores/transaction.store";
 import AddTransaction from "./AddTransaction.vue";
 import Transaction from "./Transaction.vue";
-import { GetIncomeTransactionsUseCase } from "../domain/usecases/transaction/get-income-transactions.use-case.ts";
-import { GetExpenseTransactionUseCase } from "../domain/usecases/transaction/get-expense-transactions.use-case.ts";
-import { transactionPluginAdapter } from "../infrastruct/adapter/plugin/transaction/transaction-plugin.adapter";
-import { TransactionEntity } from "../domain/entity/transaction.entity";
 
-const getIncomeTransactionsUseCase = new GetIncomeTransactionsUseCase(
-  transactionPluginAdapter,
-);
-const getExpenseTransactionUseCase = new GetExpenseTransactionUseCase(
-  transactionPluginAdapter,
-);
-const incomes = ref(new Array<TransactionEntity>());
-const expenses = ref(new Array<TransactionEntity>());
+const transactionStore = useTransactionStore();
+const page = ref(0);
+const limit = ref(999);
+await transactionStore.getTransactions(page.value, limit.value);
 
-try {
-  Logger.debug("Transactions.vue - setup() - init");
-  incomes.value = await getIncomeTransactionsUseCase.execute();
-  expenses.value = await getExpenseTransactionUseCase.execute();
-
-  Logger.debug(
-    `Transactions.vue - setup() - init - incomes: ${JSON.stringify(
-      incomes.value,
-    )}`,
-  );
-  Logger.debug(
-    `Transactions.vue - setup() - init - expenses: ${JSON.stringify(
-      expenses.value,
-    )}`,
-  );
-} catch (error) {
-  Logger.error(`Transactions.vue - setup() - error: ${error}`);
-}
-
-const onTransactionAdded = async () => {
-  incomes.value = await getIncomeTransactionsUseCase.execute();
-  expenses.value = await getExpenseTransactionUseCase.execute();
-};
-
-const onTransactionDeleted = async () => {
-  incomes.value = await getIncomeTransactionsUseCase.execute();
-  expenses.value = await getExpenseTransactionUseCase.execute();
-};
-
-try {
-  await onTransactionAdded();
-} catch (error) {
-  Logger.error(`Transactions.vue - onTransactionAdded() - error: ${error}`);
-}
 </script>
 
 <template>
   <div class="container">
     <h2>Receitas</h2>
     <div>
-      <AddTransaction
-        :transactionTypeId="TransactionTypes.INCOME"
-        :onTransactionAdded="onTransactionAdded"
-      />
+      <AddTransaction :transactionTypeId="TransactionTypes.INCOME" />
       <table>
         <thead>
           <th>Titulo</th>
@@ -69,20 +24,14 @@ try {
           <th>Data</th>
           <th>Categoria</th>
         </thead>
-        <tbody v-for="income in incomes" :key="income.id">
-          <Transaction
-            :transaction="income"
-            :onTransactionDeleted="onTransactionDeleted"
-          />
+        <tbody v-for="income in transactionStore.incomes" :key="income.id">
+          <Transaction :transaction="income" />
         </tbody>
       </table>
     </div>
     <h2>Despesas</h2>
     <div>
-      <AddTransaction
-        :transactionTypeId="TransactionTypes.EXPENSE"
-        :onTransactionAdded="onTransactionAdded"
-      />
+      <AddTransaction :transactionTypeId="TransactionTypes.EXPENSE" />
     </div>
     <table>
       <thead>
@@ -91,11 +40,8 @@ try {
         <th>Data</th>
         <th>Categoria</th>
       </thead>
-      <tbody v-for="expense in expenses" :key="expense.id">
-        <Transaction
-          :transaction="expense"
-          :onTransactionDeleted="onTransactionDeleted"
-        />
+      <tbody v-for="expense in  transactionStore.expenses" :key="expense.id">
+        <Transaction :transaction="expense" />
       </tbody>
     </table>
   </div>

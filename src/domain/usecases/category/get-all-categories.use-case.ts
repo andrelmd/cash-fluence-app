@@ -1,9 +1,9 @@
-import { CategoryGateway } from "../../gateway/category.gateway";
+import { GetCategoriesGateway } from "../../gateway/category/get-categories.gateway"
 
-export class GetAllCategoriesUseCase {
-  constructor(private readonly categoryGateway: CategoryGateway) {}
+export class GetCategoriesUseCase {
+  constructor(private readonly categoryGateway: GetCategoriesGateway) {}
 
   execute() {
-    return this.categoryGateway.getAllCategories();
+    return this.categoryGateway.getCategories()
   }
 }

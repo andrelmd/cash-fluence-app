@@ -1,9 +1,11 @@
-import { TransactionGateway } from "../../gateway/transaction.gateway";
+import { GetExpenseTransactionsGateway } from "../../gateway/transaction/get-expense-transactions.gateway";
 
-export class GetExpenseTransactionUseCase {
-  constructor(private readonly transactionGateway: TransactionGateway) {}
+export class GetExpenseTransactionsUseCase {
+  constructor(
+    private readonly transactionGateway: GetExpenseTransactionsGateway
+  ) {}
 
-  async execute() {
-    return this.transactionGateway.getExpenseTransactions();
+  async execute(page: number, limit: number) {
+    return this.transactionGateway.getExpenseTransactions(page, limit);
   }
 }

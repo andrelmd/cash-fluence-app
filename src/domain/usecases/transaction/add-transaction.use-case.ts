@@ -1,12 +1,12 @@
-import { TransactionEntity } from "../../entity/transaction.entity";
-import { TransactionGateway } from "../../gateway/transaction.gateway";
+import { TransactionEntity } from "../../entity/transaction.entity"
+import { AddTransactionGateway } from "../../gateway/transaction/add-transaction.gateway"
 
 export class AddTransactionUseCase {
-  constructor(private readonly transactionGateway: TransactionGateway) {}
+  constructor(private readonly transactionGateway: AddTransactionGateway) {}
 
   execute(
-    transaction: TransactionEntity,
+    transaction: TransactionEntity
   ): TransactionEntity | Promise<TransactionEntity> {
-    return this.transactionGateway.addTransaction(transaction);
+    return this.transactionGateway.addTransaction(transaction)
   }
 }

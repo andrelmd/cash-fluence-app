@@ -1,4 +1,4 @@
-import { CategoryGateway } from "../../gateway/category.gateway";
+import { CategoryGateway } from "../../gateway/category/category.gateway";
 
 export class GetCategoryByIdUseCase {
   constructor(private readonly categoryGateway: CategoryGateway) {}
