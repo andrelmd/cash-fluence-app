@@ -1,1 +1,7 @@
-
+:root {
+  --primary-color: #74a2c7;
+  --info: #3b3d4f;
+  --success: #58ab74;
+  --warnuing: #d59b3c;
+  --danger: #f44336;
+}

@@ -17,6 +17,7 @@ const addCategory = async () => {
 <template>
   <div class="container">
     <h2>Categorias</h2>
+
     <form class="row g-3" @submit.prevent="addCategory">
       <div class="col-auto">
         <label for="inputCategory" class="visually-hidden">Categoria</label>
@@ -26,8 +27,29 @@ const addCategory = async () => {
         <button type="submit" class="btn btn-primary mb-3">Adicionar</button>
       </div>
     </form>
-    <div v-for="category of categoryStore.categories" :key="category.id">
-      <p>{{ category.title }}</p>
-    </div>
+    <table>
+      <tr v-for="category, index of categoryStore.categories" :key="category.id" :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
+        {{ category.title }}
+      </tr>
+    </table>
   </div>
 </template>
+
+<style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 1px;
+}
+</style>

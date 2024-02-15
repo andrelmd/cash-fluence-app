@@ -3,26 +3,33 @@ import { ref } from 'vue';
 import { TransactionEntity } from '../domain/entity/transaction.entity';
 import { useCategoryStore } from '../stores/category.store';
 import { useTransactionStore } from '../stores/transaction.store';
+import Logger from '../helpers/Logger';
 const props = defineProps<{
   transactionTypeId: number;
 }>();
 
 const transactionTitle = ref("");
 const transactionAmount = ref(0);
-const transactionDate = ref(new Date());
+const transactionDate = ref('');
 const transactionCategoryId = ref(1);
 const transactionTypeId = ref(props.transactionTypeId);
 const transactionStore = useTransactionStore();
 const categoryStore = useCategoryStore();
 
 const saveTransaction = async () => {
-  await transactionStore.addTransaction(new TransactionEntity({
-    title: transactionTitle.value,
-    amount: transactionAmount.value,
-    date: transactionDate.value,
-    categoryId: transactionCategoryId.value,
-    typeId: transactionTypeId.value,
-  }));
+  Logger.debug("Saving transaction");
+  try {
+    await transactionStore.addTransaction(new TransactionEntity({
+      title: transactionTitle.value,
+      amount: transactionAmount.value,
+      date: new Date(transactionDate.value),
+      categoryId: transactionCategoryId.value,
+      typeId: transactionTypeId.value,
+    }));
+
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 </script>
@@ -48,7 +55,7 @@ const saveTransaction = async () => {
         </option>
       </select>
     </div>
-    <button type="submit" :disabled="!transactionTitle ||
+    <button class="btn" type="submit" :disabled="!transactionTitle ||
       !transactionAmount ||
       !transactionDate ||
       !transactionCategoryId
@@ -57,3 +64,16 @@ const saveTransaction = async () => {
     </button>
   </form>
 </template>
+
+<style scoped>
+form {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: var(--info);
+  color: var(--info);
+  margin: 10px;
+}
+</style>

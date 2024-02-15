@@ -14,9 +14,31 @@ await transactionStore.getTransactions(page.value, limit.value);
 
 <template>
   <div class="container">
-    <h2>Receitas</h2>
-    <div>
-      <AddTransaction :transactionTypeId="TransactionTypes.INCOME" />
+    <div class="income-container">
+      <h2>Receitas</h2>
+      <div>
+        <AddTransaction :transactionTypeId="TransactionTypes.INCOME" />
+        <table>
+          <thead>
+            <th>Titulo</th>
+            <th>Valor</th>
+            <th>Data</th>
+            <th>Categoria</th>
+          </thead>
+          <tbody>
+            <tr v-for="income, index in transactionStore.incomes" :key="income.id"
+              :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
+              <Transaction :transaction="income" />
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="expense-container">
+      <h2>Despesas</h2>
+      <div>
+        <AddTransaction :transactionTypeId="TransactionTypes.EXPENSE" />
+      </div>
       <table>
         <thead>
           <th>Titulo</th>
@@ -24,25 +46,22 @@ await transactionStore.getTransactions(page.value, limit.value);
           <th>Data</th>
           <th>Categoria</th>
         </thead>
-        <tbody v-for="income in transactionStore.incomes" :key="income.id">
-          <Transaction :transaction="income" />
+        <tbody>
+          <tr v-for="expense in transactionStore.expenses" :key="expense.id">
+            <Transaction :transaction="expense" />
+          </tr>
         </tbody>
       </table>
     </div>
-    <h2>Despesas</h2>
-    <div>
-      <AddTransaction :transactionTypeId="TransactionTypes.EXPENSE" />
-    </div>
-    <table>
-      <thead>
-        <th>Titulo</th>
-        <th>Valor</th>
-        <th>Data</th>
-        <th>Categoria</th>
-      </thead>
-      <tbody v-for="expense in  transactionStore.expenses" :key="expense.id">
-        <Transaction :transaction="expense" />
-      </tbody>
-    </table>
+
   </div>
 </template>
+
+<style scoped>
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+</style>
