@@ -18,22 +18,25 @@ const deleteTransaction = async () => {
 </script>
 
 <template>
-  <tr>
-    <td>{{ transaction.title }}</td>
-    <td>{{ CurrencyFormatter.format(transaction.amount) }}</td>
-    <td>{{ `${transaction.date.getDate().toString().padStart(2, '0')}/${(transaction.date.getMonth()
-      + 1).toString().padStart(2,
-        '0')}/${transaction.date.getFullYear()}` }}
-    </td>
-    <td>{{ categoryStore.categories.find(it => it.id === transaction.categoryId)?.title }}</td>
+  <td>{{ transaction.title }}</td>
+  <td>{{ CurrencyFormatter.format(transaction.amount) }}</td>
+  <td>{{ `${transaction.date.getDate().toString().padStart(2, '0')}/${(transaction.date.getMonth()
+    + 1).toString().padStart(2,
+      '0')}/${transaction.date.getFullYear()}` }}
+  </td>
+  <td>{{ categoryStore.categories.find(it => it.id === transaction.categoryId)?.title }}</td>
 
-    <td>
-      <button type="button" class="btn btn-danger" @click="deleteTransaction">
-        Excluir
-      </button>
-    </td>
-  </tr>
+  <td>
+    <button type="button" class="btn btn-danger" @click="deleteTransaction">
+      Excluir
+    </button>
+  </td>
 </template>
 
 
-<style scoped></style>
+<style scoped>
+td {
+  text-align: center;
+  padding: 3px;
+}
+</style>

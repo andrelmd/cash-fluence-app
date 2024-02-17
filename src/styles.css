@@ -2,6 +2,27 @@
   --primary-color: #74a2c7;
   --info: #3b3d4f;
   --success: #58ab74;
-  --warnuing: #d59b3c;
+  --warning: #d59b3c;
   --danger: #f44336;
+}
+
+.btn {
+  border: none;
+  background-color: darkgray;
+  text-transform: uppercase;
+  color: white;
+  border-radius: 3px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: white;
 }

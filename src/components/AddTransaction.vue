@@ -11,10 +11,10 @@ const props = defineProps<{
 const transactionTitle = ref("");
 const transactionAmount = ref(0);
 const transactionDate = ref('');
-const transactionCategoryId = ref(1);
 const transactionTypeId = ref(props.transactionTypeId);
 const transactionStore = useTransactionStore();
 const categoryStore = useCategoryStore();
+const transactionCategoryId = ref(categoryStore.categories[0].id);
 
 const saveTransaction = async () => {
   Logger.debug("Saving transaction");
@@ -36,26 +36,29 @@ const saveTransaction = async () => {
 
 <template>
   <form @submit.prevent="saveTransaction">
-    <div>
-      <label for="title">Título</label>
-      <input type="text" id="title" placeholder="Título" v-model="transactionTitle" />
+    <div class="input-row">
+      <div>
+        <label for="title">Título</label>
+        <input type="text" id="title" placeholder="Título" v-model="transactionTitle" />
+      </div>
+      <div>
+        <label for="amount">Valor</label>
+        <input type="number" id="amount" placeholder="Valor" v-model="transactionAmount" />
+      </div>
+      <div>
+        <label for="date">Data</label>
+        <input type="date" id="date" placeholder="Data" v-model="transactionDate" />
+      </div>
+      <div>
+        <label for="category">Categoria</label>
+        <select id="category" v-model="transactionCategoryId">
+          <option v-for="category of categoryStore.categories" :value="category.id">
+            {{ category.title }}
+          </option>
+        </select>
+      </div>
     </div>
-    <div>
-      <label for="value">Valor</label>
-      <input type="number" id="amount" placeholder="Valor" v-model="transactionAmount" />
-    </div>
-    <div>
-      <label for="date">Data</label>
-      <input type="date" id="date" placeholder="Data" v-model="transactionDate" />
-    </div>
-    <div>
-      <select v-model="transactionCategoryId">
-        <option v-for="category of categoryStore.categories" :value="category.id">
-          {{ category.title }}
-        </option>
-      </select>
-    </div>
-    <button class="btn" type="submit" :disabled="!transactionTitle ||
+    <button class="btn btn-primary" type="submit" :disabled="!transactionTitle ||
       !transactionAmount ||
       !transactionDate ||
       !transactionCategoryId
@@ -67,13 +70,24 @@ const saveTransaction = async () => {
 
 <style scoped>
 form {
+  display: inline-block;
+  color: var(--info)
+}
+
+.input-row {
   display: flex;
-  flex-direction: row;
-  gap: 10px;
-  padding: 10px;
-  border-radius: 8px;
-  background-color: var(--info);
-  color: var(--info);
-  margin: 10px;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.input-row > div {
+  flex: 1;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  
 }
 </style>

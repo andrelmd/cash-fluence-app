@@ -17,6 +17,10 @@ await transactionStore.getCurrentBalance();
 </template>
 
 <style scoped>
+.container {
+  background-color: white;
+  width: 75%;
+}
 h3 {
   font-weight: bold;
   text-align: center;

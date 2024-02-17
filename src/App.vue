@@ -6,7 +6,7 @@ import Transactions from "./components/Transactions.vue";
 </script>
 
 <template>
-  <div >
+  <div>
     <!-- Heading -->
     <div class="heading">
       <Suspense><template #default>
@@ -23,7 +23,9 @@ import Transactions from "./components/Transactions.vue";
     <div>
       <Suspense>
         <template #default>
-          <Transactions />
+          <div class="center">
+            <Transactions />
+          </div>
         </template>
         <template #fallback>
           <div>
@@ -52,23 +54,18 @@ body {
   background-color: var(--info);
   color: var(--info);
 }
-.container {
-  background-color: white;
-  border-radius: 10px;
-  align-items: center;
-  justify-content: center;
-  display: flex;
-  margin: 8px;
-}
 
-.row-even {
-  background-color: var(--success);
-  width: 100%;
-}
-tbody {
-  width: 100%;
-}
-.row-odd {
-  background-color: var(--danger);
+.heading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0px;
+  border-radius: 5px;
+} 
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

@@ -28,28 +28,12 @@ const addCategory = async () => {
       </div>
     </form>
     <table>
-      <tr v-for="category, index of categoryStore.categories" :key="category.id" :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
+      <tr v-for="category, index of categoryStore.categories" :key="category.id"
+        :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
         {{ category.title }}
       </tr>
     </table>
   </div>
 </template>
 
-<style scoped>
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-form {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 1px;
-}
-</style>
+<style scoped></style>

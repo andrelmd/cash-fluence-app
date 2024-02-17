@@ -24,6 +24,7 @@ await transactionStore.getTransactions(page.value, limit.value);
             <th>Valor</th>
             <th>Data</th>
             <th>Categoria</th>
+            <th></th>
           </thead>
           <tbody>
             <tr v-for="income, index in transactionStore.incomes" :key="income.id"
@@ -45,6 +46,7 @@ await transactionStore.getTransactions(page.value, limit.value);
           <th>Valor</th>
           <th>Data</th>
           <th>Categoria</th>
+          <th></th>
         </thead>
         <tbody>
           <tr v-for="expense in transactionStore.expenses" :key="expense.id">
@@ -60,8 +62,54 @@ await transactionStore.getTransactions(page.value, limit.value);
 <style scoped>
 .container {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
+  width: 75%;
+  justify-content: space-around;
+  padding: 50px 20px;
+  border-radius: 5px;
 }
+
+.income-container {
+  border-radius: 8px;
+  background-color: white;
+  border: 2px solid var(--info);
+  width: 50%;
+  margin: 10px 10px;
+}
+
+.income-container h2 {
+  color: var(--info);
+  text-align: center;
+}
+
+.expense-container {
+  border-radius: 8px;
+  background-color: white;
+  border: 2px solid var(--info);
+  width: 50%;
+  margin: 10px 10px;
+}
+
+.expense-container h2 {
+  color: var(--info);
+  text-align: center;
+}
+
+table {
+  width: 100%;
+  border-radius: 10px;
+  border-collapse: collapse;
+}
+
+th {
+  color: var(--info);
+  padding: 10px;
+  text-align: center;
+  width: 100%;
+}
+
+tr {
+  border-bottom: 1px solid lightgray;
+}
+
+
 </style>
