@@ -33,10 +33,3 @@ const deleteTransaction = async () => {
   </td>
 </template>
 
-
-<style scoped>
-td {
-  text-align: center;
-  padding: 3px;
-}
-</style>

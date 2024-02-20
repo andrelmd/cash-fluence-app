@@ -4,6 +4,12 @@
   --success: #58ab74;
   --warning: #d59b3c;
   --danger: #f44336;
+  --arrow-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>');
+}
+
+body {
+  background-color: var(--info);
+  color: white;
 }
 
 .btn {
@@ -25,4 +31,36 @@
 .btn-danger {
   background-color: var(--danger);
   color: white;
+}
+
+label {
+  color: var(--info);
+  font-weight: bold;
+}
+
+.input-default {
+  border: none;
+  border-radius: 0px;
+  border-bottom: 1px solid lightgray;
+  background-color: transparent;
+  color: var(--info);
+  outline: none;
+  padding: 5px;
+}
+
+select {
+  appearance: none;
+  border: 0;
+  outline: 0;
+  font: inherit;
+}
+
+.select-default {
+  color: white;
+  text-align: center;
+  text-align-last: center;
+  cursor: pointer;
+  background-color: darkgray !important;
+  padding: 5px;
+  background: var(--arrow-icon) no-repeat right 0.7em top 50% / 1em 1em white;
 }

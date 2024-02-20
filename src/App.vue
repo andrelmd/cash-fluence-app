@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import Categories from "./components/Categories.vue";
-import CurrentBalance from "./components/CurrentBalance.vue";
-import Transactions from "./components/Transactions.vue";
+import CategoriesComponent from "./components/categories.component.vue";
+import CurrentBalanceComponent from "./components/current-balance.component.vue";
+import TransactionsComponent from "./components/transactions.component.vue";
 
 </script>
 
 <template>
-  <div>
+  <div class="container">
     <!-- Heading -->
-    <div class="heading">
-      <Suspense><template #default>
-          <CurrentBalance />
+    <div>
+      <Suspense>
+        <template #default>
+          <CurrentBalanceComponent />
         </template>
         <template #fallback>
           <div>
@@ -24,7 +25,7 @@ import Transactions from "./components/Transactions.vue";
       <Suspense>
         <template #default>
           <div class="center">
-            <Transactions />
+            <TransactionsComponent />
           </div>
         </template>
         <template #fallback>
@@ -37,7 +38,7 @@ import Transactions from "./components/Transactions.vue";
     <div>
       <Suspense>
         <template #default>
-          <Categories />
+          <CategoriesComponent />
         </template>
         <template #fallback>
           <div>
@@ -49,23 +50,10 @@ import Transactions from "./components/Transactions.vue";
   </div>
 </template>
 
-<style>
-body {
-  background-color: var(--info);
-  color: var(--info);
-}
-
-.heading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 20px 0px;
-  border-radius: 5px;
-} 
-
-.center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+<style scoped>
+.container {
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
 }
 </style>

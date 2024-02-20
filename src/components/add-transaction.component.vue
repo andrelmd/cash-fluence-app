@@ -1,9 +1,9 @@
 <script async setup lang="ts">
 import { ref } from 'vue';
 import { TransactionEntity } from '../domain/entity/transaction.entity';
+import Logger from '../helpers/Logger';
 import { useCategoryStore } from '../stores/category.store';
 import { useTransactionStore } from '../stores/transaction.store';
-import Logger from '../helpers/Logger';
 const props = defineProps<{
   transactionTypeId: number;
 }>();
@@ -14,7 +14,7 @@ const transactionDate = ref('');
 const transactionTypeId = ref(props.transactionTypeId);
 const transactionStore = useTransactionStore();
 const categoryStore = useCategoryStore();
-const transactionCategoryId = ref(categoryStore.categories[0].id);
+const transactionCategoryId = ref(0);
 
 const saveTransaction = async () => {
   Logger.debug("Saving transaction");
@@ -39,19 +39,19 @@ const saveTransaction = async () => {
     <div class="input-row">
       <div>
         <label for="title">Título</label>
-        <input type="text" id="title" placeholder="Título" v-model="transactionTitle" />
+        <input class="input-default" type="text" id="title" placeholder="Título" v-model="transactionTitle" />
       </div>
       <div>
         <label for="amount">Valor</label>
-        <input type="number" id="amount" placeholder="Valor" v-model="transactionAmount" />
+        <input class="input-default" type="number" id="amount" placeholder="Valor" v-model="transactionAmount" />
       </div>
       <div>
         <label for="date">Data</label>
-        <input type="date" id="date" placeholder="Data" v-model="transactionDate" />
+        <input class="input-default" type="date" id="date" placeholder="Data" v-model="transactionDate" />
       </div>
       <div>
         <label for="category">Categoria</label>
-        <select id="category" v-model="transactionCategoryId">
+        <select class="select-default" id="category" v-model="transactionCategoryId">
           <option v-for="category of categoryStore.categories" :value="category.id">
             {{ category.title }}
           </option>
@@ -70,24 +70,34 @@ const saveTransaction = async () => {
 
 <style scoped>
 form {
-  display: inline-block;
-  color: var(--info)
+  display: flex;
 }
 
 .input-row {
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  align-items: flex-start;
+  flex-direction: row;
 }
 
-.input-row > div {
-  flex: 1;
+.input-row div {
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: left;
 }
 
 label {
-  display: block;
-  margin-bottom: 0.5rem;
-  
+  float: left;
+  margin-right: 20px;  
+}
+
+input {
+  float:left;
+}
+
+button {
+  margin: 10px;
 }
 </style>
+
+

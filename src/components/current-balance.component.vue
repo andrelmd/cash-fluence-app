@@ -10,26 +10,23 @@ await transactionStore.getCurrentBalance();
   <div class="container">
     <div>
       <h2>Seu saldo Atual</h2>
-      <h3 :style="(transactionStore.currentBalance >= 0 ? { 'color': 'var(--success)' } : { 'color': 'var(--danger)' })">{{
-        CurrencyFormatter.format(transactionStore.currentBalance) }}</h3>
+      <h2 :style="(transactionStore.currentBalance >= 0 ? { 'color': 'var(--success)' } : { 'color': 'var(--danger)' })">
+        {{
+          CurrencyFormatter.format(transactionStore.currentBalance) }}</h2>
     </div>
   </div>
 </template>
 
 <style scoped>
 .container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  margin-bottom: 50px;
+  border-radius: 10px;
   background-color: white;
-  width: 75%;
-}
-h3 {
-  font-weight: bold;
-  text-align: center;
-  margin: 0px 0px 10px 0px;
-}
-
-h2 {
   color: var(--info);
-  text-align: center;
-  margin: 10px 0px 0px 0px;
 }
 </style>
+

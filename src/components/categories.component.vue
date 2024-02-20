@@ -18,18 +18,17 @@ const addCategory = async () => {
   <div class="container">
     <h2>Categorias</h2>
 
-    <form class="row g-3" @submit.prevent="addCategory">
-      <div class="col-auto">
-        <label for="inputCategory" class="visually-hidden">Categoria</label>
-        <input type="text" class="form-control" id="inputCategory" placeholder="Categoria" v-model="title" />
+    <form @submit.prevent="addCategory">
+      <div>
+        <label for="inputCategory">Categoria</label>
+        <input type="text" id="inputCategory" placeholder="Categoria" v-model="title" />
       </div>
-      <div class="col-auto">
-        <button type="submit" class="btn btn-primary mb-3">Adicionar</button>
+      <div>
+        <button type="submit" class="btn btn-primary">Adicionar</button>
       </div>
     </form>
     <table>
-      <tr v-for="category, index of categoryStore.categories" :key="category.id"
-        :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
+      <tr v-for="category of categoryStore.categories" :key="category.id">
         {{ category.title }}
       </tr>
     </table>
