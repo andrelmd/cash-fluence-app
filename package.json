@@ -13,7 +13,8 @@
     "@tauri-apps/api": "^1.5.2",
     "pinia": "^2.1.7",
     "tauri-plugin-sql-api": "github:tauri-apps/tauri-plugin-sql#v1",
-    "vue": "^3.3.4"
+    "vue": "^3.3.4",
+    "vuetify": "^3.5.13"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.5.8",

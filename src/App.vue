@@ -6,9 +6,9 @@ import TransactionsComponent from "./components/transactions.component.vue";
 </script>
 
 <template>
-  <div class="container">
+  <v-container>
     <!-- Heading -->
-    <div>
+    <v-layout align-center justify-center>
       <Suspense>
         <template #default>
           <CurrentBalanceComponent />
@@ -19,12 +19,13 @@ import TransactionsComponent from "./components/transactions.component.vue";
           </div>
         </template>
       </Suspense>
-    </div>
+    </v-layout>
+
     <!-- Body -->
-    <div>
+    <v-layout>
       <Suspense>
         <template #default>
-          <div class="center">
+          <div>
             <TransactionsComponent />
           </div>
         </template>
@@ -34,8 +35,8 @@ import TransactionsComponent from "./components/transactions.component.vue";
           </div>
         </template>
       </Suspense>
-    </div>
-    <div>
+    </v-layout>
+    <v-layout>
       <Suspense>
         <template #default>
           <CategoriesComponent />
@@ -46,14 +47,8 @@ import TransactionsComponent from "./components/transactions.component.vue";
           </div>
         </template>
       </Suspense>
-    </div>
-  </div>
+    </v-layout>
+  </v-container>
 </template>
 
-<style scoped>
-.container {
-  margin-left: auto;
-  margin-right: auto;
-  width: 90%;
-}
-</style>
+<style scoped></style>

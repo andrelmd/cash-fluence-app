@@ -3,6 +3,7 @@ import { TransactionEntity } from "../domain/entity/transaction.entity";
 import { useCategoryStore } from "../stores/category.store";
 import { useTransactionStore } from "../stores/transaction.store";
 import { CurrencyFormatter } from "../utils/CurrencyFormatter";
+
 const props = defineProps<{
   transaction: TransactionEntity;
 }>();
@@ -27,9 +28,7 @@ const deleteTransaction = async () => {
   <td>{{ categoryStore.categories.find(it => it.id === transaction.categoryId)?.title }}</td>
 
   <td>
-    <button type="button" class="btn btn-danger" @click="deleteTransaction">
-      Excluir
-    </button>
+    <v-btn @click="deleteTransaction">
+    </v-btn>
   </td>
 </template>
-

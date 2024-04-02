@@ -13,44 +13,30 @@ await transactionStore.getTransactions(page.value, limit.value);
 </script>
 
 <template>
-  <div class="container">
-    <div class="transactions">
-      <h2>Receitas</h2>
-      <div>
-        <AddTransactionComponent :transactionTypeId="TransactionTypes.INCOME" />
-
-        <TransactionListComponent :transactions="transactionStore.incomes" />
-      </div>
-    </div>
-    <div class="transactions">
-      <h2>Despesas</h2>
-      <div>
-        <AddTransactionComponent :transactionTypeId="TransactionTypes.EXPENSE" />
-      </div>
-      <TransactionListComponent :transactions="transactionStore.expenses" />
-    </div>
-
-  </div>
+  <v-container>
+    <v-row>
+      <v-col col="1">
+        <v-card>
+          <v-card-title>
+            <h2>Receitas</h2>
+          </v-card-title>
+          <v-card-text>
+            <AddTransactionComponent :transactionTypeId="TransactionTypes.INCOME" />
+            <TransactionListComponent :transactions="transactionStore.incomes" />
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col col="1">
+        <v-card>
+          <v-card-title>
+            <h2>Despesas</h2>
+          </v-card-title>
+          <v-card-text>
+            <AddTransactionComponent :transactionTypeId="TransactionTypes.EXPENSE" />
+            <TransactionListComponent :transactions="transactionStore.expenses" />
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
-
-<style scoped>
-.container {
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  border-radius: 10px;
-  text-align: center;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  margin-bottom: 50px;
-}
-
-.transactions {
-  background-color: white;
-  color: var(--info);
-  border-radius: 10px;
-  padding: 50px;
-}
-</style>
-

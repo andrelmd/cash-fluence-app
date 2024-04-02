@@ -9,35 +9,20 @@ defineProps<{
 </script>
 
 <template>
-    <table>
+    <v-table height="300px">
         <thead>
-            <th>Titulo</th>
-            <th>Valor</th>
-            <th>Data</th>
-            <th>Categoria</th>
-            <th></th>
+            <tr>
+                <th>Titulo</th>
+                <th>Valor</th>
+                <th>Data</th>
+                <th>Categoria</th>
+                <th></th>
+            </tr>
         </thead>
         <tbody>
             <tr v-for="transaction in $props.transactions" :key="transaction.id">
                 <TransactionComponent :transaction="transaction" />
             </tr>
         </tbody>
-    </table>
+    </v-table>
 </template>
-
-<style scoped>
-table {
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    border-collapse: collapse;
-    overflow-y: auto;
-    max-height: 20px;
-    color: var(--info);
-}
-
-tr {
-    width: 100%;
-    border-bottom: 2px darkgray solid;
-}
-</style>
