@@ -1,10 +1,14 @@
 import Database, { QueryResult } from "@tauri-apps/plugin-sql";
 import { Logger } from "../../logger/logger.class";
-import { DatabaseAdapter, IDeleteOptions, ISaveOptions, ISelectOptions, IUpdateOptions } from "../types/database.types";
-import { DataMapper } from "./data-mapper";
-import { QueryBuilder } from "./query-builder";
+import { DataMapper } from "../helpers/data-mapper";
+import { QueryBuilder } from "../helpers/query-builder";
+import { IDatabaseAdapter } from "../interfaces/database-adapter.interface";
+import { IDeleteOptions } from "../interfaces/delete-options.interface";
+import { ISaveOptions } from "../interfaces/save-options.interface";
+import { ISelectOptions } from "../interfaces/select-options.interface";
+import { IUpdateOptions } from "../interfaces/update-options.interface";
 
-export class SqliteAdapter implements DatabaseAdapter {
+export class SqliteAdapter implements IDatabaseAdapter {
 	private database: Database | null = null;
 	private readonly queryBuilder = new QueryBuilder();
 	private readonly dataMapper = new DataMapper();
@@ -29,7 +33,12 @@ export class SqliteAdapter implements DatabaseAdapter {
 	async save<TEntity>(options: ISaveOptions<TEntity>): Promise<QueryResult> {
 		const db = this.getDB();
 
-		const { query, values } = this.queryBuilder.buildInsertQuery(options);
+		// Transforma a entidade para o formato do banco de dados ANTES de construir a query
+		const rawData = this.dataMapper.trasformToRawEntity(options.data);
+		const { query, values } = this.queryBuilder.buildInsertQuery({
+			...options,
+			data: rawData,
+		});
 
 		const result = await this.executeLoggedMutation(db, query, values);
 
@@ -39,7 +48,13 @@ export class SqliteAdapter implements DatabaseAdapter {
 	async findOne<TEntity>(options: ISelectOptions<TEntity>): Promise<TEntity | null> {
 		const db = this.getDB();
 
-		const { query, values } = this.queryBuilder.buildSelectQuery({ ...options, limit: 1 });
+		// Transforma as chaves do 'where' para o formato do banco de dados
+		const rawWhere = this.dataMapper.trasformToRawEntity(options.where || {});
+		const { query, values } = this.queryBuilder.buildSelectQuery({
+			...options,
+			where: rawWhere,
+			limit: 1,
+		});
 
 		const rawEntities: any[] = await this.executeLoggedQuery(db, query, values);
 
@@ -51,15 +66,26 @@ export class SqliteAdapter implements DatabaseAdapter {
 	async update<TEntity>(options: IUpdateOptions<TEntity>): Promise<void> {
 		const db = this.getDB();
 
-		const { query, values } = this.queryBuilder.buildUpdateQuery(options);
+		// Transforma os dados e o 'where' para o formato do banco de dados
+		const rawData = this.dataMapper.trasformToRawEntity(options.data);
+		const rawWhere = this.dataMapper.trasformToRawEntity(options.where || {});
+		const { query, values } = this.queryBuilder.buildUpdateQuery({
+			...options,
+			data: rawData,
+			where: rawWhere,
+		});
 
 		await this.executeLoggedMutation(db, query, values);
 	}
 
 	async delete<TEntity>(options: IDeleteOptions<TEntity>): Promise<void> {
 		const db = this.getDB();
-
-		const { query, values } = this.queryBuilder.buildDeleteQuery(options);
+		// Transforma as chaves do 'where' para o formato do banco de dados
+		const rawWhere = this.dataMapper.trasformToRawEntity(options.where || {});
+		const { query, values } = this.queryBuilder.buildDeleteQuery({
+			...options,
+			where: rawWhere,
+		});
 
 		await this.executeLoggedMutation(db, query, values);
 	}
@@ -76,13 +102,31 @@ export class SqliteAdapter implements DatabaseAdapter {
 		Logger.log(`With values: ${JSON.stringify(values)}\n`);
 	}
 
+	private logResult(result: any): void {
+		Logger.log(`Result: ${JSON.stringify(result)}\n`);
+	}
+
 	private async executeLoggedQuery<T>(db: Database, query: string, values: any[]): Promise<T> {
-		this.logQuery(query, values);
-		return await db.select(query, values);
+		try {
+			this.logQuery(query, values);
+			const result = await db.select<T>(query, values);
+			this.logResult(result);
+			return result;
+		} catch (error) {
+			Logger.log(JSON.stringify(error));
+			throw error;
+		}
 	}
 
 	private async executeLoggedMutation(db: Database, query: string, values: any[]): Promise<QueryResult> {
-		this.logQuery(query, values);
-		return await db.execute(query, values);
+		try {
+			this.logQuery(query, values);
+			const result = await db.execute(query, values);
+			this.logResult(result);
+			return result;
+		} catch (error) {
+			Logger.log(JSON.stringify(error));
+			throw error;
+		}
 	}
 }

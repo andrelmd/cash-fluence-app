@@ -1,12 +1,10 @@
-import {
-	IDeleteOptions,
-	ISaveOptions,
-	ISelectOptions,
-	IUpdateOptions,
-	IWhere,
-	IWhereOperator,
-	TEntityValue,
-} from "../types/database.types";
+import { IDeleteOptions } from "../interfaces/delete-options.interface";
+import { ISaveOptions } from "../interfaces/save-options.interface";
+import { ISelectOptions } from "../interfaces/select-options.interface";
+import { IUpdateOptions } from "../interfaces/update-options.interface";
+import { TEntityValue } from "../types/entity-value.type";
+import { TWhereOperator } from "../types/where-operator.type";
+import { TWhere } from "../types/where.type";
 
 export class QueryBuilder {
 	buildSelectQuery<TEntity>(options: ISelectOptions<TEntity>): { query: string; values: any[] } {
@@ -72,7 +70,7 @@ export class QueryBuilder {
 	}
 
 	private buildClauseWhere<TEntity>(
-		where: IWhere<TEntity>,
+		where: TWhere<TEntity>,
 		startIndexParam: number = 1,
 	): { clause: string; values: TEntityValue<TEntity>[] } {
 		const whereKeys = this.getWhereKeys(where);
@@ -137,20 +135,20 @@ export class QueryBuilder {
 		return orderBy ? `ORDER BY ${orderBy}` : "";
 	}
 
-	private getWhereKeys<TEntity>(where: IWhere<TEntity>): (keyof IWhere<TEntity>)[] {
-		return Object.keys(where).filter((key) => where[key as keyof IWhere<TEntity>] !== undefined) as (keyof IWhere<TEntity>)[];
+	private getWhereKeys<TEntity>(where: TWhere<TEntity>): (keyof TWhere<TEntity>)[] {
+		return Object.keys(where).filter((key) => where[key as keyof TWhere<TEntity>] !== undefined) as (keyof TWhere<TEntity>)[];
 	}
 
-	private getWhereValues<TEntity>(where: IWhere<TEntity>, keys: (keyof IWhere<TEntity>)[]): TEntityValue<TEntity>[] {
-		return keys.map((key) => where[key as keyof IWhere<TEntity>]);
+	private getWhereValues<TEntity>(where: TWhere<TEntity>, keys: (keyof TWhere<TEntity>)[]): TEntityValue<TEntity>[] {
+		return keys.map((key) => where[key as keyof TWhere<TEntity>]);
 	}
 
-	private isIWhereOperator<TEntity>(value: TEntityValue<TEntity> | TEntityValue<TEntity>[]): value is IWhereOperator<TEntity> {
+	private isIWhereOperator<TEntity>(value: TEntityValue<TEntity> | TEntityValue<TEntity>[]): value is TWhereOperator<TEntity> {
 		return typeof value === "object" && "operator" in value && "value" in value;
 	}
 
 	private generateWhereClauseOperation<TEntity>(
-		key: keyof IWhere<TEntity>,
+		key: keyof TWhere<TEntity>,
 		value: TEntityValue<TEntity> | TEntityValue<TEntity>[],
 		startIndexParam: number,
 	): {
@@ -184,7 +182,7 @@ export class QueryBuilder {
 	}
 
 	private generateWhereClause<TEntity>(
-		keys: (keyof IWhere<TEntity>)[],
+		keys: (keyof TWhere<TEntity>)[],
 		values: TEntityValue<TEntity>[],
 		startIndexParam: number,
 	): string {

@@ -1,30 +1,7 @@
-import { QueryResult } from "@tauri-apps/plugin-sql";
-import { DatabaseAdapter, IDeleteOptions, ISaveOptions, ISelectOptions } from "../types/database.types";
+import { SqliteAdapter } from "../adapters/sqlite.adpater";
+import { DatabaseService } from "./database-service.class";
 
-export class DatabaseService {
-	private databaseAdapter: DatabaseAdapter;
+const sqliteAdapter = new SqliteAdapter();
+sqliteAdapter.init();
 
-	constructor(databaseAdapter: DatabaseAdapter) {
-		this.databaseAdapter = databaseAdapter;
-	}
-
-	async init() {
-		await this.databaseAdapter.init();
-	}
-
-	async find<TEntity>(options: ISelectOptions<TEntity>): Promise<TEntity[]> {
-		return await this.databaseAdapter.find<TEntity>(options);
-	}
-
-	async save<TEntity>(entity: ISaveOptions<TEntity>): Promise<QueryResult> {
-		return await this.databaseAdapter.save<TEntity>(entity);
-	}
-
-	async findOne<TEntity>(options: ISelectOptions<TEntity>): Promise<TEntity | null> {
-		return await this.databaseAdapter.findOne<TEntity>(options);
-	}
-
-	async delete<TEntity>(options: IDeleteOptions<TEntity>): Promise<void> {
-		return await this.databaseAdapter.delete<TEntity>(options);
-	}
-}
+export const databaseService = new DatabaseService(sqliteAdapter);

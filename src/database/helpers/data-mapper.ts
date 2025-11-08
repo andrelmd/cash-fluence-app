@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { cameCaseToSnakeCase } from "../../utils/camel-case-to-snake-case";
 import { snakeCaseToCamelCase } from "../../utils/snake-case-to-camel-case";
 
 export class DataMapper {
@@ -12,7 +13,7 @@ export class DataMapper {
 				const camelCaseKey = snakeCaseToCamelCase(key) as keyof TEntity;
 				let value = rawEntity[key];
 
-				if (typeof value === 'string' && this.dateRegex.test(value)) {
+				if (typeof value === "string" && this.dateRegex.test(value)) {
 					value = dayjs(value);
 				}
 
@@ -20,5 +21,18 @@ export class DataMapper {
 			}
 		}
 		return entity;
+	}
+
+	trasformToRawEntity<TEntity>(entity: TEntity): any {
+		const rawEntity = {} as any;
+
+		for (const key in entity) {
+			if (Object.prototype.hasOwnProperty.call(entity, key)) {
+				const snakeCaseKey = cameCaseToSnakeCase(key) as keyof TEntity;
+				let value = entity[key];
+				rawEntity[snakeCaseKey] = value;
+			}
+		}
+		return rawEntity;
 	}
 }
