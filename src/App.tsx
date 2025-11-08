@@ -1,7 +1,6 @@
-import "@ant-design/v5-patch-for-react-19";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import "./App.css";
-import { TransactionPage } from "./transactions/transaction-page";
+import { AppLayout } from "./components/layouts/app-layout/app-layout";
+import "./index.css";
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -14,7 +13,7 @@ const queryClient = new QueryClient({
 function App() {
 	return (
 		<QueryClientProvider client={queryClient}>
-			<TransactionPage />
+			<AppLayout />
 		</QueryClientProvider>
 	);
 }
