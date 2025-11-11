@@ -4,7 +4,7 @@ import { TDeleteOptionsWithoutTable } from "../../database/types/delete-options-
 import { TSaveOptionsWithoutTable } from "../../database/types/save-options-without-table.type";
 import { TSelectOptionsWithoutTable } from "../../database/types/select-options-without-table.type";
 import { TUpdateOptionsWithoutTable } from "../../database/types/update-options-without-table.type";
-import { IDatabaseService } from "../../interfaces/database-service.interface";
+import { IDatabaseService } from "../../interfaces/database-service";
 import { Category } from "./Category";
 
 export class CategoryRepository implements IRepository<Category> {

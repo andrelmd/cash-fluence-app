@@ -26,5 +26,5 @@ export const CategoryCardList = ({ categories, onDelete, onEdit }: ICategoryCard
 		});
 	}, [categories]);
 
-	return <div className="flex flex-col gap-4">{content}</div>;
+	return <div className="flex flex-col gap-4 overflow-auto">{content}</div>;
 };

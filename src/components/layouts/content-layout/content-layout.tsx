@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Spinner } from "../../ui/spinner";
 
 interface IContentLayoutProps {
@@ -5,7 +6,13 @@ interface IContentLayoutProps {
 	isLoading?: boolean;
 }
 
-export const ContentLayout = ({ children, isLoading = false }: IContentLayoutProps) => {
-	if (isLoading) return <Spinner />;
-	return <div className="flex flex-1 flex-col p-4">{children}</div>;
-};
+export const ContentLayout = memo(({ children, isLoading = false }: IContentLayoutProps) => {
+	if (isLoading)
+		return (
+			<div className="flex flex-1 items-center justify-center">
+				<Spinner />
+			</div>
+		);
+
+	return <>{children}</>;
+});

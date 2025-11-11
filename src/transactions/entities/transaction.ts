@@ -1,33 +1,39 @@
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { TransactionType } from "../constants/transaction-type";
 
 export class Transaction {
-	id?: number;
+	id: number | null;
 	amount: number;
 	createDate: Dayjs;
+	dueDate: Dayjs;
+	paymentDate: Dayjs | null;
 	type: TransactionType;
 	description: string;
-	currentInstallment: number;
-	installments: number;
+	currentInstallment: number | null;
+	installments: number | null;
 	categoryId: number;
 
 	constructor({
 		amount,
-		createDate,
-		id,
+		createDate = dayjs(),
+		dueDate,
+		paymentDate = null,
 		type,
 		description,
-		currentInstallment,
-		installments,
 		categoryId,
+		id = null,
+		currentInstallment = null,
+		installments = null,
 	}: {
-		id?: number;
+		id: number | null;
 		amount: number;
-		createDate: Dayjs;
+		createDate?: Dayjs;
+		dueDate: Dayjs;
+		paymentDate: Dayjs | null;
 		type: TransactionType;
 		description: string;
-		currentInstallment: number;
-		installments: number;
+		currentInstallment: number | null;
+		installments: number | null;
 		categoryId: number;
 	}) {
 		this.id = id;
@@ -38,5 +44,7 @@ export class Transaction {
 		this.currentInstallment = currentInstallment;
 		this.installments = installments;
 		this.categoryId = categoryId;
+		this.dueDate = dueDate;
+		this.paymentDate = paymentDate;
 	}
 }

@@ -4,7 +4,8 @@ import { TDeleteOptionsWithoutTable } from "../../database/types/delete-options-
 import { TSaveOptionsWithoutTable } from "../../database/types/save-options-without-table.type";
 import { TSelectOptionsWithoutTable } from "../../database/types/select-options-without-table.type";
 import { TUpdateOptionsWithoutTable } from "../../database/types/update-options-without-table.type";
-import { IDatabaseService } from "../../interfaces/database-service.interface";
+import { IDatabaseService } from "../../interfaces/database-service";
+import { Logger } from "../../logger/logger.class";
 import { Transaction } from "./transaction";
 
 export class TransactionsRepository implements IRepository<Transaction> {
@@ -23,6 +24,7 @@ export class TransactionsRepository implements IRepository<Transaction> {
 		return this.source.update({ table: this.table, ...options });
 	}
 	delete(options: TDeleteOptionsWithoutTable<Transaction>): Promise<void> {
+		Logger.log(options);
 		return this.source.delete({ table: this.table, ...options });
 	}
 

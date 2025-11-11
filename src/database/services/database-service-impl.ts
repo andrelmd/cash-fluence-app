@@ -1,5 +1,5 @@
 import { SqliteAdapter } from "../adapters/sqlite.adpater";
-import { DatabaseService } from "./database-service.class";
+import { DatabaseService } from "./database-service";
 
 const sqliteAdapter = new SqliteAdapter();
 sqliteAdapter.init();

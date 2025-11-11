@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Category } from "../categories/entities/Category";
-import { categoryService } from "../categories/services/category.service";
+import { categoryService } from "../categories/services/category-service-impl";
 import { UseQueryKeys } from "../constants/use-query-keys.constant";
 
 export function useCategories() {
 	const queryKey = [UseQueryKeys.CATEGORIES];
 	const queryClient = useQueryClient();
 
-	const { data, isError, isFetching } = useQuery({
+	const { data, isError, isFetching, isLoading } = useQuery({
 		queryKey,
 		queryFn: () => categoryService.getAll(),
 	});
@@ -23,6 +23,7 @@ export function useCategories() {
 	return {
 		data,
 		isFetching,
+		isLoading,
 		isError,
 		updateFn,
 		isUpdating,

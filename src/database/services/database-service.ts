@@ -1,5 +1,5 @@
 import { QueryResult } from "@tauri-apps/plugin-sql";
-import { IDatabaseService } from "../../interfaces/database-service.interface";
+import { IDatabaseService } from "../../interfaces/database-service";
 import { IDatabaseAdapter } from "../interfaces/database-adapter.interface";
 import { IDeleteOptions } from "../interfaces/delete-options.interface";
 import { ISaveOptions } from "../interfaces/save-options.interface";

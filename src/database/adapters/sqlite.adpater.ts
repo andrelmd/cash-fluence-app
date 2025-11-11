@@ -33,7 +33,6 @@ export class SqliteAdapter implements IDatabaseAdapter {
 	async save<TEntity>(options: ISaveOptions<TEntity>): Promise<QueryResult> {
 		const db = this.getDB();
 
-		// Transforma a entidade para o formato do banco de dados ANTES de construir a query
 		const rawData = this.dataMapper.trasformToRawEntity(options.data);
 		const { query, values } = this.queryBuilder.buildInsertQuery({
 			...options,
@@ -48,7 +47,6 @@ export class SqliteAdapter implements IDatabaseAdapter {
 	async findOne<TEntity>(options: ISelectOptions<TEntity>): Promise<TEntity | null> {
 		const db = this.getDB();
 
-		// Transforma as chaves do 'where' para o formato do banco de dados
 		const rawWhere = this.dataMapper.trasformToRawEntity(options.where || {});
 		const { query, values } = this.queryBuilder.buildSelectQuery({
 			...options,
@@ -66,7 +64,6 @@ export class SqliteAdapter implements IDatabaseAdapter {
 	async update<TEntity>(options: IUpdateOptions<TEntity>): Promise<void> {
 		const db = this.getDB();
 
-		// Transforma os dados e o 'where' para o formato do banco de dados
 		const rawData = this.dataMapper.trasformToRawEntity(options.data);
 		const rawWhere = this.dataMapper.trasformToRawEntity(options.where || {});
 		const { query, values } = this.queryBuilder.buildUpdateQuery({
@@ -79,8 +76,8 @@ export class SqliteAdapter implements IDatabaseAdapter {
 	}
 
 	async delete<TEntity>(options: IDeleteOptions<TEntity>): Promise<void> {
+		Logger.log(options);
 		const db = this.getDB();
-		// Transforma as chaves do 'where' para o formato do banco de dados
 		const rawWhere = this.dataMapper.trasformToRawEntity(options.where || {});
 		const { query, values } = this.queryBuilder.buildDeleteQuery({
 			...options,

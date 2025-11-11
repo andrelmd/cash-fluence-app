@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { UseQueryKeys } from "../constants/use-query-keys.constant";
 import { TransactionType } from "../transactions/constants/transaction-type";
 import { Transaction } from "../transactions/entities/transaction";
-import { transactionsService } from "../transactions/services/transactions.service";
+import { transactionsService } from "../transactions/services/transactions-service-impl";
 
 interface IUseTransactionProp {
 	type: TransactionType;
@@ -11,12 +11,22 @@ interface IUseTransactionProp {
 export function useTransactions(options?: IUseTransactionProp) {
 	const queryClient = useQueryClient();
 	const { type } = options || {};
-	const queryKey = [UseQueryKeys.TRANSACTIONS, type];
+	const queryKey = useMemo(() => [UseQueryKeys.TRANSACTIONS, type], [type]);
 
 	const fetchFn = useCallback(async () => {
 		if (!type) return transactionsService.getAll();
 		return transactionsService.getByType(type);
 	}, [type]);
+
+	const updateFn = useCallback(
+		async ({ saveInInstallments, transaction }: { transaction: Transaction; saveInInstallments: boolean }) => {
+			if (saveInInstallments) {
+				return transactionsService.saveInInstallments(transaction);
+			}
+			return transactionsService.save(transaction);
+		},
+		[type],
+	);
 
 	const query = useQuery({
 		queryKey,
@@ -25,7 +35,7 @@ export function useTransactions(options?: IUseTransactionProp) {
 
 	const updateMutation = useMutation({
 		mutationKey: queryKey,
-		mutationFn: (data: Transaction) => transactionsService.save(data),
+		mutationFn: updateFn,
 		onSuccess: async () => {
 			queryClient.invalidateQueries({ queryKey });
 		},

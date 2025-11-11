@@ -29,7 +29,7 @@ interface IDialogCategoryFormProps {
 const formSchema = z.object({
 	color: z.string(),
 	id: z.number().optional(),
-	monthlyLimit: z.coerce.number<number>().min(0),
+	monthlyLimit: z.coerce.number<number>().min(0).optional(),
 	name: z.string(),
 });
 

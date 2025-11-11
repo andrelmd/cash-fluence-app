@@ -17,7 +17,7 @@ export const CategoryCard = ({ category, onDelete, onEdit }: ICategoryCardProps)
 	const { color, name, monthlyLimit, id } = category;
 
 	const monthlyLimitContent = useMemo(() => {
-		if (monthlyLimit <= 0) return <Badge>Sem limite definido</Badge>;
+		if (!monthlyLimit || monthlyLimit <= 0) return <Badge>Sem limite definido</Badge>;
 		return <Badge className="rounded-sm">{monthlyLimit.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</Badge>;
 	}, [monthlyLimit]);
 

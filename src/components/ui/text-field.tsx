@@ -6,10 +6,19 @@ import { Input } from "./input";
 interface TextFieldProps extends React.ComponentProps<"input"> {
 	label: string;
 	name: string;
+	mask?: (value: string) => string;
 }
 
 export const TextField = ({ label, name, ...props }: TextFieldProps) => {
 	const { control } = useFormContext();
+
+	const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>, callback: (event: React.ChangeEvent<HTMLInputElement>) => void) => {
+		if (props.mask) {
+			const value = props.mask(event.target.value);
+			return callback({ ...event, target: { ...event.target, value } });
+		}
+		return callback(event);
+	};
 
 	return (
 		<Controller
@@ -18,7 +27,14 @@ export const TextField = ({ label, name, ...props }: TextFieldProps) => {
 			render={({ field, fieldState }) => (
 				<Field data-invalid={fieldState.invalid}>
 					<FieldLabel htmlFor={field.name}>{label}</FieldLabel>
-					<Input {...field} id={field.name} aria-invalid={fieldState.invalid} {...props} />
+					<Input
+						{...field}
+						value={field.value || null}
+						onChange={(e) => handleOnChange(e, field.onChange)}
+						id={field.name}
+						aria-invalid={fieldState.invalid}
+						{...props}
+					/>
 					{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
 				</Field>
 			)}

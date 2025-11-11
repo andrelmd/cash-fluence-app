@@ -1,0 +1,175 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import dayjs from "dayjs";
+import { useEffect, useMemo, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import z from "zod";
+import { Button } from "../../components/ui/button";
+import { Collapsible, CollapsibleContent } from "../../components/ui/collapsible";
+import { ControlledSelect } from "../../components/ui/controled-select";
+import { ControlledDatePicker } from "../../components/ui/controlled-date-picker";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../components/ui/dialog";
+import { Label } from "../../components/ui/label";
+import { Switch } from "../../components/ui/switch";
+import { TextField } from "../../components/ui/text-field";
+import { useCategories } from "../../hooks/use-categories";
+import { useTransactions } from "../../hooks/use-transactions";
+import { currencyMask } from "../../utils/currency-mask";
+import { currencyMaskToNumber } from "../../utils/currency-mask-to-number";
+import { TransactionType } from "../constants/transaction-type";
+import { Transaction } from "../entities/transaction";
+
+const formSchema = z.object({
+	id: z.number().nullable(),
+	type: z.coerce.number("Selecione um tipo de transação").min(0, "Tipo de transação inválido"),
+	amount: z
+		.string("Digite um valor válido")
+		.transform(currencyMaskToNumber)
+		.pipe(z.number("Digite um valor válido").min(1, "Valor inválido")),
+	description: z.string("Digite uma descrição válida"),
+	categoryId: z.coerce
+		.number("Selecione uma categoria válida")
+		.pipe(z.number("Selecione uma categoria válida").min(1, "Categoria inválida")),
+	dueDate: z.date("Digite uma data válida").transform((value: Date) => dayjs(value)),
+	paymentDate: z.date("Digite uma data válida").transform((value: Date) => dayjs(value)),
+	installments: z.coerce.number("Digite uma quantidade válida").min(1).nullable(),
+	currentInstallment: z.coerce.number("Digite uma quantidade válida").min(1).nullable(),
+});
+
+type SchemaInput = z.input<typeof formSchema>;
+type SchemaOutput = z.output<typeof formSchema>;
+
+interface ITransactionFormProps {
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	transaction: Transaction | null;
+	onClose?: () => void;
+}
+
+export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: ITransactionFormProps) => {
+	const [isInstallment, setIsInstallment] = useState(false);
+	const [isPaid, setIsPaid] = useState(false);
+	const { updateMutation } = useTransactions();
+	const { mutateAsync: updateFn } = updateMutation;
+
+	const methods = useForm<SchemaInput, any, SchemaOutput>({
+		resolver: zodResolver(formSchema),
+	});
+
+	const { data } = useCategories();
+
+	const categoryOptions = useMemo(() => {
+		if (!data) return [];
+		return data.map((category) => ({
+			label: category.name,
+			value: String(category.id),
+		}));
+	}, [data]);
+
+	const handleOnIsInstallmentChange = (open: boolean) => {
+		setIsInstallment(open);
+	};
+
+	const handleOnsubmit = async (data: SchemaOutput) => {
+		await updateFn({
+			transaction: new Transaction(data),
+			saveInInstallments: isInstallment,
+		});
+		methods.reset();
+		setIsInstallment(false);
+		onOpenChange(false);
+	};
+
+	const handleOnClose = () => {
+		methods.reset();
+		setIsInstallment(false);
+		if (onClose) onClose();
+	};
+
+	useEffect(() => {
+		if (!isInstallment) {
+			methods.setValue("installments", null);
+			methods.setValue("currentInstallment", null);
+		}
+	}, [isInstallment]);
+
+	useEffect(() => {
+		const hasInstallments = !!transaction?.installments && transaction.installments > 0;
+		setIsInstallment(hasInstallments);
+
+		const defaultValues = {
+			id: transaction?.id || null,
+			type: transaction?.type?.toString() ?? null,
+			amount: transaction?.amount.toString() || "",
+			description: transaction?.description || "",
+			categoryId: transaction?.categoryId?.toString() ?? null,
+			createDate: transaction?.createDate?.toDate() ?? new Date(),
+			dueDate: transaction?.dueDate?.toDate() ?? new Date(),
+			installments: transaction?.installments?.toString() ?? null,
+			currentInstallment: transaction?.currentInstallment?.toString() ?? null,
+		};
+		methods.reset(defaultValues);
+	}, [transaction, methods]);
+
+	return (
+		<FormProvider {...methods}>
+			<Dialog open={open} onOpenChange={onOpenChange}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Nova transação</DialogTitle>
+						<DialogDescription>Crie uma nova entrada ou saída para suas transações.</DialogDescription>
+					</DialogHeader>
+					<form onSubmit={methods.handleSubmit(handleOnsubmit)}>
+						<div className="flex flex-1 flex-col gap-4 overflow-auto">
+							<ControlledSelect
+								label="Tipo"
+								name="type"
+								placeholder="Tipo de transação"
+								options={[
+									{
+										label: "Entrada",
+										value: String(TransactionType.INCOME),
+									},
+									{
+										label: "Saída",
+										value: String(TransactionType.EXPENSE),
+									},
+								]}
+							/>
+							<TextField label="Valor (R$)" name="amount" mask={currencyMask} />
+							<TextField label="Descrição" name="description" />
+							<ControlledSelect label="Categoria" name="categoryId" placeholder="Categoria" options={categoryOptions} />
+							<ControlledDatePicker name="dueDate" label="Data da transação" />
+							<div className="flex items-center gap-2">
+								<Label htmlFor="is-paid">Transação Paga</Label>
+								<Switch id="is-paid" checked={isPaid} onCheckedChange={setIsPaid} />
+							</div>
+							<Collapsible open={isPaid} onOpenChange={setIsPaid}>
+								<CollapsibleContent>
+									<ControlledDatePicker name="paymentDate" label="Data do pagamento" />
+								</CollapsibleContent>
+							</Collapsible>
+							<div className="flex items-center gap-2">
+								<Label htmlFor="is-installment">Transação Parcelada</Label>
+								<Switch id="is-installment" checked={isInstallment} onCheckedChange={handleOnIsInstallmentChange} />
+							</div>
+							<Collapsible open={isInstallment} onOpenChange={handleOnIsInstallmentChange}>
+								<CollapsibleContent>
+									<TextField label="Quantidade de parcelas" name="installments" />
+									<TextField label="Parcela atual" name="currentInstallment" />
+								</CollapsibleContent>
+							</Collapsible>
+							<DialogFooter>
+								<DialogClose asChild>
+									<Button variant="ghost" type="button" onClick={handleOnClose}>
+										Fechar
+									</Button>
+								</DialogClose>
+								<Button type="submit">Salvar</Button>
+							</DialogFooter>
+						</div>
+					</form>
+				</DialogContent>
+			</Dialog>
+		</FormProvider>
+	);
+};

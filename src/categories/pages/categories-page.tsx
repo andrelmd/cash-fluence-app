@@ -22,7 +22,7 @@ export const Categories = () => {
 
 	return (
 		<ContentLayout isLoading={isFetching}>
-			<div className="flex flex-1 flex-col gap-4">
+			<div className="flex flex-1 flex-col gap-4 overflow-auto">
 				<div className="flex justify-end">
 					<CategoryForm open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
 						<Button>Nova categoria</Button>
