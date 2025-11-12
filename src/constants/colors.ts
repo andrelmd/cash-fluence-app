@@ -18,12 +18,4 @@ export const colors: TColor[] = [
 	"fuchsia",
 	"pink",
 	"rose",
-	"slate",
-	"gray",
-	"zinc",
-	"neutral",
-	"stone",
-	"primary",
-	"secondary",
-	"background",
 ];

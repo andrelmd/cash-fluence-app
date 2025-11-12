@@ -4,17 +4,18 @@ import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { ColorCircle } from "../../components/ui/color-circle";
-import { TColor } from "../../types/color";
+import { useCategories } from "../../hooks/use-categories";
 import { Category } from "../entities/Category";
 
 interface ICategoryCardProps {
 	category: Category;
-	onEdit?: (id: number) => void;
-	onDelete?: (id: number) => void;
+	onEdit?: (category: Category) => void;
 }
 
-export const CategoryCard = ({ category, onDelete, onEdit }: ICategoryCardProps) => {
-	const { color, name, monthlyLimit, id } = category;
+export const CategoryCard = ({ category, onEdit }: ICategoryCardProps) => {
+	const { deleteFn } = useCategories();
+
+	const { color, name, monthlyLimit } = category;
 
 	const monthlyLimitContent = useMemo(() => {
 		if (!monthlyLimit || monthlyLimit <= 0) return <Badge>Sem limite definido</Badge>;
@@ -22,20 +23,18 @@ export const CategoryCard = ({ category, onDelete, onEdit }: ICategoryCardProps)
 	}, [monthlyLimit]);
 
 	const handleOnEdit = () => {
-		if (!id) return;
-		onEdit?.(id);
+		onEdit?.(category);
 	};
 
-	const handleOnDelete = () => {
-		if (!id) return;
-		onDelete?.(id);
+	const handleOnDelete = async () => {
+		await deleteFn(category);
 	};
 
 	return (
 		<Card>
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2">
-					<ColorCircle color={color as TColor} />
+					<ColorCircle color={color} />
 					{name}
 				</CardTitle>
 				<CardAction>

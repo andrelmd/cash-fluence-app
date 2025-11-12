@@ -15,12 +15,4 @@ export type TColor =
 	| "purple"
 	| "fuchsia"
 	| "pink"
-	| "rose"
-	| "slate"
-	| "gray"
-	| "zinc"
-	| "neutral"
-	| "stone"
-	| "primary"
-	| "secondary"
-	| "background";
+	| "rose";

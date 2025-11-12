@@ -7,6 +7,13 @@ export function useCategories() {
 	const queryKey = [UseQueryKeys.CATEGORIES];
 	const queryClient = useQueryClient();
 
+	const updateMutationFn = async (data: Category) => {
+		if (data.id) {
+			return categoryService.update(data);
+		}
+		return categoryService.save(data);
+	};
+
 	const { data, isError, isFetching, isLoading } = useQuery({
 		queryKey,
 		queryFn: () => categoryService.getAll(),
@@ -14,7 +21,15 @@ export function useCategories() {
 
 	const { mutateAsync: updateFn, isPending: isUpdating } = useMutation({
 		mutationKey: queryKey,
-		mutationFn: (data: Category) => categoryService.save(data),
+		mutationFn: updateMutationFn,
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey });
+		},
+	});
+
+	const { mutateAsync: deleteFn, isPending: isDeleting } = useMutation({
+		mutationKey: queryKey,
+		mutationFn: (category: Category) => categoryService.delete(category),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey });
 		},
@@ -27,5 +42,7 @@ export function useCategories() {
 		isError,
 		updateFn,
 		isUpdating,
+		deleteFn,
+		isDeleting,
 	};
 }

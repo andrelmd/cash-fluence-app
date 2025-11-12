@@ -1,35 +1,43 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { ContentLayout } from "../../components/layouts/content-layout/content-layout";
 import { Button } from "../../components/ui/button";
+import { CardList } from "../../components/ui/card-list";
 import { useCategories } from "../../hooks/use-categories";
-import { CategoryCardList } from "../components/category-card-list";
+import { CategoryCard } from "../components/category-card";
 import { CategoryForm } from "../components/category-form";
 import { Category } from "../entities/Category";
 
 export const Categories = () => {
-	const { data, isFetching } = useCategories();
-	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-	const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-	const [editingCategory, setEditingCategory] = useState<Category | undefined>();
+	const { data, isLoading } = useCategories();
+	const [isFormOpen, setIsFormOpen] = useState(false);
+	const [category, setCategory] = useState<Category | null>(null);
 
-	const handleEdit = (id: number) => {
-		const categoryToEdit = data?.find((category) => category.id === id);
-		if (!categoryToEdit) return;
+	const handleOnEdit = useCallback((category: Category) => {
+		setCategory(category);
+		setIsFormOpen(true);
+	}, []);
 
-		setEditingCategory(categoryToEdit);
-		setIsEditDialogOpen(true);
-	};
+	const handleOnClose = useCallback(() => {
+		setCategory(null);
+		setIsFormOpen(false);
+	}, []);
+
+	const handleOnOpen = useCallback(() => {
+		setIsFormOpen(true);
+	}, []);
 
 	return (
-		<ContentLayout isLoading={isFetching}>
+		<ContentLayout isLoading={isLoading}>
 			<div className="flex flex-1 flex-col gap-4 overflow-auto">
 				<div className="flex justify-end">
-					<CategoryForm open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-						<Button>Nova categoria</Button>
-					</CategoryForm>
-					<CategoryForm category={editingCategory} open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen} />
+					<Button onClick={handleOnOpen}>Nova categoria</Button>
 				</div>
-				<CategoryCardList categories={data} onEdit={handleEdit} />
+				<CardList
+					content={data}
+					noContentText="Nenhuma categoria encontrada"
+					render={(item) => <CategoryCard category={item} key={item.id} onEdit={handleOnEdit} />}
+				/>
+				<CategoryForm category={category} open={isFormOpen} onOpenChange={setIsFormOpen} onClose={handleOnClose} />
 			</div>
 		</ContentLayout>
 	);
