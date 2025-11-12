@@ -1,21 +1,23 @@
-import { IDeleteOptions } from "../interfaces/delete-options.interface";
-import { ISaveOptions } from "../interfaces/save-options.interface";
-import { ISelectOptions } from "../interfaces/select-options.interface";
-import { IUpdateOptions } from "../interfaces/update-options.interface";
-import { TEntityValue } from "../types/entity-value.type";
-import { TWhereOperator } from "../types/where-operator.type";
-import { TWhere } from "../types/where.type";
+import { IDeleteOptions } from "../interfaces/delete-options";
+import { ISaveOptions } from "../interfaces/save-options";
+import { ISelectOptions } from "../interfaces/select-options";
+import { IUpdateOptions } from "../interfaces/update-options";
+import { TEntityValue } from "../types/entity-value";
+import { TQueryWhere } from "../types/query-where";
+import { TWhere } from "../types/where";
+import { TWhereOperator } from "../types/where-operator";
 
 export class QueryBuilder {
 	buildSelectQuery<TEntity>(options: ISelectOptions<TEntity>): { query: string; values: any[] } {
-		const { table, where = {}, limit, offset, groupBy, orderBy } = options;
+		const { table, where = null, limit, offset, groupBy, orderBy } = options;
 
-		const { clause: whereClause, values } = this.buildClauseWhere(where);
+		const { clause: whereClause, values } = this.buildClauseWhere<TEntity>(where);
 
 		const query = [
 			this.buildClauseSelect(table),
 			whereClause,
 			this.buildClauseGroupBy(groupBy),
+			//TODO: implement "order by" clausules with entity object
 			this.buildClauseOrderBy(orderBy),
 			this.buildClauseLimit(limit),
 			this.buildClauseOffset(offset),
@@ -42,7 +44,7 @@ export class QueryBuilder {
 
 	buildUpdateQuery<TEntity>(options: IUpdateOptions<TEntity>): { query: string; values: any[] } {
 		const { table, data, where = {} } = options;
-		const dataKeys = Object.keys(data).filter((key) => data[key as keyof TEntity] !== undefined);
+		const dataKeys = this.getDefinedKeys(data);
 
 		if (dataKeys.length === 0) {
 			throw new Error("Cannot build update query with no data to update.");
@@ -67,29 +69,6 @@ export class QueryBuilder {
 
 	private buildClauseSelect(table: string): string {
 		return `SELECT * FROM ${table}`;
-	}
-
-	private buildClauseWhere<TEntity>(
-		where: TWhere<TEntity>,
-		startIndexParam: number = 1,
-	): { clause: string; values: TEntityValue<TEntity>[] } {
-		const whereKeys = this.getWhereKeys(where);
-		const whereValues = this.getWhereValues(where, whereKeys);
-		const whereClause = this.generateWhereClause(whereKeys, whereValues, startIndexParam);
-
-		if (!whereClause) {
-			return { clause: "", values: [] };
-		}
-
-		return {
-			clause: `WHERE ${whereClause}`,
-			values: whereValues.flatMap((value) => {
-				if (this.isIWhereOperator(value)) {
-					return Array.isArray(value.value) ? value.value : [value.value];
-				}
-				return value;
-			}),
-		};
 	}
 
 	private getDefinedKeys<TEntity>(data: Partial<TEntity>): string[] {
@@ -135,65 +114,74 @@ export class QueryBuilder {
 		return orderBy ? `ORDER BY ${orderBy}` : "";
 	}
 
-	private getWhereKeys<TEntity>(where: TWhere<TEntity>): (keyof TWhere<TEntity>)[] {
-		return Object.keys(where).filter((key) => where[key as keyof TWhere<TEntity>] !== undefined) as (keyof TWhere<TEntity>)[];
-	}
-
-	private getWhereValues<TEntity>(where: TWhere<TEntity>, keys: (keyof TWhere<TEntity>)[]): TEntityValue<TEntity>[] {
-		return keys.map((key) => where[key as keyof TWhere<TEntity>]);
-	}
-
 	private isIWhereOperator<TEntity>(value: TEntityValue<TEntity> | TEntityValue<TEntity>[]): value is TWhereOperator<TEntity> {
-		return typeof value === "object" && "operator" in value && "value" in value;
+		return typeof value === "object" && value !== null && "operator" in value && "value" in value;
 	}
 
-	private generateWhereClauseOperation<TEntity>(
-		key: keyof TWhere<TEntity>,
-		value: TEntityValue<TEntity> | TEntityValue<TEntity>[],
-		startIndexParam: number,
-	): {
-		query: string;
-		lastIndex: number;
-	} {
-		let paramIndex = startIndexParam;
+	private operatorFactory<TEntity>(operator: TWhereOperator<TEntity>["operator"]) {
+		const operatorHandlers: Partial<
+			Record<
+				TWhereOperator<TEntity>["operator"],
+				(key: string, paramIndex: { value: number }, value: TEntityValue<TEntity> | TEntityValue<TEntity>[]) => string
+			>
+		> = {
+			BETWEEN: (key: string, paramIndex: { value: number }, value) => {
+				if (!Array.isArray(value) || value.length !== 2) {
+					throw new Error("BETWEEN operator requires an array with two values.");
+				}
+				const start = `$${paramIndex.value++}`;
+				const end = `$${paramIndex.value++}`;
+				return `${key} BETWEEN ${start} AND ${end}`;
+			},
+		};
 
+		const handler = operatorHandlers[operator];
+		if (handler) return handler;
+
+		return (key: string, paramIndex: { value: number }) => `${key} ${operator} $${paramIndex.value++}`;
+	}
+
+	private buildWhereCondition<TEntity>(key: keyof TWhere<TEntity>, value: TEntityValue<TEntity>, paramIndex: { value: number }): string {
 		if (Array.isArray(value)) {
-			const placeholders = value.map(() => `$${paramIndex++}`);
-			const query = `${String(key)} IN (${placeholders.join(",")})`;
-			return { query, lastIndex: paramIndex };
+			const placeholders = value.map(() => `$${paramIndex.value++}`);
+			return `${String(key)} IN (${placeholders.join(",")})`;
 		}
 
 		if (this.isIWhereOperator(value)) {
-			if (value.operator !== "BETWEEN") {
-				const query = `${String(key)} ${value.operator} $${paramIndex++}`;
-				return { query, lastIndex: paramIndex };
-			}
-
-			if (Array.isArray(value.value) && value.value.length === 2) {
-				const query = `${String(key)} BETWEEN $${paramIndex++} AND $${paramIndex++}`;
-				return { query, lastIndex: paramIndex };
-			}
-
-			throw new Error("BETWEEN operator requires an array with two values.");
+			const operatorHandler = this.operatorFactory<TEntity>(value.operator);
+			return operatorHandler(String(key), paramIndex, value.value);
 		}
 
-		const query = `${String(key)} = $${paramIndex++}`;
-		return { query, lastIndex: paramIndex };
+		return `${String(key)} = $${paramIndex.value++}`;
 	}
 
-	private generateWhereClause<TEntity>(
-		keys: (keyof TWhere<TEntity>)[],
-		values: TEntityValue<TEntity>[],
-		startIndexParam: number,
-	): string {
-		let paramIndex = startIndexParam;
-		return keys
-			.map((key, i) => {
-				const value = values[i];
-				const { query, lastIndex } = this.generateWhereClauseOperation(key, value, paramIndex);
-				paramIndex = lastIndex;
-				return query;
-			})
-			.join(" AND ");
+	private buildClauseWhere<TEntity>(where: TWhere<TEntity> | null, startIndex: number = 1): TQueryWhere<TEntity> {
+		if (!where || Object.keys(where).length === 0) {
+			return { clause: "", values: [] };
+		}
+
+		const definedWhere = Object.entries(where).filter(([, value]) => value !== undefined) as [
+			keyof TWhere<TEntity>,
+			TEntityValue<TEntity>,
+		][];
+
+		if (definedWhere.length === 0) {
+			return { clause: "", values: [] };
+		}
+
+		const paramIndex = { value: startIndex };
+		const conditions = definedWhere.map(([key, value]) => this.buildWhereCondition(key, value, paramIndex));
+
+		const values = definedWhere.flatMap(([, value]) => {
+			if (this.isIWhereOperator(value)) {
+				return Array.isArray(value.value) ? value.value : [value.value];
+			}
+			return value;
+		});
+
+		return {
+			clause: `WHERE ${conditions.join(" AND ")}`,
+			values,
+		};
 	}
 }

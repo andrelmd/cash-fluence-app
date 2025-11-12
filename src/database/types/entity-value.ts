@@ -1,4 +1,4 @@
-import { TWhereOperator } from "./where-operator.type";
+import { TWhereOperator } from "./where-operator";
 
 export type TEntityValue<TEntity> =
 	| Partial<TEntity[keyof TEntity]>

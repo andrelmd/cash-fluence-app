@@ -1,9 +1,24 @@
 import dayjs from "dayjs";
+import { TSelectOptionsWithoutTable } from "../../database/types/select-options-without-table";
+import { IEntityServiceDelete } from "../../interfaces/entity-service-delete";
+import { IEntityServiceGetAll } from "../../interfaces/entity-service-get-all";
+import { IEntityServiceGetMany } from "../../interfaces/entity-service-get-many";
+import { IEntityServiceGetOne } from "../../interfaces/entity-service-get-one";
+import { IEntityServiceSave } from "../../interfaces/entity-service-save";
+import { IEntityServiceUpdate } from "../../interfaces/entity-service-update";
 import { TransactionType } from "../constants/transaction-type";
 import { Transaction } from "../entities/transaction";
 import { TransactionsRepository } from "../entities/transactions-repository";
 
-export class TransactionsService {
+export class TransactionsService
+	implements
+		IEntityServiceDelete<Transaction>,
+		IEntityServiceSave<Transaction>,
+		IEntityServiceGetAll<Transaction>,
+		IEntityServiceGetOne<Transaction>,
+		IEntityServiceGetMany<Transaction>,
+		IEntityServiceUpdate<Transaction>
+{
 	private repository: TransactionsRepository;
 
 	constructor(repository: TransactionsRepository) {
@@ -20,28 +35,27 @@ export class TransactionsService {
 		return newTransaction;
 	}
 
-	async delete(id: number): Promise<void> {
-		return this.repository.delete({ where: { id } });
+	async delete(transaction: Transaction): Promise<void> {
+		return this.repository.delete({ where: { id: transaction.id } });
 	}
 
 	async getAll(): Promise<Transaction[]> {
-		const result = await this.repository.getAll();
-		const sortedResult = result.sort((a, b) => a.createDate.unix() - b.createDate.unix());
-		return sortedResult;
+		return this.repository.getMany({ orderBy: "create_date DESC" });
 	}
 
 	async getByType(type: TransactionType): Promise<Transaction[]> {
-		return this.repository.getMany({ where: { type } });
+		return this.getMany({ where: { type } });
 	}
 
-	private createInstallmentTransaction(transaction: Transaction, installmentNumber: number): Transaction {
-		const { installments, amount, createDate, description } = transaction;
+	private createInstallmentTransaction(transaction: Transaction, currentInstallment: number, installmentNumber: number): Transaction {
+		const { installments, amount, createDate } = transaction;
 		const installmentValue = amount / installments!;
-		const newCreateDate = dayjs(createDate).add(installmentNumber, "month");
+		const monthOffset = installmentNumber - currentInstallment;
+		const newCreateDate = dayjs(createDate).add(monthOffset, "month");
 
 		return new Transaction({
 			...transaction,
-			description: `${description} - Parcela ${installmentNumber} de ${installments}`,
+			paymentDate: null,
 			currentInstallment: installmentNumber,
 			amount: installmentValue,
 			createDate: newCreateDate,
@@ -54,12 +68,40 @@ export class TransactionsService {
 			throw new Error("Transactions must have installments");
 		}
 
-		const transactionsToSave: Transaction[] = [];
-		for (let i = currentInstallment; i <= installments; i++) {
-			const newTransaction = this.createInstallmentTransaction(transaction, i);
-			transactionsToSave.push(newTransaction);
-		}
+		const transactionsToSave = Array.from({ length: installments - currentInstallment + 1 }, (_, i) =>
+			this.createInstallmentTransaction(transaction, currentInstallment, i + currentInstallment),
+		);
 
 		return Promise.all(transactionsToSave.map((t) => this.save(t)));
+	}
+
+	async getOne(options: TSelectOptionsWithoutTable<Transaction>): Promise<Transaction | null> {
+		return this.repository.getOne(options);
+	}
+
+	async getMany(options: TSelectOptionsWithoutTable<Transaction>): Promise<Transaction[]> {
+		return this.repository.getMany(options);
+	}
+
+	async update(transaction: Transaction): Promise<Transaction> {
+		await this.repository.update({ data: { ...transaction, id: undefined }, where: { id: transaction.id } });
+		const updatedTransaction = await this.repository.getOne({ where: { id: transaction.id } });
+
+		if (!updatedTransaction) {
+			throw new Error("Transaction not found");
+		}
+
+		return updatedTransaction;
+	}
+
+	async getTransactionsByPeriod(startDate: dayjs.Dayjs, endDate: dayjs.Dayjs): Promise<Transaction[]> {
+		return this.repository.getMany({
+			where: {
+				createDate: {
+					operator: "BETWEEN",
+					value: [startDate, endDate],
+				},
+			},
+		});
 	}
 }

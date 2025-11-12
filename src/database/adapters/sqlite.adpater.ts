@@ -2,11 +2,11 @@ import Database, { QueryResult } from "@tauri-apps/plugin-sql";
 import { Logger } from "../../logger/logger.class";
 import { DataMapper } from "../helpers/data-mapper";
 import { QueryBuilder } from "../helpers/query-builder";
-import { IDatabaseAdapter } from "../interfaces/database-adapter.interface";
-import { IDeleteOptions } from "../interfaces/delete-options.interface";
-import { ISaveOptions } from "../interfaces/save-options.interface";
-import { ISelectOptions } from "../interfaces/select-options.interface";
-import { IUpdateOptions } from "../interfaces/update-options.interface";
+import { IDatabaseAdapter } from "../interfaces/database-adapter";
+import { IDeleteOptions } from "../interfaces/delete-options";
+import { ISaveOptions } from "../interfaces/save-options";
+import { ISelectOptions } from "../interfaces/select-options";
+import { IUpdateOptions } from "../interfaces/update-options";
 
 export class SqliteAdapter implements IDatabaseAdapter {
 	private database: Database | null = null;
@@ -23,7 +23,11 @@ export class SqliteAdapter implements IDatabaseAdapter {
 	async find<TEntity>(options: ISelectOptions<TEntity>): Promise<TEntity[]> {
 		const db = this.getDB();
 
-		const { query, values } = this.queryBuilder.buildSelectQuery(options);
+		const rawHere = this.dataMapper.trasformToRawEntity(options.where || {});
+		const { query, values } = this.queryBuilder.buildSelectQuery({
+			...options,
+			where: rawHere,
+		});
 
 		const rawEntities: any[] = await this.executeLoggedQuery(db, query, values);
 
@@ -76,7 +80,6 @@ export class SqliteAdapter implements IDatabaseAdapter {
 	}
 
 	async delete<TEntity>(options: IDeleteOptions<TEntity>): Promise<void> {
-		Logger.log(options);
 		const db = this.getDB();
 		const rawWhere = this.dataMapper.trasformToRawEntity(options.where || {});
 		const { query, values } = this.queryBuilder.buildDeleteQuery({
@@ -99,15 +102,10 @@ export class SqliteAdapter implements IDatabaseAdapter {
 		Logger.log(`With values: ${JSON.stringify(values)}\n`);
 	}
 
-	private logResult(result: any): void {
-		Logger.log(`Result: ${JSON.stringify(result)}\n`);
-	}
-
 	private async executeLoggedQuery<T>(db: Database, query: string, values: any[]): Promise<T> {
 		try {
 			this.logQuery(query, values);
 			const result = await db.select<T>(query, values);
-			this.logResult(result);
 			return result;
 		} catch (error) {
 			Logger.log(JSON.stringify(error));
@@ -119,7 +117,6 @@ export class SqliteAdapter implements IDatabaseAdapter {
 		try {
 			this.logQuery(query, values);
 			const result = await db.execute(query, values);
-			this.logResult(result);
 			return result;
 		} catch (error) {
 			Logger.log(JSON.stringify(error));

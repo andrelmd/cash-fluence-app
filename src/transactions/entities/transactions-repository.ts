@@ -1,14 +1,24 @@
 import { QueryResult } from "@tauri-apps/plugin-sql";
-import { IRepository } from "../../database/interfaces/repository.interface";
-import { TDeleteOptionsWithoutTable } from "../../database/types/delete-options-without-table.type";
-import { TSaveOptionsWithoutTable } from "../../database/types/save-options-without-table.type";
-import { TSelectOptionsWithoutTable } from "../../database/types/select-options-without-table.type";
-import { TUpdateOptionsWithoutTable } from "../../database/types/update-options-without-table.type";
-import { IDatabaseService } from "../../interfaces/database-service";
-import { Logger } from "../../logger/logger.class";
+import { IDatabaseService } from "../../database/interfaces/database-service";
+import { IRepositoryDelete } from "../../database/interfaces/repository-delete";
+import { IRepositoryGetMany } from "../../database/interfaces/repository-get-many";
+import { IRepositoryGetOne } from "../../database/interfaces/repository-get-one";
+import { IRepositorySave } from "../../database/interfaces/repository-save";
+import { IRepositoryUpdate } from "../../database/interfaces/repository-update";
+import { TDeleteOptionsWithoutTable } from "../../database/types/delete-options-without-table";
+import { TSaveOptionsWithoutTable } from "../../database/types/save-options-without-table";
+import { TSelectOptionsWithoutTable } from "../../database/types/select-options-without-table";
+import { TUpdateOptionsWithoutTable } from "../../database/types/update-options-without-table";
 import { Transaction } from "./transaction";
 
-export class TransactionsRepository implements IRepository<Transaction> {
+export class TransactionsRepository
+	implements
+		IRepositoryDelete<Transaction>,
+		IRepositoryGetMany<Transaction>,
+		IRepositoryGetOne<Transaction>,
+		IRepositorySave<Transaction>,
+		IRepositoryUpdate<Transaction>
+{
 	source: IDatabaseService;
 	table: string;
 
@@ -24,16 +34,11 @@ export class TransactionsRepository implements IRepository<Transaction> {
 		return this.source.update({ table: this.table, ...options });
 	}
 	delete(options: TDeleteOptionsWithoutTable<Transaction>): Promise<void> {
-		Logger.log(options);
 		return this.source.delete({ table: this.table, ...options });
 	}
 
 	getMany(options: TSelectOptionsWithoutTable<Transaction>): Promise<Transaction[]> {
 		return this.source.find<Transaction>({ table: this.table, ...options });
-	}
-
-	getAll(): Promise<Transaction[]> {
-		return this.source.find<Transaction>({ table: this.table });
 	}
 
 	getOne(options: TSelectOptionsWithoutTable<Transaction>): Promise<Transaction | null> {

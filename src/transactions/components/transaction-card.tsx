@@ -7,8 +7,6 @@ import { ColorCircle } from "../../components/ui/color-circle";
 import { Label } from "../../components/ui/label";
 import { useCategories } from "../../hooks/use-categories";
 import { useTransactions } from "../../hooks/use-transactions";
-import { Logger } from "../../logger/logger.class";
-import { TColor } from "../../types/color";
 import { TransactionType } from "../constants/transaction-type";
 import { Transaction } from "../entities/transaction";
 
@@ -32,9 +30,8 @@ export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) 
 	}, [data, categoryId]);
 
 	const handleOnDelete = async () => {
-		Logger.log(transaction);
 		if (!transaction.id) return;
-		await deleteFn(transaction.id);
+		await deleteFn(transaction);
 	};
 
 	const handleOnEdit = () => {
@@ -52,7 +49,7 @@ export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) 
 						<div className="flex flex-col gap-2">
 							<div className="flex gap-2 items-center">
 								{description}
-								{installments > 0 && (
+								{installments && installments > 0 && (
 									<Badge variant={"outline"}>
 										{currentInstallment}/{installments}x
 									</Badge>
@@ -74,7 +71,7 @@ export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) 
 			<CardContent>
 				<div className="flex justify-between">
 					<div className="flex gap-2 items-center">
-						{category && <ColorCircle className="w-4 h-4" color={category.color as TColor} />}
+						{category && <ColorCircle className="w-4 h-4" color={category.color} />}
 						<p>{category?.name}</p>
 					</div>
 					<div data-type={type} className="flex items-center gap-2 data-[type=0]:text-green-400 data-[type=1]:text-red-400">

@@ -1,8 +1,8 @@
 import { QueryResult } from "@tauri-apps/plugin-sql";
-import { IDeleteOptions } from "../database/interfaces/delete-options.interface";
-import { ISaveOptions } from "../database/interfaces/save-options.interface";
-import { ISelectOptions } from "../database/interfaces/select-options.interface";
-import { IUpdateOptions } from "../database/interfaces/update-options.interface";
+import { IDeleteOptions } from "./delete-options";
+import { ISaveOptions } from "./save-options";
+import { ISelectOptions } from "./select-options";
+import { IUpdateOptions } from "./update-options";
 
 export interface IDatabaseService {
 	init(): Promise<void>;

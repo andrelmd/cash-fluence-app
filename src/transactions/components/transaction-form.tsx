@@ -26,11 +26,13 @@ const formSchema = z.object({
 		.transform(currencyMaskToNumber)
 		.pipe(z.number("Digite um valor válido").min(1, "Valor inválido")),
 	description: z.string("Digite uma descrição válida"),
-	categoryId: z.coerce
-		.number("Selecione uma categoria válida")
-		.pipe(z.number("Selecione uma categoria válida").min(1, "Categoria inválida")),
+	categoryId: z.coerce.number("Selecione uma categoria válida").min(1, "Categoria inválida"),
+	createDate: z.date("Digite uma data válida").transform((value: Date) => dayjs(value)),
 	dueDate: z.date("Digite uma data válida").transform((value: Date) => dayjs(value)),
-	paymentDate: z.date("Digite uma data válida").transform((value: Date) => dayjs(value)),
+	paymentDate: z
+		.date("Digite uma data válida")
+		.transform((value: Date) => dayjs(value))
+		.nullable(),
 	installments: z.coerce.number("Digite uma quantidade válida").min(1).nullable(),
 	currentInstallment: z.coerce.number("Digite uma quantidade válida").min(1).nullable(),
 });
@@ -69,20 +71,30 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 		setIsInstallment(open);
 	};
 
+	const resetForm = () => {
+		methods.reset();
+		setIsInstallment(false);
+		setIsPaid(false);
+	};
+
 	const handleOnsubmit = async (data: SchemaOutput) => {
 		await updateFn({
 			transaction: new Transaction(data),
 			saveInInstallments: isInstallment,
 		});
-		methods.reset();
-		setIsInstallment(false);
-		onOpenChange(false);
+		handleOnClose();
 	};
 
 	const handleOnClose = () => {
-		methods.reset();
-		setIsInstallment(false);
+		resetForm();
 		if (onClose) onClose();
+	};
+
+	const handleOnOpenChange = (open: boolean) => {
+		if (!open) {
+			resetForm();
+		}
+		onOpenChange(open);
 	};
 
 	useEffect(() => {
@@ -104,6 +116,7 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 			categoryId: transaction?.categoryId?.toString() ?? null,
 			createDate: transaction?.createDate?.toDate() ?? new Date(),
 			dueDate: transaction?.dueDate?.toDate() ?? new Date(),
+			paymentDate: transaction?.paymentDate?.toDate() ?? null,
 			installments: transaction?.installments?.toString() ?? null,
 			currentInstallment: transaction?.currentInstallment?.toString() ?? null,
 		};
@@ -112,10 +125,10 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 
 	return (
 		<FormProvider {...methods}>
-			<Dialog open={open} onOpenChange={onOpenChange}>
+			<Dialog open={open} onOpenChange={handleOnOpenChange}>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>Nova transação</DialogTitle>
+						<DialogTitle>{transaction ? "Editar transação" : "Nova transação"}</DialogTitle>
 						<DialogDescription>Crie uma nova entrada ou saída para suas transações.</DialogDescription>
 					</DialogHeader>
 					<form onSubmit={methods.handleSubmit(handleOnsubmit)}>
@@ -135,7 +148,7 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 									},
 								]}
 							/>
-							<TextField label="Valor (R$)" name="amount" mask={currencyMask} />
+							<TextField label="Valor (R$)" name="amount" mask={currencyMask} type="number" />
 							<TextField label="Descrição" name="description" />
 							<ControlledSelect label="Categoria" name="categoryId" placeholder="Categoria" options={categoryOptions} />
 							<ControlledDatePicker name="dueDate" label="Data da transação" />

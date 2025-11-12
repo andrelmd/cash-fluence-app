@@ -1,10 +1,10 @@
 import { QueryResult } from "@tauri-apps/plugin-sql";
-import { IDatabaseService } from "../../interfaces/database-service";
-import { IDatabaseAdapter } from "../interfaces/database-adapter.interface";
-import { IDeleteOptions } from "../interfaces/delete-options.interface";
-import { ISaveOptions } from "../interfaces/save-options.interface";
-import { ISelectOptions } from "../interfaces/select-options.interface";
-import { IUpdateOptions } from "../interfaces/update-options.interface";
+import { IDatabaseAdapter } from "../interfaces/database-adapter";
+import { IDatabaseService } from "../interfaces/database-service";
+import { IDeleteOptions } from "../interfaces/delete-options";
+import { ISaveOptions } from "../interfaces/save-options";
+import { ISelectOptions } from "../interfaces/select-options";
+import { IUpdateOptions } from "../interfaces/update-options";
 
 export class DatabaseService implements IDatabaseService {
 	private databaseAdapter: IDatabaseAdapter;

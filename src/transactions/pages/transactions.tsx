@@ -1,9 +1,10 @@
-import { useCallback, useMemo, useState } from "react";
+import dayjs from "dayjs";
+import { useCallback, useState } from "react";
 import { ContentLayout } from "../../components/layouts/content-layout/content-layout";
 import { Button } from "../../components/ui/button";
-import { Spinner } from "../../components/ui/spinner";
+import { CardList } from "../../components/ui/card-list";
 import { useTransactions } from "../../hooks/use-transactions";
-import { TransactionCardList } from "../components/transaction-card-list";
+import { TransactionCard } from "../components/transaction-card";
 import { TransactionForm } from "../components/transaction-form";
 import { Transaction } from "../entities/transaction";
 
@@ -11,7 +12,9 @@ export const Transactions = () => {
 	const [isFormOpen, setIsFormOpen] = useState(false);
 	const [transaction, setTransaction] = useState<Transaction | null>(null);
 
-	const { query } = useTransactions();
+	const startDate = dayjs().startOf("month");
+	const endDate = dayjs().endOf("month");
+	const { query } = useTransactions({ startDate, endDate });
 	const { data, isLoading } = query;
 
 	const handleOnEdit = useCallback((transaction: Transaction) => {
@@ -19,30 +22,27 @@ export const Transactions = () => {
 		setIsFormOpen(true);
 	}, []);
 
-	const content = useMemo(() => {
-		if (!data) return <Spinner />;
-		if (!data.length)
-			return (
-				<div className="flex flex-1 items-center justify-center">
-					<p>Nenhuma transação encontrada</p>
-				</div>
-			);
-		return <TransactionCardList transactions={data} onEdit={handleOnEdit} />;
-	}, [data, handleOnEdit]);
+	const handleOnClose = useCallback(() => {
+		setTransaction(null);
+		setIsFormOpen(false);
+	}, []);
+
+	const handleOnOpen = useCallback(() => {
+		setIsFormOpen(true);
+	}, []);
 
 	return (
 		<ContentLayout isLoading={isLoading}>
 			<div className="flex flex-1 flex-col gap-4 overflow-auto">
 				<div className="flex justify-end">
-					<Button onClick={() => setIsFormOpen(true)}>Criar nova transação</Button>
+					<Button onClick={handleOnOpen}>Criar nova transação</Button>
 				</div>
-				{content}
-				<TransactionForm
-					transaction={transaction}
-					open={isFormOpen}
-					onOpenChange={setIsFormOpen}
-					onClose={() => setTransaction(null)}
+				<CardList
+					noContentText="Nenhuma transação encontrada"
+					content={data}
+					render={(item) => <TransactionCard transaction={item} key={item.id} onEdit={handleOnEdit} />}
 				/>
+				<TransactionForm transaction={transaction} open={isFormOpen} onOpenChange={setIsFormOpen} onClose={handleOnClose} />
 			</div>
 		</ContentLayout>
 	);

@@ -1,5 +1,5 @@
-import { TEntityValue } from "../types/entity-value.type";
-import { TWhereOperator } from "../types/where-operator.type";
+import { TEntityValue } from "../types/entity-value";
+import { TWhereOperator } from "../types/where-operator";
 
 /**
  * Creates a "greater than" condition for a query.

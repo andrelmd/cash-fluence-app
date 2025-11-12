@@ -5,10 +5,10 @@ import { IRepositoryGetMany } from "../../database/interfaces/repository-get-man
 import { IRepositoryGetOne } from "../../database/interfaces/repository-get-one";
 import { IRepositorySave } from "../../database/interfaces/repository-save";
 import { IRepositoryUpdate } from "../../database/interfaces/repository-update";
-import { TDeleteOptionsWithoutTable } from "../../database/types/delete-options-without-table.type";
-import { TSaveOptionsWithoutTable } from "../../database/types/save-options-without-table.type";
-import { TSelectOptionsWithoutTable } from "../../database/types/select-options-without-table.type";
-import { TUpdateOptionsWithoutTable } from "../../database/types/update-options-without-table.type";
+import { TDeleteOptionsWithoutTable } from "../../database/types/delete-options-without-table";
+import { TSaveOptionsWithoutTable } from "../../database/types/save-options-without-table";
+import { TSelectOptionsWithoutTable } from "../../database/types/select-options-without-table";
+import { TUpdateOptionsWithoutTable } from "../../database/types/update-options-without-table";
 import { Category } from "./Category";
 
 export class CategoryRepository

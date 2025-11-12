@@ -1,4 +1,4 @@
-import { TWhere } from "../types/where.type";
+import { TWhere } from "../types/where";
 
 export interface ISelectOptions<TEntity> {
 	table: string;
