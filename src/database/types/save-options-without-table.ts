@@ -1,3 +1,3 @@
-import { ISaveOptions } from "../interfaces/save-options";
+import { ISaveOptions } from "../interfaces/save-options"
 
-export type TSaveOptionsWithoutTable<TEntity> = Omit<ISaveOptions<TEntity>, "table">;
+export type TSaveOptionsWithoutTable<TEntity> = Omit<ISaveOptions<TEntity>, "table">

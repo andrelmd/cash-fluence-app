@@ -1,3 +1,3 @@
-import { IUpdateOptions } from "../interfaces/update-options";
+import { IUpdateOptions } from "../interfaces/update-options"
 
-export type TUpdateOptionsWithoutTable<TEntity> = Omit<IUpdateOptions<TEntity>, "table">;
+export type TUpdateOptionsWithoutTable<TEntity> = Omit<IUpdateOptions<TEntity>, "table">

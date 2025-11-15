@@ -1,12 +1,12 @@
-import { TEntityValue } from "../types/entity-value";
-import { TWhereOperator } from "../types/where-operator";
+import { TEntityValue } from "../types/entity-value"
+import { TWhereOperator } from "../types/where-operator"
 
 /**
  * Creates a "greater than" condition for a query.
  * @example where: { amount: GreaterThan(100) }
  */
 export function GreaterThan<TEntity>(value: TEntityValue<TEntity>): TWhereOperator<TEntity> {
-	return { operator: ">", value };
+	return { operator: ">", value }
 }
 
 /**
@@ -14,7 +14,7 @@ export function GreaterThan<TEntity>(value: TEntityValue<TEntity>): TWhereOperat
  * @example where: { amount: LessThan(100) }
  */
 export function LessThan<TEntity>(value: TEntityValue<TEntity>): TWhereOperator<TEntity> {
-	return { operator: "<", value };
+	return { operator: "<", value }
 }
 
 /**
@@ -23,5 +23,5 @@ export function LessThan<TEntity>(value: TEntityValue<TEntity>): TWhereOperator<
  */
 
 export function Between<TEntity>(start: TEntityValue<TEntity>, end: TEntityValue<TEntity>): TWhereOperator<TEntity> {
-	return { operator: "BETWEEN", value: [start, end] };
+	return { operator: "BETWEEN", value: [start, end] }
 }

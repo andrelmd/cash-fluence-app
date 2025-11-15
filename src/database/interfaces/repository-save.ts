@@ -1,6 +1,6 @@
-import { QueryResult } from "@tauri-apps/plugin-sql";
-import { ISaveOptions } from "./save-options";
+import { QueryResult } from "@tauri-apps/plugin-sql"
+import { TSaveOptionsWithoutTable } from "../types/save-options-without-table"
 
 export interface IRepositorySave<TEntity> {
-	save(options: ISaveOptions<TEntity>): Promise<QueryResult>;
+	save(options: TSaveOptionsWithoutTable<TEntity>): Promise<QueryResult>
 }

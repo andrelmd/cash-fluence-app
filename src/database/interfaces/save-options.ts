@@ -1,5 +1,5 @@
 export interface ISaveOptions<TEntity> {
-	table: string;
-	data: Partial<TEntity>;
-	primaryKeys?: string[];
+	table: string
+	data: Partial<TEntity>
+	primaryKeys?: string[]
 }

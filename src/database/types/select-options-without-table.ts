@@ -1,3 +1,3 @@
-import { ISelectOptions } from "../interfaces/select-options";
+import { ISelectOptions } from "../interfaces/select-options"
 
-export type TSelectOptionsWithoutTable<TEntity> = Omit<ISelectOptions<TEntity>, "table">;
+export type TSelectOptionsWithoutTable<TEntity> = Omit<ISelectOptions<TEntity>, "table">

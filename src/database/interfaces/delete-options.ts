@@ -1,6 +1,6 @@
-import { TWhere } from "../types/where";
+import { TWhere } from "../types/where"
 
 export interface IDeleteOptions<TEntity> {
-	table: string;
-	where?: TWhere<TEntity>;
+	table: string
+	where?: TWhere<TEntity>
 }

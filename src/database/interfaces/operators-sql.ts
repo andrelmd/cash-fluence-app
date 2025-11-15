@@ -1,1 +1,1 @@
-export type IOperator = "BETWEEN" | "<=" | ">=" | ">" | "<" | "LIKE";
+export type IOperator = "BETWEEN" | "<=" | ">=" | ">" | "<" | "LIKE"

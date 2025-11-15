@@ -1,5 +1,5 @@
-import { ISelectOptions } from "./select-options";
+import { TSelectOptionsWithoutTable } from "../types/select-options-without-table"
 
 export interface IRepositoryGetOne<TEntity> {
-	getOne(options: ISelectOptions<TEntity>): Promise<TEntity | null>;
+	getOne(options: TSelectOptionsWithoutTable<TEntity>): Promise<TEntity | null>
 }
