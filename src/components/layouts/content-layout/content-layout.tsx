@@ -1,9 +1,9 @@
-import { memo } from "react";
-import { Spinner } from "../../ui/spinner";
+import { memo } from "react"
+import { Spinner } from "../../ui/spinner"
 
 interface IContentLayoutProps {
-	children: React.ReactNode;
-	isLoading?: boolean;
+	children: React.ReactNode
+	isLoading?: boolean
 }
 
 export const ContentLayout = memo(({ children, isLoading = false }: IContentLayoutProps) => {
@@ -12,7 +12,7 @@ export const ContentLayout = memo(({ children, isLoading = false }: IContentLayo
 			<div className="flex flex-1 items-center justify-center">
 				<Spinner />
 			</div>
-		);
+		)
 
-	return <>{children}</>;
-});
+	return <>{children}</>
+})

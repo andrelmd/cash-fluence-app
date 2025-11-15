@@ -1,4 +1,4 @@
-import { ArrowLeftRight, FolderKanban, LayoutDashboard, Target } from "lucide-react";
+import { ArrowLeftRight, FolderKanban, LayoutDashboard, Target } from "lucide-react"
 
 export enum AppPage {
 	DASHBOARD = "dashboard",
@@ -28,4 +28,4 @@ export const appPages = [
 		label: "Planejamentos",
 		value: AppPage.PLANNINGS,
 	},
-];
+]
