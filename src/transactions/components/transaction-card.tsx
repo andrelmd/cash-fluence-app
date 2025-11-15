@@ -1,49 +1,44 @@
-import { ArrowDownCircleIcon, ArrowUpCircleIcon, Edit, Trash } from "lucide-react";
-import { useMemo } from "react";
-import { Badge } from "../../components/ui/badge";
-import { Button } from "../../components/ui/button";
-import { Card, CardAction, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
-import { ColorCircle } from "../../components/ui/color-circle";
-import { Label } from "../../components/ui/label";
-import { useCategories } from "../../hooks/use-categories";
-import { useTransactions } from "../../hooks/use-transactions";
-import { TransactionType } from "../constants/transaction-type";
-import { Transaction } from "../entities/transaction";
+import { ArrowDownCircleIcon, ArrowUpCircleIcon, Edit, Trash } from "lucide-react"
+import { Badge } from "../../components/ui/badge"
+import { Button } from "../../components/ui/button"
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
+import { ColorCircle } from "../../components/ui/color-circle"
+import { Label } from "../../components/ui/label"
+import { useDeleteTransaction } from "../../hooks/use-delete-transaction"
+import { useFetchOneCategory } from "../../hooks/use-fetch-one-category"
+import { TransactionType } from "../constants/transaction-type"
+import { Transaction } from "../entities/transaction"
 
 interface ITransactionCardProps {
-	transaction: Transaction;
-	onEdit?: (transaction: Transaction) => void;
+	transaction: Transaction
+	onEdit?: (transaction: Transaction) => void
 }
 
 export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) => {
-	const { amount, categoryId, createDate, currentInstallment, description, installments, type } = transaction;
-	const transactionIcon = type === TransactionType.EXPENSE ? <ArrowDownCircleIcon /> : <ArrowUpCircleIcon />;
+	const { amount, categoryId, createDate, currentInstallment, description, installments, type } = transaction
+	const transactionIcon = type === TransactionType.EXPENSE ? <ArrowDownCircleIcon /> : <ArrowUpCircleIcon />
 
-	const { deleteMutation } = useTransactions();
-	const { mutateAsync: deleteFn } = deleteMutation;
-	const { data } = useCategories();
-
-	const category = useMemo(() => {
-		if (!data) return null;
-
-		return data.find((category) => category.id === categoryId);
-	}, [data, categoryId]);
+	const { data: category } = useFetchOneCategory(categoryId)
+	const { mutateAsync: deleteFn } = useDeleteTransaction()
 
 	const handleOnDelete = async () => {
-		if (!transaction.id) return;
-		await deleteFn(transaction);
-	};
+		if (!transaction.id) return
+		await deleteFn(transaction)
+	}
 
 	const handleOnEdit = () => {
-		if (onEdit) onEdit(transaction);
-	};
+		if (onEdit) onEdit(transaction)
+	}
 
 	return (
 		<Card>
 			<CardHeader>
 				<CardTitle>
-					<div className="flex items-center gap-2">
-						<div data-type={type} className="rounded-full data-[type=0]:bg-green data-[type=1]:bg-red p-2">
+					<div className="flex gap-4 items-center">
+						<div
+							data-type={type}
+							className="rounded-full text-white data-[type=0]:bg-green data-[type=1]:bg-red p-1.5 dark:text-black"
+						>
 							{transactionIcon}
 						</div>
 						<div className="flex flex-col gap-2">
@@ -63,7 +58,7 @@ export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) 
 					<Button variant="ghost" onClick={handleOnEdit}>
 						<Edit />
 					</Button>
-					<Button variant="ghost" onClick={handleOnDelete}>
+					<Button variant="ghost" onClick={handleOnDelete} className="text-red-400 dark:text-red-300">
 						<Trash />
 					</Button>
 				</CardAction>
@@ -74,12 +69,15 @@ export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) 
 						{category && <ColorCircle className="w-4 h-4" color={category.color} />}
 						<p>{category?.name}</p>
 					</div>
-					<div data-type={type} className="flex items-center gap-2 data-[type=0]:text-green-400 data-[type=1]:text-red-400">
-						{type === TransactionType.EXPENSE ? "- " : "+ "}
+					<div
+						data-type={type}
+						className="flex items-center gap-2 data-[type=0]:text-green-400 data-[type=1]:text-red-400 dark:data-[type=0]:text-green-300 dark:data-[type=1]:text-red-300"
+					>
+						{type === TransactionType.EXPENSE ? "-" : "+"}
 						{amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
 					</div>
 				</div>
 			</CardContent>
 		</Card>
-	);
-};
+	)
+}

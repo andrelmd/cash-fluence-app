@@ -1,3 +1,3 @@
 export interface IEntityServiceDelete<TEntity> {
-	delete(entity: TEntity): Promise<void>;
+	delete(entity: TEntity): Promise<void>
 }

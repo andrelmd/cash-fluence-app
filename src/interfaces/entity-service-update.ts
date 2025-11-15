@@ -1,3 +1,3 @@
 export interface IEntityServiceUpdate<TEntity> {
-	update(entity: TEntity): Promise<TEntity>;
+	update(entity: Partial<TEntity>): Promise<TEntity>
 }

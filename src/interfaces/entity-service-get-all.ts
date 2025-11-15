@@ -1,3 +1,3 @@
 export interface IEntityServiceGetAll<TEntity> {
-	getAll(): Promise<TEntity[]>;
+	getAll(): Promise<TEntity[]>
 }

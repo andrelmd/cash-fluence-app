@@ -1,17 +1,17 @@
-import dayjs, { Dayjs } from "dayjs";
-import { TransactionType } from "../constants/transaction-type";
+import dayjs, { Dayjs } from "dayjs"
+import { TransactionType } from "../constants/transaction-type"
 
 export class Transaction {
-	id: number | null;
-	amount: number;
-	createDate: Dayjs;
-	dueDate: Dayjs;
-	paymentDate: Dayjs | null;
-	type: TransactionType;
-	description: string;
-	currentInstallment: number | null;
-	installments: number | null;
-	categoryId: number;
+	id: number | null
+	amount: number
+	createDate: Dayjs
+	dueDate: Dayjs
+	paymentDate: Dayjs | null
+	type: TransactionType
+	description: string
+	currentInstallment: number | null
+	installments: number | null
+	categoryId: number
 
 	constructor({
 		amount,
@@ -25,26 +25,26 @@ export class Transaction {
 		currentInstallment = null,
 		installments = null,
 	}: {
-		id: number | null;
-		amount: number;
-		createDate?: Dayjs;
-		dueDate: Dayjs;
-		paymentDate: Dayjs | null;
-		type: TransactionType;
-		description: string;
-		currentInstallment: number | null;
-		installments: number | null;
-		categoryId: number;
+		id: number | null
+		amount: number
+		createDate?: Dayjs
+		dueDate: Dayjs
+		paymentDate: Dayjs | null
+		type: TransactionType
+		description: string
+		currentInstallment: number | null
+		installments: number | null
+		categoryId: number
 	}) {
-		this.id = id;
-		this.amount = amount;
-		this.createDate = createDate;
-		this.type = type;
-		this.description = description;
-		this.currentInstallment = currentInstallment;
-		this.installments = installments;
-		this.categoryId = categoryId;
-		this.dueDate = dueDate;
-		this.paymentDate = paymentDate;
+		this.id = id
+		this.amount = amount
+		this.createDate = createDate
+		this.type = type
+		this.description = description
+		this.currentInstallment = currentInstallment
+		this.installments = installments
+		this.categoryId = categoryId
+		this.dueDate = dueDate
+		this.paymentDate = paymentDate
 	}
 }

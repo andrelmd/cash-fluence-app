@@ -1,22 +1,30 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import dayjs from "dayjs";
-import { useEffect, useMemo, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
-import z from "zod";
-import { Button } from "../../components/ui/button";
-import { Collapsible, CollapsibleContent } from "../../components/ui/collapsible";
-import { ControlledSelect } from "../../components/ui/controled-select";
-import { ControlledDatePicker } from "../../components/ui/controlled-date-picker";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../components/ui/dialog";
-import { Label } from "../../components/ui/label";
-import { Switch } from "../../components/ui/switch";
-import { TextField } from "../../components/ui/text-field";
-import { useCategories } from "../../hooks/use-categories";
-import { useTransactions } from "../../hooks/use-transactions";
-import { currencyMask } from "../../utils/currency-mask";
-import { currencyMaskToNumber } from "../../utils/currency-mask-to-number";
-import { TransactionType } from "../constants/transaction-type";
-import { Transaction } from "../entities/transaction";
+import { zodResolver } from "@hookform/resolvers/zod"
+import dayjs from "dayjs"
+import { useEffect, useMemo, useState } from "react"
+import { FormProvider, useForm } from "react-hook-form"
+import z from "zod"
+import { Button } from "../../components/ui/button"
+import { Collapsible, CollapsibleContent } from "../../components/ui/collapsible"
+import { ControlledDatePicker } from "../../components/ui/controlled-date-picker"
+import { ControlledSelect } from "../../components/ui/controlled-select"
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "../../components/ui/dialog"
+import { Label } from "../../components/ui/label"
+import { Switch } from "../../components/ui/switch"
+import { TextField } from "../../components/ui/text-field"
+import { useFetchCategories } from "../../hooks/use-fetch-categories"
+import { useUpdateTransaction } from "../../hooks/use-update-transaction"
+import { currencyMask } from "../../utils/currency-mask"
+import { currencyMaskToNumber } from "../../utils/currency-mask-to-number"
+import { TransactionType } from "../constants/transaction-type"
+import { Transaction } from "../entities/transaction"
 
 const formSchema = z.object({
 	id: z.number().nullable(),
@@ -35,93 +43,90 @@ const formSchema = z.object({
 		.nullable(),
 	installments: z.coerce.number("Digite uma quantidade válida").min(1).nullable(),
 	currentInstallment: z.coerce.number("Digite uma quantidade válida").min(1).nullable(),
-});
+})
 
-type SchemaInput = z.input<typeof formSchema>;
-type SchemaOutput = z.output<typeof formSchema>;
+type SchemaInput = z.input<typeof formSchema>
+type SchemaOutput = z.output<typeof formSchema>
 
 interface ITransactionFormProps {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
-	transaction: Transaction | null;
-	onClose?: () => void;
+	open: boolean
+	onOpenChange: (open: boolean) => void
+	transaction: Transaction | null
+	onClose?: () => void
 }
 
 export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: ITransactionFormProps) => {
-	const [isInstallment, setIsInstallment] = useState(false);
-	const [isPaid, setIsPaid] = useState(false);
-	const { updateMutation } = useTransactions();
-	const { mutateAsync: updateFn } = updateMutation;
-
+	const [isInstallment, setIsInstallment] = useState(false)
+	const [isPaid, setIsPaid] = useState(false)
+	const { mutateAsync: updateFn } = useUpdateTransaction()
+	const { data: categories } = useFetchCategories()
 	const methods = useForm<SchemaInput, any, SchemaOutput>({
 		resolver: zodResolver(formSchema),
-	});
-
-	const { data } = useCategories();
+	})
 
 	const categoryOptions = useMemo(() => {
-		if (!data) return [];
-		return data.map((category) => ({
+		if (!categories) return []
+		return categories.map((category) => ({
 			label: category.name,
 			value: String(category.id),
-		}));
-	}, [data]);
+		}))
+	}, [categories])
 
 	const handleOnIsInstallmentChange = (open: boolean) => {
-		setIsInstallment(open);
-	};
+		setIsInstallment(open)
+	}
 
 	const resetForm = () => {
-		methods.reset();
-		setIsInstallment(false);
-		setIsPaid(false);
-	};
+		methods.reset()
+		setIsInstallment(false)
+		setIsPaid(false)
+	}
 
 	const handleOnsubmit = async (data: SchemaOutput) => {
 		await updateFn({
 			transaction: new Transaction(data),
 			saveInInstallments: isInstallment,
-		});
-		handleOnClose();
-	};
+		})
+		handleOnClose()
+	}
 
 	const handleOnClose = () => {
-		resetForm();
-		if (onClose) onClose();
-	};
+		resetForm()
+		if (onClose) onClose()
+	}
 
 	const handleOnOpenChange = (open: boolean) => {
 		if (!open) {
-			resetForm();
+			resetForm()
 		}
-		onOpenChange(open);
-	};
+		onOpenChange(open)
+	}
 
 	useEffect(() => {
 		if (!isInstallment) {
-			methods.setValue("installments", null);
-			methods.setValue("currentInstallment", null);
+			methods.setValue("installments", null)
+			methods.setValue("currentInstallment", null)
 		}
-	}, [isInstallment]);
+	}, [isInstallment])
 
 	useEffect(() => {
-		const hasInstallments = !!transaction?.installments && transaction.installments > 0;
-		setIsInstallment(hasInstallments);
+		const hasInstallments = !!transaction?.installments && transaction.installments > 0
+		setIsInstallment(hasInstallments)
 
 		const defaultValues = {
 			id: transaction?.id || null,
 			type: transaction?.type?.toString() ?? null,
-			amount: transaction?.amount.toString() || "",
+			amount: transaction?.amount.toFixed(2) || "",
 			description: transaction?.description || "",
-			categoryId: transaction?.categoryId?.toString() ?? null,
-			createDate: transaction?.createDate?.toDate() ?? new Date(),
-			dueDate: transaction?.dueDate?.toDate() ?? new Date(),
-			paymentDate: transaction?.paymentDate?.toDate() ?? null,
-			installments: transaction?.installments?.toString() ?? null,
-			currentInstallment: transaction?.currentInstallment?.toString() ?? null,
-		};
-		methods.reset(defaultValues);
-	}, [transaction, methods]);
+			categoryId: transaction?.categoryId?.toString() || null,
+			createDate: transaction?.createDate?.toDate() || new Date(),
+			dueDate: transaction?.dueDate?.toDate() || new Date(),
+			paymentDate: transaction?.paymentDate?.toDate() || null,
+			installments: transaction?.installments?.toString() || null,
+			currentInstallment: transaction?.currentInstallment?.toString() || null,
+		}
+		methods.reset(defaultValues)
+	}, [transaction, methods])
 
 	return (
 		<FormProvider {...methods}>
@@ -150,7 +155,12 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 							/>
 							<TextField label="Valor (R$)" name="amount" mask={currencyMask} type="number" />
 							<TextField label="Descrição" name="description" />
-							<ControlledSelect label="Categoria" name="categoryId" placeholder="Categoria" options={categoryOptions} />
+							<ControlledSelect
+								label="Categoria"
+								name="categoryId"
+								placeholder="Categoria"
+								options={categoryOptions}
+							/>
 							<ControlledDatePicker name="dueDate" label="Data da transação" />
 							<div className="flex items-center gap-2">
 								<Label htmlFor="is-paid">Transação Paga</Label>
@@ -163,7 +173,11 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 							</Collapsible>
 							<div className="flex items-center gap-2">
 								<Label htmlFor="is-installment">Transação Parcelada</Label>
-								<Switch id="is-installment" checked={isInstallment} onCheckedChange={handleOnIsInstallmentChange} />
+								<Switch
+									id="is-installment"
+									checked={isInstallment}
+									onCheckedChange={handleOnIsInstallmentChange}
+								/>
 							</div>
 							<Collapsible open={isInstallment} onOpenChange={handleOnIsInstallmentChange}>
 								<CollapsibleContent>
@@ -184,5 +198,5 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 				</DialogContent>
 			</Dialog>
 		</FormProvider>
-	);
-};
+	)
+}
