@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schema.tauri.app/config/2",
-	"productName": "tauri-app",
+	"productName": "cash-fluence",
 	"version": "0.1.0",
 	"identifier": "com.lmaldonado.cash-fluence",
 	"build": {

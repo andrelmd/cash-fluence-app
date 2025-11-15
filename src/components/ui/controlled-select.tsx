@@ -1,7 +1,7 @@
 import * as SelectPrimitive from "@radix-ui/react-select"
 import React from "react"
 import { Controller, useFormContext } from "react-hook-form"
-import { ISelectFieldOptions } from "../../interfaces/select-options"
+import { ISelectFieldOptions } from "../../interfaces/select-field-options"
 import { Field } from "./field"
 import { SelectField } from "./select-field"
 

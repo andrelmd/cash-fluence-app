@@ -1,6 +1,6 @@
 import * as SelectPrimitive from "@radix-ui/react-select"
 import { FieldError as FieldFormError } from "react-hook-form"
-import { ISelectFieldOptions } from "../../interfaces/select-options"
+import { ISelectFieldOptions } from "../../interfaces/select-field-options"
 import { camelCaseToKebabCase } from "../../utils/camel-case-to-kebab-case"
 import { Field, FieldError, FieldLabel } from "./field"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select"

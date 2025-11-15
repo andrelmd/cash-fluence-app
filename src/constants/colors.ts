@@ -1,4 +1,4 @@
-import { TColor } from "../types/color";
+import { TColor } from "../types/color"
 
 export const colors: TColor[] = [
 	"red",
@@ -18,4 +18,4 @@ export const colors: TColor[] = [
 	"fuchsia",
 	"pink",
 	"rose",
-];
+]
