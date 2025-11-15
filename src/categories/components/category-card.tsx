@@ -1,34 +1,36 @@
-import { Edit, Trash } from "lucide-react";
-import { useMemo } from "react";
-import { Badge } from "../../components/ui/badge";
-import { Button } from "../../components/ui/button";
-import { Card, CardAction, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
-import { ColorCircle } from "../../components/ui/color-circle";
-import { useCategories } from "../../hooks/use-categories";
-import { Category } from "../entities/Category";
+import { Edit, Trash } from "lucide-react"
+import { useMemo } from "react"
+import { Badge } from "../../components/ui/badge"
+import { Button } from "../../components/ui/button"
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
+import { ColorCircle } from "../../components/ui/color-circle"
+import { useDeleteCategory } from "../../hooks/use-delete-category"
+import { Category } from "../entities/Category"
 
 interface ICategoryCardProps {
-	category: Category;
-	onEdit?: (category: Category) => void;
+	category: Category
+	onEdit?: (category: Category) => void
 }
 
 export const CategoryCard = ({ category, onEdit }: ICategoryCardProps) => {
-	const { deleteFn } = useCategories();
-
-	const { color, name, monthlyLimit } = category;
-
+	const { color, name, monthlyLimit } = category
+	const { mutateAsync: deleteFn } = useDeleteCategory()
 	const monthlyLimitContent = useMemo(() => {
-		if (!monthlyLimit || monthlyLimit <= 0) return <Badge>Sem limite definido</Badge>;
-		return <Badge className="rounded-sm">{monthlyLimit.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</Badge>;
-	}, [monthlyLimit]);
+		if (!monthlyLimit || monthlyLimit <= 0) return <Badge>Sem limite definido</Badge>
+		return (
+			<Badge className="rounded-sm">
+				{monthlyLimit.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+			</Badge>
+		)
+	}, [monthlyLimit])
 
 	const handleOnEdit = () => {
-		onEdit?.(category);
-	};
+		onEdit?.(category)
+	}
 
 	const handleOnDelete = async () => {
-		await deleteFn(category);
-	};
+		await deleteFn(category)
+	}
 
 	return (
 		<Card>
@@ -41,7 +43,7 @@ export const CategoryCard = ({ category, onEdit }: ICategoryCardProps) => {
 					<Button variant="ghost" onClick={handleOnEdit}>
 						<Edit />
 					</Button>
-					<Button variant="ghost" onClick={handleOnDelete}>
+					<Button className="text-red-400 dark:text-red-300" variant="ghost" onClick={handleOnDelete}>
 						<Trash />
 					</Button>
 				</CardAction>
@@ -53,5 +55,5 @@ export const CategoryCard = ({ category, onEdit }: ICategoryCardProps) => {
 				</div>
 			</CardContent>
 		</Card>
-	);
-};
+	)
+}

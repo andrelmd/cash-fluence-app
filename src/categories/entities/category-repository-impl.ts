@@ -1,4 +1,4 @@
-import { databaseService } from "../../database/services/database-service-impl";
-import { CategoryRepository } from "./category-repository";
+import { databaseService } from "../../database/services/database-service-impl"
+import { CategoryRepository } from "./category-repository"
 
-export const categoryRepository = new CategoryRepository(databaseService, "categories");
+export const categoryRepository = new CategoryRepository(databaseService, "categories")
