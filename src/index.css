@@ -56,12 +56,6 @@
 	--color-fuchsia: var(--fuchsia);
 	--color-pink: var(--pink);
 	--color-rose: var(--rose);
-	--color-slate: var(--slate);
-	--color-gray: var(--gray);
-	--color-zinc: var(--zinc);
-	--color-neutral: var(--neutral);
-	--color-stone: var(--stone);
-	--color-warning: var(--red);
 }
 
 :root {
@@ -97,28 +91,23 @@
 	--sidebar-accent-foreground: oklch(0.205 0 0);
 	--sidebar-border: oklch(0.922 0 0);
 	--sidebar-ring: oklch(0.708 0 0);
-	--red: oklch(0.808 0.114 19.571);
-	--orange: oklch(0.837 0.128 66.29);
-	--amber: oklch(0.879 0.169 91.605);
-	--yellow: oklch(0.905 0.182 98.111);
-	--lime: oklch(0.897 0.196 126.665);
-	--green: oklch(0.871 0.15 154.449);
-	--emerald: oklch(0.845 0.143 164.978);
-	--teal: oklch(0.855 0.138 181.071);
-	--cyan: oklch(0.865 0.127 207.078);
-	--sky: oklch(0.828 0.111 230.318);
-	--blue: oklch(0.809 0.105 251.813);
-	--indigo: oklch(0.785 0.115 274.713);
-	--violet: oklch(0.811 0.111 293.571);
-	--purple: oklch(0.827 0.119 306.383);
-	--fuchsia: oklch(0.833 0.145 321.434);
-	--pink: oklch(0.823 0.12 346.018);
-	--rose: oklch(0.81 0.117 11.638);
-	--slate: oklch(0.869 0.022 252.894);
-	--gray: oklch(0.872 0.01 258.338);
-	--zinc: oklch(0.871 0.006 286.286);
-	--neutral: oklch(0.87 0 0);
-	--stone: oklch(0.869 0.005 56.366);
+	--red: oklch(0.704 0.191 22.216);
+	--orange: oklch(0.75 0.183 55.934);
+	--amber: oklch(0.828 0.189 84.429);
+	--yellow: oklch(0.852 0.199 91.936);
+	--lime: oklch(0.841 0.238 128.85);
+	--green: oklch(0.792 0.209 151.711);
+	--emerald: oklch(0.765 0.177 163.223);
+	--teal: oklch(0.777 0.152 181.912);
+	--cyan: oklch(0.789 0.154 211.53);
+	--sky: oklch(0.746 0.16 232.661);
+	--blue: oklch(0.707 0.165 254.624);
+	--indigo: oklch(0.673 0.182 276.935);
+	--violet: oklch(0.702 0.183 293.541);
+	--purple: oklch(0.714 0.203 305.504);
+	--fuchsia: oklch(0.74 0.238 322.16);
+	--pink: oklch(0.718 0.202 349.761);
+	--rose: oklch(0.712 0.194 13.428);
 }
 
 .dark {
@@ -170,11 +159,6 @@
 	--fuchsia: oklch(0.833 0.145 321.434);
 	--pink: oklch(0.823 0.12 346.018);
 	--rose: oklch(0.81 0.117 11.638);
-	--slate: oklch(0.869 0.022 252.894);
-	--gray: oklch(0.872 0.01 258.338);
-	--zinc: oklch(0.871 0.006 286.286);
-	--neutral: oklch(0.87 0 0);
-	--stone: oklch(0.869 0.005 56.366);
 }
 
 @layer base {

@@ -1,4 +1,4 @@
-import { AppPage, appPages } from "../layouts/app-layout/constants/app-pages";
+import { AppPage, appPages } from "../layouts/app-layout/constants/app-pages"
 import {
 	Sidebar,
 	SidebarContent,
@@ -8,17 +8,17 @@ import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
-} from "./sidebar";
+} from "./sidebar"
 
 interface IAppSidebarProps {
-	onSelect: (page: AppPage) => void;
-	selectedPage: AppPage;
+	onSelect: (page: AppPage) => void
+	selectedPage: AppPage
 }
 
 export const AppSidebar = ({ onSelect, selectedPage }: IAppSidebarProps) => {
 	const handleOnClick = (page: AppPage) => {
-		onSelect(page);
-	};
+		onSelect(page)
+	}
 
 	return (
 		<Sidebar variant="sidebar">
@@ -29,7 +29,10 @@ export const AppSidebar = ({ onSelect, selectedPage }: IAppSidebarProps) => {
 						<SidebarMenu>
 							{appPages.map((item) => (
 								<SidebarMenuItem key={item.value}>
-									<SidebarMenuButton onClick={() => handleOnClick(item.value)} isActive={selectedPage === item.value}>
+									<SidebarMenuButton
+										onClick={() => handleOnClick(item.value)}
+										isActive={selectedPage === item.value}
+									>
 										{item.icon}
 										{item.label}
 									</SidebarMenuButton>
@@ -40,5 +43,5 @@ export const AppSidebar = ({ onSelect, selectedPage }: IAppSidebarProps) => {
 				</SidebarGroup>
 			</SidebarContent>
 		</Sidebar>
-	);
-};
+	)
+}

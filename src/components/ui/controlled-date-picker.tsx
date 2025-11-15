@@ -1,26 +1,26 @@
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { useState } from "react";
-import { Controller, useFormContext } from "react-hook-form";
-import { Button } from "./button";
-import { Calendar } from "./calendar";
-import { Field, FieldError } from "./field";
-import { Label } from "./label";
-import { Popover, PopoverContent, PopoverTrigger } from "./popover";
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+import { useState } from "react"
+import { Controller, useFormContext } from "react-hook-form"
+import { Button } from "./button"
+import { Calendar } from "./calendar"
+import { Field, FieldContent, FieldError } from "./field"
+import { Label } from "./label"
+import { Popover, PopoverContent, PopoverTrigger } from "./popover"
 
 interface IControlledDatePickerProps {
-	name: string;
-	label: string;
+	name: string
+	label: string
 }
 
 export const ControlledDatePicker = ({ name, label }: IControlledDatePickerProps) => {
-	const { control } = useFormContext();
-	const [isOpen, setIsOpen] = useState(false);
+	const { control } = useFormContext()
+	const [isOpen, setIsOpen] = useState(false)
 
 	const handleOnSelect = (event: any, callback: (event: any) => void) => {
-		callback(event);
-		setIsOpen(false);
-	};
+		callback(event)
+		setIsOpen(false)
+	}
 
 	return (
 		<Controller
@@ -28,7 +28,9 @@ export const ControlledDatePicker = ({ name, label }: IControlledDatePickerProps
 			name={name}
 			render={({ field, fieldState }) => (
 				<Field data-invalid={fieldState.invalid}>
-					<Label htmlFor={field.name}>{label}</Label>
+					<FieldContent>
+						<Label htmlFor={field.name}>{label}</Label>
+					</FieldContent>
 					<Popover open={isOpen} onOpenChange={setIsOpen}>
 						<PopoverTrigger asChild>
 							<Button
@@ -42,12 +44,16 @@ export const ControlledDatePicker = ({ name, label }: IControlledDatePickerProps
 							</Button>
 						</PopoverTrigger>
 						<PopoverContent className="w-auto p-0">
-							<Calendar mode="single" selected={field.value || null} onSelect={(e) => handleOnSelect(e, field.onChange)} />
+							<Calendar
+								mode="single"
+								selected={field.value || null}
+								onSelect={(e) => handleOnSelect(e, field.onChange)}
+							/>
 						</PopoverContent>
 					</Popover>
 					{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
 				</Field>
 			)}
 		/>
-	);
-};
+	)
+}

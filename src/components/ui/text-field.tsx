@@ -1,24 +1,27 @@
-import React from "react";
-import { Controller, useFormContext } from "react-hook-form";
-import { Field, FieldError, FieldLabel } from "./field";
-import { Input } from "./input";
+import React from "react"
+import { Controller, useFormContext } from "react-hook-form"
+import { Field, FieldError, FieldLabel } from "./field"
+import { Input } from "./input"
 
 interface TextFieldProps extends React.ComponentProps<"input"> {
-	label: string;
-	name: string;
-	mask?: (value: string) => string;
+	label: string
+	name: string
+	mask?: (value: string) => string
 }
 
 export const TextField = ({ label, name, ...props }: TextFieldProps) => {
-	const { control } = useFormContext();
+	const { control } = useFormContext()
 
-	const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>, callback: (event: React.ChangeEvent<HTMLInputElement>) => void) => {
+	const handleOnChange = (
+		event: React.ChangeEvent<HTMLInputElement>,
+		callback: (event: React.ChangeEvent<HTMLInputElement>) => void
+	) => {
 		if (props.mask) {
-			const value = props.mask(event.target.value);
-			return callback({ ...event, target: { ...event.target, value } });
+			const value = props.mask(event.target.value)
+			return callback({ ...event, target: { ...event.target, value } })
 		}
-		return callback(event);
-	};
+		return callback(event)
+	}
 
 	return (
 		<Controller
@@ -39,5 +42,5 @@ export const TextField = ({ label, name, ...props }: TextFieldProps) => {
 				</Field>
 			)}
 		/>
-	);
-};
+	)
+}

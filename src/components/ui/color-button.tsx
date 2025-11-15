@@ -1,12 +1,12 @@
-import { cva } from "class-variance-authority";
-import { cn } from "../../lib/utils";
-import { TColor } from "../../types/color";
-import { Button } from "./button";
+import { cva } from "class-variance-authority"
+import { cn } from "../../lib/utils"
+import { TColor } from "../../types/color"
+import { Button } from "./button"
 
 interface IColorButtonProps extends React.ComponentProps<"button"> {
-	color: TColor;
-	className?: string;
-	selected?: boolean;
+	color: TColor
+	className?: string
+	selected?: boolean
 }
 
 const colorHover: Record<TColor, string> = {
@@ -27,24 +27,29 @@ const colorHover: Record<TColor, string> = {
 	fuchsia: "bg-fuchsia hover:bg-fuchsia/50",
 	pink: "bg-pink hover:bg-pink/50",
 	rose: "bg-rose hover:bg-rose/50",
-};
+	primary: "bg-primary hover:bg-primary/50",
+}
 
 const colorButtonVariants = cva("rounded-full w-8 h-8", {
 	variants: {
 		color: colorHover,
+		selected: {
+			true: "ring-2 ring-offset-0 ring-primary",
+			false: "",
+		},
 	},
 	defaultVariants: {
 		color: "primary",
 	},
-});
+})
 
 export const ColorButton = ({ color, className, selected = false, ...props }: IColorButtonProps) => {
 	return (
 		<Button
 			key={color}
 			variant={"default"}
-			className={cn(colorButtonVariants({ color }), selected ? "ring-1 ring-offset-0 ring-primary" : "", className)}
+			className={cn(colorButtonVariants({ color, selected }), className)}
 			{...props}
 		/>
-	);
-};
+	)
+}
