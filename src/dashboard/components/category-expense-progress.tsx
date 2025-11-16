@@ -1,0 +1,43 @@
+import React from "react"
+import { ColorCircle } from "../../components/ui/color-circle"
+import { Progress } from "../../components/ui/progress"
+import { TColor } from "../../types/color"
+
+interface ICategoryExpenseProgressProps extends React.ComponentPropsWithoutRef<"div"> {
+	category: string
+	percentage: number
+	color: string
+	actual: number
+	planned: number
+}
+
+export const CategoryExpenseProgress = ({
+	category,
+	percentage,
+	actual,
+	color,
+	planned,
+}: ICategoryExpenseProgressProps) => {
+	const currencyProgress = `${percentage.toFixed(2)}% utilizado`
+	const actualVsPlanned = `${actual.toLocaleString("pt-BR", {
+		style: "currency",
+		currency: "BRL",
+	})} / ${planned.toLocaleString("pt-BR", {
+		style: "currency",
+		currency: "BRL",
+	})}`
+
+	return (
+		<div className="flex flex-col gap-2">
+			<div className="flex justify-between items-center">
+				<div className="flex items-center gap-2 text-md">
+					<ColorCircle color={color as TColor} className="w-4 h-4" />
+					{category}
+				</div>
+				<div className="text-muted-foreground font-medium text-sm">{actualVsPlanned}</div>
+			</div>
+			<Progress value={percentage} />
+			<div className="text-xs text-muted-foreground font-medium">{currencyProgress}</div>
+		</div>
+	)
+}

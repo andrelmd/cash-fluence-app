@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { Dayjs } from "dayjs"
-import { useCallback } from "react"
+import { useCallback, useMemo } from "react"
 import { UseQueryKeys } from "../constants/use-query-keys"
 import { TransactionType } from "../transactions/constants/transaction-type"
 import { transactionsService } from "../transactions/services/transactions-service-impl"
@@ -12,7 +12,7 @@ interface IUseFetchTransactionsOptions {
 }
 
 export function useFetchTransactions(options: IUseFetchTransactionsOptions = {}) {
-	const queryKey = [UseQueryKeys.TRANSACTIONS, options]
+	const queryKey = useMemo(() => [UseQueryKeys.TRANSACTIONS, options], [options])
 
 	const getFetchFn = useCallback(() => {
 		const { type, startDate, endDate } = options

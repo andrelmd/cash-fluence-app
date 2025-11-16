@@ -6,7 +6,7 @@ import { IChartData } from "../../helpers/balance-chart-calculation"
 
 const chartConfig = {
 	balance: {
-		label: "balance",
+		label: "Saldo",
 		color: "var(--chart-1)",
 	},
 } satisfies ChartConfig
@@ -36,7 +36,7 @@ export const BalanceChart = ({ data, date }: IBalanceChartProps) => {
 							right: 12,
 						}}
 					>
-						<CartesianGrid vertical={false} />
+						<CartesianGrid vertical={false} horizontal={true} />
 						<YAxis domain={[minBalance - 5, maxBalance + 5]} tick={false} axisLine={false} />
 						<XAxis dataKey={"date"} tickLine={false} axisLine={false} tickMargin={8} />
 						<ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />

@@ -5,12 +5,12 @@ import { Planning } from "../plannings/entities/planning"
 import { planningsService } from "../plannings/services/plannings-service-impl"
 import { useInvalidateAll } from "../utils/query-invalidation"
 
-export const useUpdatePlanning = () => {
+export const useDeletePlanning = () => {
 	const invalidateAllPlannings = useInvalidateAll(UseQueryKeys.PLANNINGS)
 
 	const mutationFn = useCallback(async (data: Planning) => {
 		if (data.id) {
-			return planningsService.update(data)
+			return planningsService.delete(data)
 		}
 		return planningsService.save(data)
 	}, [])

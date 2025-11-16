@@ -1,4 +1,5 @@
 import { TSelectOptionsWithoutTable } from "../../database/types/select-options-without-table"
+import { IEntityServiceDelete } from "../../interfaces/entity-service-delete"
 import { IEntityServiceGetAll } from "../../interfaces/entity-service-get-all"
 import { IEntityServiceGetMany } from "../../interfaces/entity-service-get-many"
 import { IEntityServiceSave } from "../../interfaces/entity-service-save"
@@ -11,7 +12,8 @@ export class PlanningsService
 		IEntityServiceGetMany<Planning>,
 		IEntityServiceGetAll<Planning>,
 		IEntityServiceSave<Planning>,
-		IEntityServiceUpdate<Planning>
+		IEntityServiceUpdate<Planning>,
+		IEntityServiceDelete<Planning>
 {
 	constructor(private repository: PlanningRepository) {}
 
@@ -52,5 +54,9 @@ export class PlanningsService
 
 	async getByDate(month: number, year: number): Promise<Planning[]> {
 		return this.getMany({ where: { month, year } })
+	}
+
+	delete(entity: Planning): Promise<void> {
+		return this.repository.delete({ where: { id: entity.id } })
 	}
 }

@@ -1,8 +1,9 @@
 import dayjs from "dayjs"
-import { useCallback, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { ContentLayout } from "../../components/layouts/content-layout/content-layout"
 import { Button } from "../../components/ui/button"
 import { CardList } from "../../components/ui/card-list"
+import { DateFilterDialog } from "../../components/ui/date-filter-dialog"
 import { useFetchTransactions } from "../../hooks/use-fetch-transactions"
 import { TransactionCard } from "../components/transaction-card"
 import { TransactionForm } from "../components/transaction-form"
@@ -11,9 +12,14 @@ import { Transaction } from "../entities/transaction"
 export const Transactions = () => {
 	const [isFormOpen, setIsFormOpen] = useState(false)
 	const [transaction, setTransaction] = useState<Transaction | null>(null)
+	const [filterDialogIsOpen, setFilterDialogIsOpen] = useState(false)
+	const [month, setMoth] = useState(dayjs().month())
+	const [year, setYear] = useState(dayjs().year())
 
-	const startDate = dayjs().startOf("month")
-	const endDate = dayjs().endOf("month")
+	const date = useMemo(() => dayjs().year(year).month(month), [month, year])
+	const startDate = useMemo(() => date.startOf("month"), [date])
+	const endDate = useMemo(() => date.endOf("month"), [date])
+
 	const { query } = useFetchTransactions({ startDate, endDate })
 	const { data, isLoading } = query
 
@@ -34,21 +40,34 @@ export const Transactions = () => {
 	return (
 		<ContentLayout isLoading={isLoading}>
 			<div className="flex flex-1 flex-col gap-4 overflow-auto">
-				<div className="flex justify-end">
+				<div className="flex justify-between">
+					<Button variant={"secondary"} onClick={() => setFilterDialogIsOpen(true)}>
+						Filtrar
+					</Button>
 					<Button onClick={handleOnOpen}>Criar nova transação</Button>
 				</div>
-				<CardList
-					noContentText="Nenhuma transação encontrada"
-					content={data}
-					render={(item) => <TransactionCard transaction={item} key={item.id} onEdit={handleOnEdit} />}
-				/>
-				<TransactionForm
-					transaction={transaction}
-					open={isFormOpen}
-					onOpenChange={setIsFormOpen}
-					onClose={handleOnClose}
-				/>
+				<div className="overflow-auto flex-1 flex p-4">
+					<CardList
+						noContentText="Nenhuma transação encontrada"
+						data={data}
+						render={(item) => <TransactionCard transaction={item} key={item.id} onEdit={handleOnEdit} />}
+					/>
+				</div>
 			</div>
+			<TransactionForm
+				transaction={transaction}
+				open={isFormOpen}
+				onOpenChange={setIsFormOpen}
+				onClose={handleOnClose}
+			/>
+			<DateFilterDialog
+				month={month}
+				onOpenChange={setFilterDialogIsOpen}
+				setMoth={setMoth}
+				year={year}
+				setYear={setYear}
+				open={filterDialogIsOpen}
+			/>
 		</ContentLayout>
 	)
 }

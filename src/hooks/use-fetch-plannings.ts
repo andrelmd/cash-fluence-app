@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query"
-import { useCallback } from "react"
+import { useCallback, useMemo } from "react"
 import { UseQueryKeys } from "../constants/use-query-keys"
 import { planningsService } from "../plannings/services/plannings-service-impl"
 
 export const useFetchPlannings = () => {
-	const queryKey = [UseQueryKeys.PLANNINGS]
+	const queryKey = useMemo(() => [UseQueryKeys.PLANNINGS], [])
 
 	const getFetchFn = useCallback(() => {
 		return async () => planningsService.getAll()

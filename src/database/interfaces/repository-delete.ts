@@ -1,5 +1,5 @@
-import { IDeleteOptions } from "./delete-options"
+import { TDeleteOptionsWithoutTable } from "../types/delete-options-without-table"
 
 export interface IRepositoryDelete<TEntity> {
-	delete(options: IDeleteOptions<TEntity>): Promise<void>
+	delete(options: TDeleteOptionsWithoutTable<TEntity>): Promise<void>
 }

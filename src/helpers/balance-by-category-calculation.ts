@@ -1,12 +1,13 @@
 import { Category } from "../categories/entities/Category"
 import { Planning } from "../plannings/entities/planning"
+import { TransactionType } from "../transactions/constants/transaction-type"
 import { Transaction } from "../transactions/entities/transaction"
 
 export interface IBalanceByCategoryChartData {
-	category: string
-	planned: number
-	actual: number
-	limit: number
+	type: string
+	label: string
+	data: Record<string, number>
+	colors: Record<string, string>
 }
 
 export function calculateBalanceByCategories(
@@ -14,34 +15,51 @@ export function calculateBalanceByCategories(
 	categories?: Category[],
 	plannings?: Planning[]
 ) {
-	if (!transactions || transactions.length === 0) {
+	if (!categories?.length || !transactions?.length) {
 		return []
 	}
 
-	if (!categories || categories.length === 0) {
-		return []
-	}
+	const expenseTransactions = transactions.filter((t) => t.type === TransactionType.EXPENSE)
 
-	if (!plannings || plannings.length === 0) {
-		return []
-	}
+	const planned: Record<string, number> = {}
+	const actual: Record<string, number> = {}
+	const monthlyLimit: Record<string, number> = {}
+	const colors: Record<string, string> = {}
 
-	const chartData: IBalanceByCategoryChartData[] = categories.map((category) => {
-		const planning = plannings.find((p) => p.categoryId === category.id)
+	categories.forEach((category) => {
+		const categoryName = category.name
 
-		const transactionsForCategory = transactions.filter((t) => t.categoryId === category.id)
+		planned[categoryName] = plannings?.find((p) => p.categoryId === category.id)?.amount || 0
 
-		const planned = planning ? planning.amount : 0
-		const actual = transactionsForCategory.reduce((acc, curr) => acc + curr.amount, 0)
-		const limit = category.monthlyLimit ? category.monthlyLimit : 0
+		actual[categoryName] = expenseTransactions
+			.filter((t) => t.categoryId === category.id)
+			.reduce((acc, curr) => acc + curr.amount, 0)
 
-		return {
-			category: category.name,
-			planned,
-			actual,
-			limit,
-		}
-	}, [])
+		monthlyLimit[categoryName] = category.monthlyLimit || 0
+
+		colors[categoryName] = `var(--${category.color})`
+	})
+
+	const chartData: IBalanceByCategoryChartData[] = [
+		{
+			data: planned,
+			type: "planned",
+			label: "Planejado",
+			colors,
+		},
+		{
+			data: actual,
+			type: "actual",
+			label: "Realizado",
+			colors,
+		},
+		{
+			data: monthlyLimit,
+			type: "limit",
+			label: "Limite mensal",
+			colors,
+		},
+	]
 
 	return chartData
 }

@@ -3,9 +3,9 @@ import { useCallback, useState } from "react"
 import { ContentLayout } from "../../components/layouts/content-layout/content-layout"
 import { Button } from "../../components/ui/button"
 import { CardList } from "../../components/ui/card-list"
+import { DateFilterDialog } from "../../components/ui/date-filter-dialog"
 import { useFetchPlanningsByPeriod } from "../../hooks/use-fetch-plannings-by-period"
 import { PlanningCard } from "../components/planning-card"
-import { PlanningFilterDialog } from "../components/planning-filter-dialog"
 import { CategoryForm } from "../components/planning-form"
 import { Planning } from "../entities/planning"
 
@@ -36,29 +36,28 @@ export const Plannings = () => {
 		<ContentLayout isLoading={isLoading}>
 			<div className="flex flex-1 flex-col gap-4 overflow-auto">
 				<div className="flex justify-between">
-					<Button onClick={() => setFilterDialogIsOpen(true)}>Filtrar</Button>
+					<Button variant={"secondary"} onClick={() => setFilterDialogIsOpen(true)}>
+						Filtrar
+					</Button>
 					<Button onClick={handleOnOpen}>Novo planejamento</Button>
 				</div>
-				<PlanningFilterDialog
-					open={filterDialogIsOpen}
-					onOpenChange={setFilterDialogIsOpen}
-					month={month}
-					setMoth={setMoth}
-					year={year}
-					setYear={setYear}
-				/>
-				<CardList
-					content={data}
-					noContentText="Nenhum planejamento encontrado"
-					render={(item) => <PlanningCard plan={item} key={item.id} onEdit={handleOnEdit} />}
-				/>
-				<CategoryForm
-					planning={planning}
-					open={isFormOpen}
-					onOpenChange={setIsFormOpen}
-					onClose={handleOnClose}
-				/>
+				<div className="flex-1 overflow-auto p-4">
+					<CardList
+						data={data}
+						noContentText="Nenhum planejamento encontrado"
+						render={(item) => <PlanningCard plan={item} key={item.id} onEdit={handleOnEdit} />}
+					/>
+				</div>
 			</div>
+			<CategoryForm planning={planning} open={isFormOpen} onOpenChange={setIsFormOpen} onClose={handleOnClose} />
+			<DateFilterDialog
+				open={filterDialogIsOpen}
+				onOpenChange={setFilterDialogIsOpen}
+				month={month}
+				setMoth={setMoth}
+				year={year}
+				setYear={setYear}
+			/>
 		</ContentLayout>
 	)
 }

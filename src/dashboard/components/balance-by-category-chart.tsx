@@ -1,7 +1,9 @@
 import { Dayjs } from "dayjs"
+import { useMemo } from "react"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import {
+	ChartConfig,
 	ChartContainer,
 	ChartLegend,
 	ChartLegendContent,
@@ -10,27 +12,25 @@ import {
 } from "../../components/ui/chart"
 import { IBalanceByCategoryChartData } from "../../helpers/balance-by-category-calculation"
 
-const chartConfig = {
-	planned: {
-		label: "Planejado",
-		color: "var(--chart-1)",
-	},
-	actual: {
-		label: "Real",
-		color: "var(--chart-2)",
-	},
-	limit: {
-		label: "Limite",
-		color: "var(--chart-3)",
-	},
-}
-
 interface IBalanceByCategoryChartProps {
 	data: IBalanceByCategoryChartData[]
 	date: Dayjs
 }
 
 export const BalanceByCategoryChart = ({ data, date }: IBalanceByCategoryChartProps) => {
+	const categories = useMemo(() => (data && data.length > 0 ? Object.keys(data[0].data) : []), [data])
+	const colors = useMemo(() => (data && data.length > 0 ? data[0].colors : {}), [data])
+
+	const chartConfig = categories.reduce((acc, curr) => {
+		acc[curr] = {
+			label: curr,
+			color: colors[curr],
+		}
+		return acc
+	}, {} as ChartConfig) satisfies ChartConfig
+
+	const chartData = data.map((item) => ({ type: item.label, ...item.data }))
+
 	return (
 		<Card>
 			<CardHeader>
@@ -39,14 +39,20 @@ export const BalanceByCategoryChart = ({ data, date }: IBalanceByCategoryChartPr
 			</CardHeader>
 			<CardContent>
 				<ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
-					<BarChart accessibilityLayer data={data}>
+					<BarChart accessibilityLayer data={chartData}>
 						<CartesianGrid vertical={false} />
-						<XAxis dataKey="category" tickLine={false} tickMargin={10} axisLine={false} />
+						<XAxis dataKey="type" tickLine={false} tickMargin={10} axisLine={false} />
 						<ChartTooltip content={<ChartTooltipContent hideLabel />} />
 						<ChartLegend content={<ChartLegendContent />} />
-						<Bar dataKey="planned" stackId="a" fill="var(--color-planned)" radius={[0, 0, 4, 4]} />
-						<Bar dataKey="actual" stackId="a" fill="var(--color-actual)" radius={[4, 4, 0, 0]} />
-						<Bar dataKey="limit" stackId="a" fill="var(--color-limit)" radius={[0, 0, 4, 4]} />
+						{categories.map((category) => (
+							<Bar
+								key={category}
+								dataKey={category}
+								stackId="a"
+								fill={`var(--color-${category})`}
+								radius={[0, 0, 4, 4]}
+							/>
+						))}
 					</BarChart>
 				</ChartContainer>
 			</CardContent>

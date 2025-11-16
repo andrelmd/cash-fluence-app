@@ -32,18 +32,15 @@ export const Categories = () => {
 				<div className="flex justify-end">
 					<Button onClick={handleOnOpen}>Nova categoria</Button>
 				</div>
-				<CardList
-					content={data}
-					noContentText="Nenhuma categoria encontrada"
-					render={(item) => <CategoryCard category={item} key={item.id} onEdit={handleOnEdit} />}
-				/>
-				<CategoryForm
-					category={category}
-					open={isFormOpen}
-					onOpenChange={setIsFormOpen}
-					onClose={handleOnClose}
-				/>
+				<div className="flex-1 overflow-auto p-4">
+					<CardList
+						data={data}
+						noContentText="Nenhuma categoria encontrada"
+						render={(item) => <CategoryCard category={item} key={item.id} onEdit={handleOnEdit} />}
+					/>
+				</div>
 			</div>
+			<CategoryForm category={category} open={isFormOpen} onOpenChange={setIsFormOpen} onClose={handleOnClose} />
 		</ContentLayout>
 	)
 }

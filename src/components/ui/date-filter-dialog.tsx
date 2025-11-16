@@ -1,22 +1,34 @@
 import { Button } from "@/components/ui/button"
+import { DialogDescription } from "@radix-ui/react-dialog"
 import dayjs from "dayjs"
 import { useMemo } from "react"
-import { Dialog, DialogClose, DialogContent, DialogFooter } from "../../components/ui/dialog"
-import { FieldDescription, FieldGroup, FieldLegend, FieldSet } from "../../components/ui/field"
-import { SelectField } from "../../components/ui/select-field"
 import { useFetchFirstYearTransaction } from "../../hooks/use-fetch-first-year-transaction"
 import { ISelectFieldOptions } from "../../interfaces/select-field-options"
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./dialog"
+import { FieldGroup, FieldSet } from "./field"
+import { SelectField } from "./select-field"
 
-interface IPlanningFilterProps {
+interface IDateFilterProps {
 	open: boolean
 	onOpenChange: (value: boolean) => void
 	month: number
 	setMoth: (value: number) => void
 	year: number
 	setYear: (value: number) => void
+	title?: string
+	description?: string
 }
 
-export const PlanningFilterDialog = ({ open, onOpenChange, month, setMoth, year, setYear }: IPlanningFilterProps) => {
+export const DateFilterDialog = ({
+	open,
+	onOpenChange,
+	month,
+	setMoth,
+	year,
+	setYear,
+	title = "Filtros",
+	description = "Filtre por mês e ano.",
+}: IDateFilterProps) => {
 	const monthLabel = "Mês"
 	const monthPlaceholder = "Selecione um mês"
 	const MonthOptions: ISelectFieldOptions[] = useMemo(
@@ -52,9 +64,11 @@ export const PlanningFilterDialog = ({ open, onOpenChange, month, setMoth, year,
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent>
+				<DialogHeader>
+					<DialogTitle>{title}</DialogTitle>
+					<DialogDescription>{description}</DialogDescription>
+				</DialogHeader>
 				<FieldSet>
-					<FieldLegend>Filtros</FieldLegend>
-					<FieldDescription>Filtre seus planejamentos por mês e ano.</FieldDescription>
 					<FieldGroup>
 						<div className="grid grid-cols-2 gap-4">
 							<SelectField

@@ -1,9 +1,13 @@
 import { useQuery } from "@tanstack/react-query"
+import { useMemo } from "react"
+import { UseQueryKeys } from "../constants/use-query-keys"
 import { transactionsService } from "../transactions/services/transactions-service-impl"
 
 export const useFetchFirstYearTransaction = () => {
+	const queryKey = useMemo(() => [UseQueryKeys.FIRST_YEAR_TRANSACTION], [])
+
 	return useQuery({
-		queryKey: ["firstYearTransaction"],
+		queryKey,
 		queryFn: async () => transactionsService.getFirstYear(),
 	})
 }

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Categories } from "../../../categories/pages/categories-page"
+import { Categories } from "../../../categories/pages/categories"
 import { Dashboard } from "../../../dashboard/pages/dashboard"
 import { getAppPageTitle } from "../../../helpers/get-app-page-title"
 import { Plannings } from "../../../plannings/pages/plannings"
