@@ -3,7 +3,7 @@
 > Aplicativo de gerência financeira pessoal.
 
 <p align="center">
-  <a href="https://github.com/andrelmd/cash-fluence-app/actions/workflows/release.yml">
+  <a href="https://github.com/andrelmd/cash-fluence-app/actions/workflows/publish.yml">
     <img src="https://github.com/andrelmd/cash-fluence-app/actions/workflows/release.yml/badge.svg" alt="Status do Build">
   </a>
   <a href="https://github.com/andrelmd/cash-fluence-app/releases/latest">
@@ -42,3 +42,4 @@ Se você deseja compilar o aplicativo a partir do código-fonte, siga estes pass
 ## 📜 Licença
 
 Este projeto está licenciado sob a Licença MIT - veja o arquivo LICENSE para mais detalhes.
+
