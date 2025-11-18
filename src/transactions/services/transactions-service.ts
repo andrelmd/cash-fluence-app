@@ -52,17 +52,17 @@ export class TransactionsService
 		currentInstallment: number,
 		installmentNumber: number
 	): Transaction {
-		const { installments, amount, createDate } = transaction
+		const { installments, amount, dueDate } = transaction
 		const installmentValue = amount / installments!
 		const monthOffset = installmentNumber - currentInstallment
-		const newCreateDate = dayjs(createDate).add(monthOffset, "month")
+		const newDueDate = dayjs(dueDate).add(monthOffset, "month")
 
 		return new Transaction({
 			...transaction,
 			paymentDate: null,
 			currentInstallment: installmentNumber,
 			amount: installmentValue,
-			createDate: newCreateDate,
+			dueDate: newDueDate,
 		})
 	}
 
@@ -101,13 +101,13 @@ export class TransactionsService
 	async getTransactionsByPeriod(startDate: dayjs.Dayjs, endDate: dayjs.Dayjs): Promise<Transaction[]> {
 		return this.getMany({
 			where: {
-				createDate: {
+				dueDate: {
 					operator: "BETWEEN",
 					value: [startDate, endDate],
 				},
 			},
 			orderBy: {
-				createDate: "desc",
+				dueDate: "desc",
 			},
 		})
 	}
@@ -115,7 +115,7 @@ export class TransactionsService
 	async getFirstYear() {
 		const firstTransaction = await this.getOne({
 			orderBy: {
-				createDate: "asc",
+				dueDate: "asc",
 			},
 			limit: 1,
 		})
@@ -124,6 +124,21 @@ export class TransactionsService
 			throw new Error("No transactions found")
 		}
 
-		return dayjs(firstTransaction.createDate).year()
+		return dayjs(firstTransaction.dueDate).year()
+	}
+
+	async getLastYear() {
+		const lastTransaction = await this.getOne({
+			orderBy: {
+				dueDate: "desc",
+			},
+			limit: 1,
+		})
+
+		if (!lastTransaction) {
+			throw new Error("No transactions found")
+		}
+
+		return dayjs(lastTransaction.dueDate).year()
 	}
 }

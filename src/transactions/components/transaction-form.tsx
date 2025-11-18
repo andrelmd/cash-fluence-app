@@ -17,6 +17,7 @@ import {
 	DialogTitle,
 } from "../../components/ui/dialog"
 import { Label } from "../../components/ui/label"
+import { ShowIf } from "../../components/ui/show-if"
 import { Switch } from "../../components/ui/switch"
 import { TextField } from "../../components/ui/text-field"
 import { useFetchCategories } from "../../hooks/use-fetch-categories"
@@ -110,6 +111,13 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 	}, [isInstallment])
 
 	useEffect(() => {
+		if (!isPaid) {
+			methods.setValue("paymentDate", null)
+		}
+		methods.setValue("paymentDate", new Date())
+	}, [isPaid])
+
+	useEffect(() => {
 		const hasInstallments = !!transaction?.installments && transaction.installments > 0
 		setIsInstallment(hasInstallments)
 
@@ -171,20 +179,23 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 									<ControlledDatePicker name="paymentDate" label="Data do pagamento" />
 								</CollapsibleContent>
 							</Collapsible>
-							<div className="flex items-center gap-2">
-								<Label htmlFor="is-installment">Transação Parcelada</Label>
-								<Switch
-									id="is-installment"
-									checked={isInstallment}
-									onCheckedChange={handleOnIsInstallmentChange}
-								/>
-							</div>
-							<Collapsible open={isInstallment} onOpenChange={handleOnIsInstallmentChange}>
-								<CollapsibleContent>
-									<TextField label="Quantidade de parcelas" name="installments" />
-									<TextField label="Parcela atual" name="currentInstallment" />
-								</CollapsibleContent>
-							</Collapsible>
+							<ShowIf option={transaction} value={null}>
+								<div className="flex items-center gap-2">
+									<Label htmlFor="is-installment">Transação Parcelada</Label>
+									<Switch
+										id="is-installment"
+										checked={isInstallment}
+										onCheckedChange={handleOnIsInstallmentChange}
+									/>
+								</div>
+								<Collapsible open={isInstallment} onOpenChange={handleOnIsInstallmentChange}>
+									<CollapsibleContent>
+										<TextField label="Quantidade de parcelas" name="installments" />
+										<TextField label="Parcela atual" name="currentInstallment" />
+									</CollapsibleContent>
+								</Collapsible>
+							</ShowIf>
+
 							<DialogFooter>
 								<DialogClose asChild>
 									<Button variant="ghost" type="button" onClick={handleOnClose}>

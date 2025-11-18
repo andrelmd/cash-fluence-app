@@ -3,6 +3,7 @@ import { DialogDescription } from "@radix-ui/react-dialog"
 import dayjs from "dayjs"
 import { useMemo } from "react"
 import { useFetchFirstYearTransaction } from "../../hooks/use-fetch-first-year-transaction"
+import { useFetchLastYearTransaction } from "../../hooks/use-fetch-last-year-transaction"
 import { ISelectFieldOptions } from "../../interfaces/select-field-options"
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./dialog"
 import { FieldGroup, FieldSet } from "./field"
@@ -41,25 +42,26 @@ export const DateFilterDialog = ({
 	)
 
 	const { data: firstYear } = useFetchFirstYearTransaction()
+	const { data: lastYear } = useFetchLastYearTransaction()
 
 	const yearLabel = "Ano"
 	const yearPlaceholder = "Selecione um ano"
 	const YearOptions: ISelectFieldOptions[] = useMemo(() => {
-		const currentYear = dayjs().year()
+		const latestYear = lastYear || dayjs().year()
 
 		if (!firstYear)
 			return [
 				{
-					label: String(currentYear),
-					value: String(currentYear),
+					label: String(latestYear),
+					value: String(latestYear),
 				},
 			]
 
-		return Array.from({ length: Math.max(currentYear - firstYear, 1) }, (_, index) => ({
-			label: String(currentYear - index),
-			value: String(currentYear - index),
+		return Array.from({ length: latestYear - firstYear + 1 }, (_, index) => ({
+			label: String(firstYear + index),
+			value: String(firstYear + index),
 		}))
-	}, [firstYear])
+	}, [firstYear, lastYear])
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>

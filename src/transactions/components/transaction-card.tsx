@@ -15,7 +15,8 @@ interface ITransactionCardProps {
 }
 
 export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) => {
-	const { amount, categoryId, createDate, currentInstallment, description, installments, type } = transaction
+	const { amount, categoryId, dueDate, currentInstallment, description, installments, type, paymentDate } =
+		transaction
 	const transactionIcon = type === TransactionType.EXPENSE ? <ArrowDownCircleIcon /> : <ArrowUpCircleIcon />
 
 	const { data: category } = useFetchOneCategory(categoryId)
@@ -50,7 +51,7 @@ export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) 
 									</Badge>
 								)}
 							</div>
-							<Label>{createDate.format("DD/MM/YYYY")}</Label>
+							<Label>{dueDate.format("DD/MM/YYYY")}</Label>
 						</div>
 					</div>
 				</CardTitle>
@@ -65,9 +66,16 @@ export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) 
 			</CardHeader>
 			<CardContent>
 				<div className="flex justify-between">
-					<div className="flex gap-2 items-center">
-						{category && <ColorCircle className="w-4 h-4" color={category.color} />}
-						<p>{category?.name}</p>
+					<div className="flex flex-col gap-2">
+						<div className="flex gap-2 items-center">
+							{category && <ColorCircle className="w-4 h-4" color={category.color} />}
+							<p>{category?.name}</p>
+						</div>
+						{paymentDate && (
+							<div className="text-muted-foreground text-xs">
+								Pago em {paymentDate.format("DD/MM/YYYY")}
+							</div>
+						)}
 					</div>
 					<div
 						data-type={type}
