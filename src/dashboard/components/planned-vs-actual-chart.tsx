@@ -1,13 +1,8 @@
-"use client"
-
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Dayjs } from "dayjs"
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 import { IPlannedVsActualData } from "../../helpers/planned-vs-actual-calculation"
-
-export const description = "A bar chart"
 
 export function PlannedVsActualChart({ data, date }: { data: IPlannedVsActualData[]; date: Dayjs }) {
 	const chartConfig = {
@@ -18,6 +13,10 @@ export function PlannedVsActualChart({ data, date }: { data: IPlannedVsActualDat
 		actual: {
 			label: "Realizado",
 			color: "var(--chart-2)",
+		},
+		paid: {
+			label: "Pago",
+			color: "var(--chart-3)",
 		},
 	}
 
@@ -35,6 +34,7 @@ export function PlannedVsActualChart({ data, date }: { data: IPlannedVsActualDat
 						<ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
 						<Bar dataKey="planned" fill="var(--color-planned)" radius={8} />
 						<Bar dataKey="actual" fill="var(--color-actual)" radius={8} />
+						<Bar dataKey="paid" fill="var(--color-paid)" radius={8} />
 					</BarChart>
 				</ChartContainer>
 			</CardContent>

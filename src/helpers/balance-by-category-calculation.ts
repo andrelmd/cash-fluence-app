@@ -24,6 +24,7 @@ export function calculateBalanceByCategories(
 	const planned: Record<string, number> = {}
 	const actual: Record<string, number> = {}
 	const monthlyLimit: Record<string, number> = {}
+	const paid: Record<string, number> = {}
 	const colors: Record<string, string> = {}
 
 	categories.forEach((category) => {
@@ -38,6 +39,11 @@ export function calculateBalanceByCategories(
 		monthlyLimit[categoryName] = category.monthlyLimit || 0
 
 		colors[categoryName] = `var(--${category.color})`
+
+		paid[categoryName] = expenseTransactions
+			.filter((t) => t.categoryId === category.id)
+			.filter((t) => t.paymentDate)
+			.reduce((acc, curr) => acc + curr.amount, 0)
 	})
 
 	const chartData: IBalanceByCategoryChartData[] = [
@@ -57,6 +63,12 @@ export function calculateBalanceByCategories(
 			data: monthlyLimit,
 			type: "limit",
 			label: "Limite mensal",
+			colors,
+		},
+		{
+			data: paid,
+			type: "paid",
+			label: "Pago",
 			colors,
 		},
 	]

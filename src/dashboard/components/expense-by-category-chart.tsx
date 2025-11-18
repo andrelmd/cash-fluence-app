@@ -1,8 +1,3 @@
-"use client"
-
-import * as React from "react"
-import { Label, Pie, PieChart } from "recharts"
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
 	ChartConfig,
@@ -13,6 +8,8 @@ import {
 	ChartTooltipContent,
 } from "@/components/ui/chart"
 import { Dayjs } from "dayjs"
+import * as React from "react"
+import { Label, Pie, PieChart } from "recharts"
 import { IExpenseByCategoryChartData } from "../../helpers/expenses-by-category-calculation"
 
 export const description = "A donut chart with text"
@@ -47,7 +44,7 @@ export const ExpenseByCategoryChart = ({ data, date }: IExpenseByCategoryChartPr
 				<ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
 					<PieChart accessibilityLayer>
 						<ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-						<Pie data={chartData} dataKey="amount" nameKey="category" innerRadius={60} strokeWidth={5}>
+						<Pie data={chartData} dataKey="amount" nameKey="category" innerRadius={70} strokeWidth={5}>
 							<Label
 								content={({ viewBox }) => {
 									if (viewBox && "cx" in viewBox && "cy" in viewBox) {

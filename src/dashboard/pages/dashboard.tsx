@@ -6,6 +6,7 @@ import { DateFilterDialog } from "../../components/ui/date-filter-dialog"
 import { calculateBalanceByCategories } from "../../helpers/balance-by-category-calculation"
 import { calculateDailyBalance } from "../../helpers/balance-chart-calculation"
 import { calculateExpensesByCategory } from "../../helpers/expenses-by-category-calculation"
+import { calculatePaidByCategory } from "../../helpers/paid-by-category-calculation"
 import { calculatePlannedVsActual } from "../../helpers/planned-vs-actual-calculation"
 import { sumTransactionsByType } from "../../helpers/transaction-calculations"
 import { useFetchCategories } from "../../hooks/use-fetch-categories"
@@ -17,6 +18,7 @@ import { BalanceCard } from "../components/balance-card"
 import { BalanceChart } from "../components/balance-chart"
 import { CategoryExpenseCard } from "../components/category-expense-card"
 import { ExpenseByCategoryChart } from "../components/expense-by-category-chart"
+import { PaidByCategoryChart } from "../components/paid-by-category-chart"
 import { PlannedVsActualChart } from "../components/planned-vs-actual-chart"
 
 export const Dashboard = () => {
@@ -53,6 +55,11 @@ export const Dashboard = () => {
 		[transactions, categories, plannings]
 	)
 
+	const paidByCategoryData = useMemo(
+		() => calculatePaidByCategory(transactions, categories),
+		[transactions, categories]
+	)
+
 	return (
 		<ContentLayout isLoading={isLoading}>
 			<div className="flex flex-1 flex-col gap-4 overflow-auto p-4">
@@ -68,8 +75,9 @@ export const Dashboard = () => {
 					</div>
 					<BalanceChart data={chartData} date={date} />
 					<PlannedVsActualChart data={plannedVsActualData} date={date} />
-					<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
+					<div className="grid grid-cols-1 lg:grid-cols-4 gap-4 w-full">
 						<BalanceByCategoryChart data={byCategoryChartData} date={date} />
+						<PaidByCategoryChart data={paidByCategoryData} date={date} />
 						<ExpenseByCategoryChart data={expenseByCategoryData} date={date} />
 						<CategoryExpenseCard data={plannedVsActualData} date={date} />
 					</div>

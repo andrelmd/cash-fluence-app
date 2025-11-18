@@ -7,6 +7,7 @@ export interface IPlannedVsActualData {
 	category: string
 	planned: number
 	actual: number
+	paid: number
 	percentage: number
 	color: string
 }
@@ -25,16 +26,22 @@ export function calculatePlannedVsActual(
 	const chartData = categories.reduce((acc, category) => {
 		const categoryName = category.name
 
-		const planned = plannings?.find((p) => p.categoryId === category.id)?.amount || 0
+		const planned = plannings?.find((p) => p.categoryId === category.id)?.amount || category.monthlyLimit || 0
 
 		const actual = expenseTransactions
 			.filter((t) => t.categoryId === category.id)
+			.reduce((acc, curr) => acc + curr.amount, 0)
+
+		const paid = expenseTransactions
+			.filter((t) => t.categoryId === category.id)
+			.filter((t) => t.paymentDate)
 			.reduce((acc, curr) => acc + curr.amount, 0)
 
 		acc.push({
 			category: categoryName,
 			planned,
 			actual,
+			paid,
 			color: category.color,
 			percentage: (actual / planned) * 100,
 		})
