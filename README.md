@@ -1,18 +1,10 @@
-# [Cash Fluence]
+# Cash Fluence
 
 > Aplicativo de gerência financeira pessoal.
 
-<p align="center">
-  <a href="https://github.com/andrelmd/cash-fluence-app/actions/workflows/publish.yml">
-    <img src="https://github.com/andrelmd/cash-fluence-app/actions/workflows/release.yml/badge.svg" alt="Status do Build">
-  </a>
-  <a href="https://github.com/andrelmd/cash-fluence-app/releases/latest">
-    <img src="https://img.shields.io/github/v/release/andrelmd/cash-fluence-app" alt="Última Release">
-  </a>
-  <a href="LICENSE">
-    <img src="https://img.shields.io/github/license/andrelmd/cash-fluence-app" alt="Licença">
-  </a>
-</p>
+[![publish](https://github.com/andrelmd/cash-fluence-app/actions/workflows/publish.yml/badge.svg)](https://github.com/andrelmd/cash-fluence-app/actions/workflows/publish.yml)
+[![Última Release](https://img.shields.io/github/v/release/andrelmd/cash-fluence-app)](https://github.com/andrelmd/cash-fluence-app/releases/latest)
+[![Licensa](https://img.shields.io/github/license/andrelmd/cash-fluence-app)](LICENSE)
 
 Crie categorias de gastos, planejamentos mensais e gerencia entradas e saídas de capital. Acompanhe tudo com gráficos.
 
@@ -42,4 +34,3 @@ Se você deseja compilar o aplicativo a partir do código-fonte, siga estes pass
 ## 📜 Licença
 
 Este projeto está licenciado sob a Licença MIT - veja o arquivo LICENSE para mais detalhes.
-
