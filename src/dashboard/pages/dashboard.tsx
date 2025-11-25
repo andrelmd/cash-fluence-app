@@ -75,7 +75,7 @@ export const Dashboard = () => {
 					</div>
 					<BalanceChart data={chartData} date={date} />
 					<PlannedVsActualChart data={plannedVsActualData} date={date} />
-					<div className="grid grid-cols-1 lg:grid-cols-4 gap-4 w-full">
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
 						<BalanceByCategoryChart data={byCategoryChartData} date={date} />
 						<PaidByCategoryChart data={paidByCategoryData} date={date} />
 						<ExpenseByCategoryChart data={expenseByCategoryData} date={date} />

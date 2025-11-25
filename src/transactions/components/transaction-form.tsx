@@ -170,7 +170,7 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 								options={categoryOptions}
 							/>
 							<ControlledDatePicker name="dueDate" label="Data da transação" />
-							<div className="flex items-center gap-2">
+							<div className="flex items-center justify-between">
 								<Label htmlFor="is-paid">Transação Paga</Label>
 								<Switch id="is-paid" checked={isPaid} onCheckedChange={setIsPaid} />
 							</div>
@@ -180,7 +180,7 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 								</CollapsibleContent>
 							</Collapsible>
 							<ShowIf option={transaction} value={null}>
-								<div className="flex items-center gap-2">
+								<div className="flex items-center justify-between">
 									<Label htmlFor="is-installment">Transação Parcelada</Label>
 									<Switch
 										id="is-installment"

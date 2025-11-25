@@ -59,12 +59,11 @@ export const CategoryForm = ({ category, onOpenChange, open, onClose }: ICategor
 	}
 
 	useEffect(() => {
-		if (!category) return
 		const defaultValues = {
-			id: category.id,
-			name: category.name,
-			color: category.color,
-			monthlyLimit: category.monthlyLimit?.toFixed(2),
+			id: category?.id,
+			name: category?.name || "",
+			color: category?.color || "",
+			monthlyLimit: category?.monthlyLimit?.toFixed(2) || "",
 		}
 		methods.reset(defaultValues)
 	}, [category, methods])

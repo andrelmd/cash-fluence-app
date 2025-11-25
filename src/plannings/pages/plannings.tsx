@@ -41,7 +41,7 @@ export const Plannings = () => {
 					</Button>
 					<Button onClick={handleOnOpen}>Novo planejamento</Button>
 				</div>
-				<div className="flex-1 overflow-auto p-4">
+				<div className="overflow-auto flex-1 flex p-4">
 					<CardList
 						data={data}
 						noContentText="Nenhum planejamento encontrado"
