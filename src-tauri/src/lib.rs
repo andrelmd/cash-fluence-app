@@ -1,6 +1,7 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 pub mod migrations {
     pub mod v1;
+	pub mod v2;
 }
 
 pub mod logger;
@@ -11,13 +12,14 @@ fn greet(name: &str) -> String {
 }
 
 use crate::migrations::v1::execute_migration as execute_migration_v1;
+use crate::migrations::v2::execute_migration as execute_migration_v2;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(
             tauri_plugin_sql::Builder::new()
-                .add_migrations("sqlite:cash_fluence.db", vec![execute_migration_v1()])
+                .add_migrations("sqlite:cash_fluence.db", vec![execute_migration_v1(), execute_migration_v2()])
                 .build(),
         )
         .plugin(tauri_plugin_opener::init())

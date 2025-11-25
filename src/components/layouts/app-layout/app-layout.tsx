@@ -3,6 +3,7 @@ import { Categories } from "../../../categories/pages/categories"
 import { Dashboard } from "../../../dashboard/pages/dashboard"
 import { getAppPageTitle } from "../../../helpers/get-app-page-title"
 import { Plannings } from "../../../plannings/pages/plannings"
+import { Recurrences } from "../../../recurrences/pages/recurrences"
 import { Transactions } from "../../../transactions/pages/transactions"
 import { ThemeProvider } from "../../theme/theme-provider"
 import { AppSidebar } from "../../ui/app-sidebar"
@@ -42,6 +43,9 @@ export const AppLayout = () => {
 						</ShowIf>
 						<ShowIf option={selectedPage} value={AppPage.PLANNINGS}>
 							<Plannings />
+						</ShowIf>
+						<ShowIf option={selectedPage} value={AppPage.RECURRENCES}>
+							<Recurrences />
 						</ShowIf>
 					</div>
 				</div>

@@ -112,7 +112,7 @@ export class SqliteAdapter implements IDatabaseAdapter {
 			const result = await db.select<T>(query, values)
 			return result
 		} catch (error) {
-			Logger.log(JSON.stringify(error))
+			Logger.error("SqlAdapter: Error executing query", error)
 			throw error
 		}
 	}
@@ -123,8 +123,20 @@ export class SqliteAdapter implements IDatabaseAdapter {
 			const result = await db.execute(query, values)
 			return result
 		} catch (error) {
-			console.error(error)
-			Logger.log(JSON.stringify(error))
+			Logger.error("SqlAdapter: Error executing mutation", error)
+			throw error
+		}
+	}
+
+	async transaction(callback: () => Promise<void>): Promise<void> {
+		const db = this.getDB()
+		await this.executeLoggedMutation(db, "BEGIN TRANSACTION;", [])
+		try {
+			await callback()
+			await this.executeLoggedMutation(db, "COMMIT TRANSACTION;", [])
+		} catch (error) {
+			Logger.error("SqlAdapter: Error executing transaction", error)
+			await this.executeLoggedMutation(db, "ROLLBACK TRANSACTION;", [])
 			throw error
 		}
 	}
