@@ -1,7 +1,7 @@
 export enum Tables {
 	TRANSACTIONS = "transactions",
 	CATEGORIES = "categories",
-	PLANINGS = "planings",
+	PLANNINGS = "plannings",
 	RECURRENCES = "recurrences",
 	LOCKS = "locks",
 }

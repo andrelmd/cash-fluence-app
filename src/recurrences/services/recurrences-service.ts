@@ -8,7 +8,7 @@ import { IEntityServiceSave } from "../../interfaces/entity-service-save"
 import { IEntityServiceUpdate } from "../../interfaces/entity-service-update"
 import { TransactionType } from "../../transactions/constants/transaction-type"
 import { Recurrence } from "../entities/recurrence"
-import { RecurrencesRepository } from "../entities/recurrences-repository"
+import { RecurrenceRepository } from "../entities/recurrence-repository"
 
 export class RecurrencesService
 	implements
@@ -19,9 +19,9 @@ export class RecurrencesService
 		IEntityServiceGetMany<Recurrence>,
 		IEntityServiceUpdate<Recurrence>
 {
-	private repository: RecurrencesRepository
+	private repository: RecurrenceRepository
 
-	constructor(repository: RecurrencesRepository) {
+	constructor(repository: RecurrenceRepository) {
 		this.repository = repository
 	}
 	async save(recurrence: Recurrence): Promise<Recurrence> {

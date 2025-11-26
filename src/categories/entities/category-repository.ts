@@ -1,4 +1,5 @@
 import { QueryResult } from "@tauri-apps/plugin-sql"
+import { Tables } from "../../database/constants/tables"
 import { IDatabaseService } from "../../database/interfaces/database-service"
 import { IRepositoryDelete } from "../../database/interfaces/repository-delete"
 import { IRepositoryGetMany } from "../../database/interfaces/repository-get-many"
@@ -19,13 +20,10 @@ export class CategoryRepository
 		IRepositorySave<Category>,
 		IRepositoryUpdate<Category>
 {
-	source: IDatabaseService
-	table: string
-
-	constructor(source: IDatabaseService, table: string) {
-		this.source = source
-		this.table = table
-	}
+	constructor(
+		private readonly source: IDatabaseService,
+		private readonly table: Tables
+	) {}
 
 	getOne(options: TSelectOptionsWithoutTable<Category>): Promise<Category | null> {
 		return this.source.findOne<Category>({ table: this.table, ...options })

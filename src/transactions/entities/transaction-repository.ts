@@ -1,4 +1,5 @@
 import { QueryResult } from "@tauri-apps/plugin-sql"
+import { Tables } from "../../database/constants/tables"
 import { IDatabaseService } from "../../database/interfaces/database-service"
 import { IRepositoryDelete } from "../../database/interfaces/repository-delete"
 import { IRepositoryGetMany } from "../../database/interfaces/repository-get-many"
@@ -9,39 +10,37 @@ import { TDeleteOptionsWithoutTable } from "../../database/types/delete-options-
 import { TSaveOptionsWithoutTable } from "../../database/types/save-options-without-table"
 import { TSelectOptionsWithoutTable } from "../../database/types/select-options-without-table"
 import { TUpdateOptionsWithoutTable } from "../../database/types/update-options-without-table"
-import { Recurrence } from "./recurrence"
+import { Transaction } from "./transaction"
 
-export class RecurrencesRepository
+export class TransactionRepository
 	implements
-		IRepositoryDelete<Recurrence>,
-		IRepositoryGetMany<Recurrence>,
-		IRepositoryGetOne<Recurrence>,
-		IRepositorySave<Recurrence>,
-		IRepositoryUpdate<Recurrence>
+		IRepositoryDelete<Transaction>,
+		IRepositoryGetMany<Transaction>,
+		IRepositoryGetOne<Transaction>,
+		IRepositorySave<Transaction>,
+		IRepositoryUpdate<Transaction>
 {
-	source: IDatabaseService
-	table: string
+	constructor(
+		private readonly source: IDatabaseService,
+		private readonly table: Tables
+	) {}
 
-	constructor(source: IDatabaseService, table: string) {
-		this.source = source
-		this.table = table
-	}
-	save(entity: TSaveOptionsWithoutTable<Recurrence>): Promise<QueryResult> {
+	save(entity: TSaveOptionsWithoutTable<Transaction>): Promise<QueryResult> {
 		return this.source.save({ table: this.table, ...entity })
 	}
 
-	update(options: TUpdateOptionsWithoutTable<Recurrence>): Promise<void> {
+	update(options: TUpdateOptionsWithoutTable<Transaction>): Promise<void> {
 		return this.source.update({ table: this.table, ...options })
 	}
-	delete(options: TDeleteOptionsWithoutTable<Recurrence>): Promise<void> {
+	delete(options: TDeleteOptionsWithoutTable<Transaction>): Promise<void> {
 		return this.source.delete({ table: this.table, ...options })
 	}
 
-	getMany(options?: TSelectOptionsWithoutTable<Recurrence>): Promise<Recurrence[]> {
-		return this.source.find<Recurrence>({ table: this.table, ...options })
+	getMany(options?: TSelectOptionsWithoutTable<Transaction>): Promise<Transaction[]> {
+		return this.source.find<Transaction>({ table: this.table, ...options })
 	}
 
-	getOne(options: TSelectOptionsWithoutTable<Recurrence>): Promise<Recurrence | null> {
-		return this.source.findOne<Recurrence>({ table: this.table, ...options })
+	getOne(options: TSelectOptionsWithoutTable<Transaction>): Promise<Transaction | null> {
+		return this.source.findOne<Transaction>({ table: this.table, ...options })
 	}
 }

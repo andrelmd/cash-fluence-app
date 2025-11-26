@@ -1,4 +1,5 @@
 import { QueryResult } from "@tauri-apps/plugin-sql"
+import { Tables } from "../../database/constants/tables"
 import { IDatabaseService } from "../../database/interfaces/database-service"
 import { IRepositoryDelete } from "../../database/interfaces/repository-delete"
 import { IRepositoryGetMany } from "../../database/interfaces/repository-get-many"
@@ -20,8 +21,8 @@ export class PlanningRepository
 		IRepositoryDelete<Planning>
 {
 	constructor(
-		private source: IDatabaseService,
-		private table: string
+		private readonly source: IDatabaseService,
+		private readonly table: Tables
 	) {}
 	delete(options: TDeleteOptionsWithoutTable<Planning>): Promise<void> {
 		return this.source.delete({ table: this.table, ...options })
