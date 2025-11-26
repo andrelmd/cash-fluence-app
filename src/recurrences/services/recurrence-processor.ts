@@ -17,12 +17,18 @@ export class RecurrenceProcessor {
 		for await (const recurrence of recurrences) {
 			const { amount, categoryId, description, dueDate, type, id } = recurrence
 
+			const originalDueDay = dayjs(dueDate).get("date")
+			const daysInCurrentMonth = today.daysInMonth()
+
+			const newDueDay = Math.min(originalDueDay, daysInCurrentMonth)
+			const newDueDate = today.clone().set("date", newDueDay)
+
 			const newTransaction = new Transaction({
 				amount,
 				categoryId,
 				createDate: today,
 				description,
-				dueDate,
+				dueDate: newDueDate,
 				type,
 				currentInstallment: null,
 				installments: null,
