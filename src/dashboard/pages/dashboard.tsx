@@ -1,8 +1,7 @@
 import dayjs from "dayjs"
 import { useMemo, useState } from "react"
 import { ContentLayout } from "../../components/layouts/content-layout/content-layout"
-import { Button } from "../../components/ui/button"
-import { DateFilterDialog } from "../../components/ui/date-filter-dialog"
+import { DateFilter } from "../../components/ui/date-filter"
 import { calculateBalanceByCategories } from "../../helpers/balance-by-category-calculation"
 import { calculateDailyBalance } from "../../helpers/balance-chart-calculation"
 import { calculateExpensesByCategory } from "../../helpers/expenses-by-category-calculation"
@@ -24,7 +23,6 @@ import { PlannedVsActualChart } from "../components/planned-vs-actual-chart"
 export const Dashboard = () => {
 	const [month, setMoth] = useState(dayjs().month())
 	const [year, setYear] = useState(dayjs().year())
-	const [filterDialogIsOpen, setFilterDialogIsOpen] = useState(false)
 	const date = useMemo(() => {
 		return dayjs().month(month).year(year)
 	}, [month, year])
@@ -63,8 +61,8 @@ export const Dashboard = () => {
 	return (
 		<ContentLayout isLoading={isLoading}>
 			<div className="flex flex-1 flex-col gap-4 overflow-auto p-4">
-				<div>
-					<Button onClick={() => setFilterDialogIsOpen(true)}>Filtrar</Button>
+				<div className="flex items-center justify-between">
+					<DateFilter month={month} setMoth={setMoth} year={year} setYear={setYear} />
 				</div>
 
 				<div className="flex flex-1 flex-col gap-4 overflow-auto p-4">
@@ -83,14 +81,6 @@ export const Dashboard = () => {
 					</div>
 				</div>
 			</div>
-			<DateFilterDialog
-				open={filterDialogIsOpen}
-				onOpenChange={setFilterDialogIsOpen}
-				month={month}
-				setMoth={setMoth}
-				year={year}
-				setYear={setYear}
-			/>
 		</ContentLayout>
 	)
 }

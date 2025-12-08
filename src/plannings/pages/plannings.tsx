@@ -3,7 +3,7 @@ import { useCallback, useState } from "react"
 import { ContentLayout } from "../../components/layouts/content-layout/content-layout"
 import { Button } from "../../components/ui/button"
 import { CardList } from "../../components/ui/card-list"
-import { DateFilterDialog } from "../../components/ui/date-filter-dialog"
+import { DateFilter } from "../../components/ui/date-filter"
 import { useFetchPlanningsByPeriod } from "../../hooks/use-fetch-plannings-by-period"
 import { PlanningCard } from "../components/planning-card"
 import { CategoryForm } from "../components/planning-form"
@@ -14,7 +14,6 @@ export const Plannings = () => {
 	const [planning, setPlanning] = useState<Planning | null>(null)
 	const [month, setMoth] = useState(dayjs().month())
 	const [year, setYear] = useState(dayjs().year())
-	const [filterDialogIsOpen, setFilterDialogIsOpen] = useState(false)
 
 	const { data, isLoading } = useFetchPlanningsByPeriod({ month, year })
 
@@ -35,10 +34,9 @@ export const Plannings = () => {
 	return (
 		<ContentLayout isLoading={isLoading}>
 			<div className="flex flex-1 flex-col gap-4 overflow-auto">
-				<div className="flex justify-between">
-					<Button variant={"secondary"} onClick={() => setFilterDialogIsOpen(true)}>
-						Filtrar
-					</Button>
+				<div className="flex items-center justify-between">
+					<DateFilter month={month} setMoth={setMoth} year={year} setYear={setYear} />
+
 					<Button onClick={handleOnOpen}>Novo planejamento</Button>
 				</div>
 				<div className="overflow-auto flex-1 flex p-4">
@@ -50,14 +48,6 @@ export const Plannings = () => {
 				</div>
 			</div>
 			<CategoryForm planning={planning} open={isFormOpen} onOpenChange={setIsFormOpen} onClose={handleOnClose} />
-			<DateFilterDialog
-				open={filterDialogIsOpen}
-				onOpenChange={setFilterDialogIsOpen}
-				month={month}
-				setMoth={setMoth}
-				year={year}
-				setYear={setYear}
-			/>
 		</ContentLayout>
 	)
 }

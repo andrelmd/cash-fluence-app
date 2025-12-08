@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from "react"
 import { ContentLayout } from "../../components/layouts/content-layout/content-layout"
 import { Button } from "../../components/ui/button"
 import { CardList } from "../../components/ui/card-list"
-import { DateFilterDialog } from "../../components/ui/date-filter-dialog"
+import { DateFilter } from "../../components/ui/date-filter"
 import { useFetchTransactions } from "../../hooks/use-fetch-transactions"
 import { TransactionCard } from "../components/transaction-card"
 import { TransactionForm } from "../components/transaction-form"
@@ -12,7 +12,6 @@ import { Transaction } from "../entities/transaction"
 export const Transactions = () => {
 	const [isFormOpen, setIsFormOpen] = useState(false)
 	const [transaction, setTransaction] = useState<Transaction | null>(null)
-	const [filterDialogIsOpen, setFilterDialogIsOpen] = useState(false)
 	const [month, setMoth] = useState(dayjs().month())
 	const [year, setYear] = useState(dayjs().year())
 
@@ -40,10 +39,9 @@ export const Transactions = () => {
 	return (
 		<ContentLayout isLoading={isLoading}>
 			<div className="flex flex-1 flex-col gap-4 overflow-auto">
-				<div className="flex justify-between">
-					<Button variant={"secondary"} onClick={() => setFilterDialogIsOpen(true)}>
-						Filtrar
-					</Button>
+				<div className="flex items-center justify-between">
+					<DateFilter month={month} setMoth={setMoth} year={year} setYear={setYear} />
+
 					<Button onClick={handleOnOpen}>Criar nova transação</Button>
 				</div>
 				<div className="overflow-auto flex-1 flex p-4">
@@ -59,14 +57,6 @@ export const Transactions = () => {
 				open={isFormOpen}
 				onOpenChange={setIsFormOpen}
 				onClose={handleOnClose}
-			/>
-			<DateFilterDialog
-				month={month}
-				onOpenChange={setFilterDialogIsOpen}
-				setMoth={setMoth}
-				year={year}
-				setYear={setYear}
-				open={filterDialogIsOpen}
 			/>
 		</ContentLayout>
 	)
