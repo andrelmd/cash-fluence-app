@@ -16,7 +16,7 @@ export class SqliteAdapter implements IDatabaseAdapter {
 	async init(): Promise<void> {
 		const startTime = Date.now()
 		Logger.log("Initializing sqlite connection")
-		this.database = await Database.load("sqlite:cash_fluence.db")
+		this.database = await Database.load(`sqlite:${import.meta.env.VITE_DB_HOST}.db`)
 		Logger.log(`Sqlite connection initialized in ${Date.now() - startTime}ms`)
 	}
 
