@@ -1,7 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime"
+import { useEffect } from "react"
 import { AppLayout } from "./components/layouts/app-layout/app-layout"
 import "./index.css"
+import { lockService } from "./lock/services/lock-service-impl"
+import { Logger } from "./logger/logger.class"
+import { recurrenceProcessor } from "./recurrences/services/recurrences-processor-impl"
 import("dayjs/locale/pt-br")
 
 const queryClient = new QueryClient({
@@ -14,6 +19,20 @@ const queryClient = new QueryClient({
 
 function App() {
 	dayjs.locale("pt-br")
+	dayjs.extend(relativeTime)
+
+	useEffect(() => {
+		const process = async () => {
+			const lock = await lockService.acquireLock("recurrence_processor")
+			if (!lock) {
+				Logger.log("Could not acquire lock")
+				return
+			}
+
+			await recurrenceProcessor.processRecurrences()
+		}
+		process()
+	}, [])
 
 	return (
 		<QueryClientProvider client={queryClient}>

@@ -1,8 +1,10 @@
 import { useState } from "react"
 import { Categories } from "../../../categories/pages/categories"
+import { PeriodFilterProvider } from "../../../contexts/period-filter-context"
 import { Dashboard } from "../../../dashboard/pages/dashboard"
 import { getAppPageTitle } from "../../../helpers/get-app-page-title"
 import { Plannings } from "../../../plannings/pages/plannings"
+import { Recurrences } from "../../../recurrences/pages/recurrences"
 import { Transactions } from "../../../transactions/pages/transactions"
 import { ThemeProvider } from "../../theme/theme-provider"
 import { AppSidebar } from "../../ui/app-sidebar"
@@ -31,18 +33,23 @@ export const AppLayout = () => {
 						<ModeToggle />
 					</div>
 					<div className="flex flex-1 flex-col overflow-auto p-2">
-						<ShowIf option={selectedPage} value={AppPage.DASHBOARD}>
-							<Dashboard />
-						</ShowIf>
-						<ShowIf option={selectedPage} value={AppPage.TRANSACTIONS}>
-							<Transactions />
-						</ShowIf>
-						<ShowIf option={selectedPage} value={AppPage.CATEGORIES}>
-							<Categories />
-						</ShowIf>
-						<ShowIf option={selectedPage} value={AppPage.PLANNINGS}>
-							<Plannings />
-						</ShowIf>
+						<PeriodFilterProvider>
+							<ShowIf option={selectedPage} value={AppPage.DASHBOARD}>
+								<Dashboard />
+							</ShowIf>
+							<ShowIf option={selectedPage} value={AppPage.TRANSACTIONS}>
+								<Transactions />
+							</ShowIf>
+							<ShowIf option={selectedPage} value={AppPage.CATEGORIES}>
+								<Categories />
+							</ShowIf>
+							<ShowIf option={selectedPage} value={AppPage.PLANNINGS}>
+								<Plannings />
+							</ShowIf>
+							<ShowIf option={selectedPage} value={AppPage.RECURRENCES}>
+								<Recurrences />
+							</ShowIf>
+						</PeriodFilterProvider>
 					</div>
 				</div>
 			</SidebarProvider>

@@ -8,7 +8,7 @@ import { IEntityServiceSave } from "../../interfaces/entity-service-save"
 import { IEntityServiceUpdate } from "../../interfaces/entity-service-update"
 import { TransactionType } from "../constants/transaction-type"
 import { Transaction } from "../entities/transaction"
-import { TransactionsRepository } from "../entities/transactions-repository"
+import { TransactionRepository } from "../entities/transaction-repository"
 
 export class TransactionsService
 	implements
@@ -19,9 +19,9 @@ export class TransactionsService
 		IEntityServiceGetMany<Transaction>,
 		IEntityServiceUpdate<Transaction>
 {
-	private repository: TransactionsRepository
+	private repository: TransactionRepository
 
-	constructor(repository: TransactionsRepository) {
+	constructor(repository: TransactionRepository) {
 		this.repository = repository
 	}
 	async save(transaction: Transaction): Promise<Transaction> {
@@ -52,8 +52,7 @@ export class TransactionsService
 		currentInstallment: number,
 		installmentNumber: number
 	): Transaction {
-		const { installments, amount, dueDate } = transaction
-		const installmentValue = amount / installments!
+		const { amount, dueDate } = transaction
 		const monthOffset = installmentNumber - currentInstallment
 		const newDueDate = dayjs(dueDate).add(monthOffset, "month")
 
@@ -61,7 +60,7 @@ export class TransactionsService
 			...transaction,
 			paymentDate: null,
 			currentInstallment: installmentNumber,
-			amount: installmentValue,
+			amount,
 			dueDate: newDueDate,
 		})
 	}

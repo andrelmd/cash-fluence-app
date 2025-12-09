@@ -5,6 +5,6 @@ export const useInvalidateAll = (cacheKey: UseQueryKeys) => {
 	const queryClient = useQueryClient()
 	return () =>
 		queryClient.invalidateQueries({
-			predicate: (query) => query.queryKey[0] === cacheKey,
+			queryKey: [cacheKey],
 		})
 }

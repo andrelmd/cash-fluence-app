@@ -5,7 +5,8 @@ import { sumTransactionsByType } from "./transaction-calculations"
 
 export interface IChartData {
 	date: string
-	balance: number
+	projectedBalance: number
+	realizedBalance: number
 }
 
 export const calculateDailyBalance = (transactions: Transaction[], month: Dayjs): IChartData[] => {
@@ -16,21 +17,33 @@ export const calculateDailyBalance = (transactions: Transaction[], month: Dayjs)
 	const daysInMonth = month.daysInMonth()
 	const chartData: IChartData[] = []
 
-	const sortedTransactions = [...transactions].sort((a, b) => a.dueDate.diff(b.dueDate))
+	// Não é mais necessário ordenar previamente, pois faremos dois loops separados
 
-	let cumulativeBalance = 0
+	let cumulativeProjectedBalance = 0
+	let cumulativeRealizedBalance = 0
 
 	for (let day = 1; day <= daysInMonth; day++) {
 		const currentDate = month.date(day)
-		const dailyTransactions = sortedTransactions.filter((t) => t.dueDate.isSame(currentDate, "day"))
 
-		const dailyIncome = sumTransactionsByType(dailyTransactions, TransactionType.INCOME)
-		const dailyExpense = sumTransactionsByType(dailyTransactions, TransactionType.EXPENSE)
-		const netChange = dailyIncome - dailyExpense
+		const dailyProjectedTransactions = transactions.filter((transaction) =>
+			transaction.dueDate.isSame(currentDate, "day")
+		)
+		const dailyProjectedIncome = sumTransactionsByType(dailyProjectedTransactions, TransactionType.INCOME)
+		const dailyProjectedExpense = sumTransactionsByType(dailyProjectedTransactions, TransactionType.EXPENSE)
+		cumulativeProjectedBalance += dailyProjectedIncome - dailyProjectedExpense
 
-		cumulativeBalance += netChange
+		const dailyRealizedTransactions = transactions.filter(
+			(transaction) => transaction.paymentDate && transaction.paymentDate.isSame(currentDate, "day")
+		)
+		const dailyRealizedIncome = sumTransactionsByType(dailyRealizedTransactions, TransactionType.INCOME)
+		const dailyRealizedExpense = sumTransactionsByType(dailyRealizedTransactions, TransactionType.EXPENSE)
+		cumulativeRealizedBalance += dailyRealizedIncome - dailyRealizedExpense
 
-		chartData.push({ date: currentDate.format("DD/MM"), balance: cumulativeBalance })
+		chartData.push({
+			date: currentDate.format("DD/MM"),
+			projectedBalance: cumulativeProjectedBalance,
+			realizedBalance: cumulativeRealizedBalance,
+		})
 	}
 
 	return chartData

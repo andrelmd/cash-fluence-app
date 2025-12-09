@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react"
-import { ContentLayout } from "../../components/layouts/content-layout/content-layout"
 import { Button } from "../../components/ui/button"
 import { CardList } from "../../components/ui/card-list"
 import { useFetchCategories } from "../../hooks/use-fetch-categories"
@@ -27,13 +26,14 @@ export const Categories = () => {
 	}, [])
 
 	return (
-		<ContentLayout isLoading={isLoading}>
+		<>
 			<div className="flex flex-1 flex-col gap-4 overflow-auto">
 				<div className="flex justify-end">
 					<Button onClick={handleOnOpen}>Nova categoria</Button>
 				</div>
-				<div className="flex-1 overflow-auto p-4">
+				<div className="overflow-auto flex-1 flex p-4">
 					<CardList
+						isLoading={isLoading}
 						data={data}
 						noContentText="Nenhuma categoria encontrada"
 						render={(item) => <CategoryCard category={item} key={item.id} onEdit={handleOnEdit} />}
@@ -41,6 +41,6 @@ export const Categories = () => {
 				</div>
 			</div>
 			<CategoryForm category={category} open={isFormOpen} onOpenChange={setIsFormOpen} onClose={handleOnClose} />
-		</ContentLayout>
+		</>
 	)
 }

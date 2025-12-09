@@ -1,4 +1,5 @@
 import { QueryResult } from "@tauri-apps/plugin-sql"
+import { Tables } from "../../database/constants/tables"
 import { IDatabaseService } from "../../database/interfaces/database-service"
 import { IRepositoryDelete } from "../../database/interfaces/repository-delete"
 import { IRepositoryGetMany } from "../../database/interfaces/repository-get-many"
@@ -11,7 +12,7 @@ import { TSelectOptionsWithoutTable } from "../../database/types/select-options-
 import { TUpdateOptionsWithoutTable } from "../../database/types/update-options-without-table"
 import { Transaction } from "./transaction"
 
-export class TransactionsRepository
+export class TransactionRepository
 	implements
 		IRepositoryDelete<Transaction>,
 		IRepositoryGetMany<Transaction>,
@@ -19,13 +20,11 @@ export class TransactionsRepository
 		IRepositorySave<Transaction>,
 		IRepositoryUpdate<Transaction>
 {
-	source: IDatabaseService
-	table: string
+	constructor(
+		private readonly source: IDatabaseService,
+		private readonly table: Tables
+	) {}
 
-	constructor(source: IDatabaseService, table: string) {
-		this.source = source
-		this.table = table
-	}
 	save(entity: TSaveOptionsWithoutTable<Transaction>): Promise<QueryResult> {
 		return this.source.save({ table: this.table, ...entity })
 	}

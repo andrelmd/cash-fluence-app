@@ -36,4 +36,8 @@ export class DatabaseService implements IDatabaseService {
 	async update<TEntity>(options: IUpdateOptions<TEntity>): Promise<void> {
 		return await this.databaseAdapter.update<TEntity>(options)
 	}
+
+	async transaction(callback: () => Promise<void>): Promise<void> {
+		return await this.databaseAdapter.transaction(callback)
+	}
 }

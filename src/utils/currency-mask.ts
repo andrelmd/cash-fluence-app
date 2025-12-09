@@ -1,10 +1,15 @@
 export const currencyMask = (value: string | number) => {
 	if (typeof value === "number") {
-		return value.toFixed(2).replace(".", ",")
+		return value.toLocaleString("pt-BR", {
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
+		})
 	}
 
-	let onlyDigits = value.replace(/\D/g, "")
+	const onlyDigits = value.replace(/\D/g, "")
 
-	const formattedValue = onlyDigits.replace(/(\d)(\d{2})$/, "$1.$2")
-	return formattedValue
+	const numericValue = Number(onlyDigits) / 100
+
+	const currency = numericValue.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+	return currency
 }

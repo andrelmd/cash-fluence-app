@@ -24,6 +24,29 @@ export function useFetchTransactions(options: IUseFetchTransactionsOptions = {})
 			return () => transactionsService.getTransactionsByPeriod(startDate, endDate)
 		}
 
+		if (startDate) {
+			return () =>
+				transactionsService.getMany({
+					where: {
+						dueDate: {
+							operator: ">=",
+							value: startDate,
+						},
+					},
+				})
+		}
+		if (endDate) {
+			return () =>
+				transactionsService.getMany({
+					where: {
+						dueDate: {
+							operator: "<=",
+							value: endDate,
+						},
+					},
+				})
+		}
+
 		return () => transactionsService.getAll()
 	}, [options])
 
@@ -32,5 +55,5 @@ export function useFetchTransactions(options: IUseFetchTransactionsOptions = {})
 		queryFn: getFetchFn(),
 	})
 
-	return { query }
+	return { ...query }
 }

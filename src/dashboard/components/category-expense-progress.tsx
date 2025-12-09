@@ -1,6 +1,7 @@
 import React from "react"
 import { ColorCircle } from "../../components/ui/color-circle"
 import { Progress } from "../../components/ui/progress"
+import { formatCurrency } from "../../helpers/balance-card-calculations"
 import { TColor } from "../../types/color"
 
 interface ICategoryExpenseProgressProps extends React.ComponentPropsWithoutRef<"div"> {
@@ -18,14 +19,8 @@ export const CategoryExpenseProgress = ({
 	color,
 	planned,
 }: ICategoryExpenseProgressProps) => {
-	const currencyProgress = `${percentage.toFixed(2)}% utilizado`
-	const actualVsPlanned = `${actual.toLocaleString("pt-BR", {
-		style: "currency",
-		currency: "BRL",
-	})} / ${planned.toLocaleString("pt-BR", {
-		style: "currency",
-		currency: "BRL",
-	})}`
+	const currencyProgress = Number.isFinite(percentage) ? `${percentage.toFixed(2)}% utilizado` : "Sem limite"
+	const actualVsPlanned = planned ? `${formatCurrency(actual)} / ${formatCurrency(planned)}` : formatCurrency(actual)
 
 	return (
 		<div className="flex flex-col gap-2">
@@ -36,7 +31,7 @@ export const CategoryExpenseProgress = ({
 				</div>
 				<div className="text-muted-foreground font-medium text-sm">{actualVsPlanned}</div>
 			</div>
-			<Progress value={percentage} />
+			<Progress value={Number.isFinite(percentage) ? percentage : 100} />
 			<div className="text-xs text-muted-foreground font-medium">{currencyProgress}</div>
 		</div>
 	)

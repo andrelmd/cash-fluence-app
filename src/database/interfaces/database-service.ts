@@ -11,4 +11,5 @@ export interface IDatabaseService {
 	save<TEntity>(entity: ISaveOptions<TEntity>): Promise<QueryResult>
 	update<TEntity>(options: IUpdateOptions<TEntity>): Promise<void>
 	delete<TEntity>(options: IDeleteOptions<TEntity>): Promise<void>
+	transaction(callback: () => Promise<void>): Promise<void>
 }

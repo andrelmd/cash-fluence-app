@@ -9,17 +9,18 @@ interface TextFieldProps extends React.ComponentProps<"input"> {
 	mask?: (value: string) => string
 }
 
-export const TextField = ({ label, name, ...props }: TextFieldProps) => {
+export const TextField = ({ label, name, mask, ...props }: TextFieldProps) => {
 	const { control } = useFormContext()
 
 	const handleOnChange = (
 		event: React.ChangeEvent<HTMLInputElement>,
 		callback: (event: React.ChangeEvent<HTMLInputElement>) => void
 	) => {
-		if (props.mask) {
-			const value = props.mask(event.target.value)
-			return callback({ ...event, target: { ...event.target, value } })
+		if (mask) {
+			const value = mask(event.target.value)
+			event.target.value = value
 		}
+
 		return callback(event)
 	}
 

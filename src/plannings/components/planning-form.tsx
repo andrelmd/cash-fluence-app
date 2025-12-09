@@ -105,7 +105,7 @@ export const CategoryForm = ({ planning: planning, onOpenChange, open, onClose }
 						className="flex flex-col gap-4"
 					>
 						<div className="flex flex-col gap-4">
-							<TextField label="Valor planejado (R$)" name="amount" mask={currencyMask} type="number" />
+							<TextField label="Valor planejado (R$)" name="amount" mask={currencyMask} />
 							<ControlledSelect
 								label="Categoria"
 								name="categoryId"
@@ -114,7 +114,7 @@ export const CategoryForm = ({ planning: planning, onOpenChange, open, onClose }
 							/>
 							<div className="flex gap-8">
 								<ControlledSelect label="Mês" name="month" options={MonthOptions} />
-								<TextField label="Ano" name="year" type="number" />
+								<TextField label="Ano" name="year" mask={(value) => value.replace(/\D/g, "")} />
 							</div>
 						</div>
 						<DialogFooter>

@@ -1,10 +1,11 @@
-import { ArrowLeftRight, FolderKanban, LayoutDashboard, Target } from "lucide-react"
+import { ArrowLeftRight, FolderKanban, LayoutDashboard, RefreshCcw, Target } from "lucide-react"
 
 export enum AppPage {
 	DASHBOARD = "dashboard",
 	TRANSACTIONS = "transactions",
 	CATEGORIES = "categories",
 	PLANNINGS = "plannings",
+	RECURRENCES = "recurrences",
 }
 
 export const appPages = [
@@ -27,5 +28,10 @@ export const appPages = [
 		icon: <Target />,
 		label: "Planejamentos",
 		value: AppPage.PLANNINGS,
+	},
+	{
+		icon: <RefreshCcw />,
+		label: "Recorrências",
+		value: AppPage.RECURRENCES,
 	},
 ]
