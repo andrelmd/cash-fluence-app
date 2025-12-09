@@ -1,9 +1,6 @@
-import dayjs from "dayjs"
-import { useCallback, useMemo, useState } from "react"
-import { ContentLayout } from "../../components/layouts/content-layout/content-layout"
+import { useCallback, useState } from "react"
 import { Button } from "../../components/ui/button"
 import { CardList } from "../../components/ui/card-list"
-import { DateFilter } from "../../components/ui/date-filter"
 import { useFetchRecurrences } from "../../hooks/use-fetch-recurrences"
 import { RecurrenceCard } from "../components/recurrence-card"
 import { RecurrenceForm } from "../components/recurrence-form"
@@ -12,15 +9,8 @@ import { Recurrence } from "../entities/recurrence"
 export const Recurrences = () => {
 	const [isFormOpen, setIsFormOpen] = useState(false)
 	const [recurrence, setRecurrence] = useState<Recurrence | null>(null)
-	const [month, setMoth] = useState(dayjs().month())
-	const [year, setYear] = useState(dayjs().year())
 
-	const date = useMemo(() => dayjs().year(year).month(month), [month, year])
-	const startDate = useMemo(() => date.startOf("month"), [date])
-	const endDate = useMemo(() => date.endOf("month"), [date])
-
-	const { query } = useFetchRecurrences({ startDate, endDate })
-	const { data, isLoading } = query
+	const { data, isLoading } = useFetchRecurrences()
 
 	const handleOnEdit = useCallback((recurrence: Recurrence) => {
 		setRecurrence(recurrence)
@@ -37,17 +27,16 @@ export const Recurrences = () => {
 	}, [])
 
 	return (
-		<ContentLayout isLoading={isLoading}>
+		<>
 			<div className="flex flex-1 flex-col gap-4 overflow-auto">
-				<div className="flex items-center justify-between">
-					<DateFilter month={month} setMoth={setMoth} year={year} setYear={setYear} />
-
+				<div className="flex items-center justify-end">
 					<Button onClick={handleOnOpen}>Criar nova recorrência</Button>
 				</div>
 				<div className="overflow-auto flex-1 flex p-4">
 					<CardList
 						noContentText="Nenhuma recorrência encontrada"
 						data={data}
+						isLoading={isLoading}
 						render={(item) => <RecurrenceCard recurrence={item} key={item.id} onEdit={handleOnEdit} />}
 					/>
 				</div>
@@ -58,6 +47,6 @@ export const Recurrences = () => {
 				onOpenChange={setIsFormOpen}
 				onClose={handleOnClose}
 			/>
-		</ContentLayout>
+		</>
 	)
 }

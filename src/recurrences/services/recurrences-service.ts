@@ -66,20 +66,6 @@ export class RecurrencesService
 		return updatedRecurrence
 	}
 
-	async getRecurrencesByPeriod(startDate: dayjs.Dayjs, endDate: dayjs.Dayjs): Promise<Recurrence[]> {
-		return this.getMany({
-			where: {
-				dueDate: {
-					operator: "BETWEEN",
-					value: [startDate, endDate],
-				},
-			},
-			orderBy: {
-				dueDate: "desc",
-			},
-		})
-	}
-
 	async getFirstYear() {
 		const firstRecurrence = await this.getOne({
 			orderBy: {

@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime"
 import { useEffect } from "react"
 import { AppLayout } from "./components/layouts/app-layout/app-layout"
 import "./index.css"
@@ -18,6 +19,7 @@ const queryClient = new QueryClient({
 
 function App() {
 	dayjs.locale("pt-br")
+	dayjs.extend(relativeTime)
 
 	useEffect(() => {
 		const process = async () => {

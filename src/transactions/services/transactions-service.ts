@@ -52,8 +52,7 @@ export class TransactionsService
 		currentInstallment: number,
 		installmentNumber: number
 	): Transaction {
-		const { installments, amount, dueDate } = transaction
-		const installmentValue = amount / installments!
+		const { amount, dueDate } = transaction
 		const monthOffset = installmentNumber - currentInstallment
 		const newDueDate = dayjs(dueDate).add(monthOffset, "month")
 
@@ -61,7 +60,7 @@ export class TransactionsService
 			...transaction,
 			paymentDate: null,
 			currentInstallment: installmentNumber,
-			amount: installmentValue,
+			amount,
 			dueDate: newDueDate,
 		})
 	}

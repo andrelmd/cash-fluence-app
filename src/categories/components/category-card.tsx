@@ -43,7 +43,7 @@ export const CategoryCard = ({ category, onEdit }: ICategoryCardProps) => {
 					<Button variant="ghost" onClick={handleOnEdit}>
 						<Edit />
 					</Button>
-					<Button className="text-red-400 dark:text-red-300" variant="ghost" onClick={handleOnDelete}>
+					<Button className="text-red-500 dark:text-red-300" variant="ghost" onClick={handleOnDelete}>
 						<Trash />
 					</Button>
 				</CardAction>

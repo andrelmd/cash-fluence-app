@@ -8,6 +8,7 @@ import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
+	useSidebar,
 } from "./sidebar"
 
 interface IAppSidebarProps {
@@ -16,7 +17,11 @@ interface IAppSidebarProps {
 }
 
 export const AppSidebar = ({ onSelect, selectedPage }: IAppSidebarProps) => {
+	const { setOpen, setOpenMobile } = useSidebar()
+
 	const handleOnClick = (page: AppPage) => {
+		setOpen(false)
+		setOpenMobile(false)
 		onSelect(page)
 	}
 
@@ -24,7 +29,7 @@ export const AppSidebar = ({ onSelect, selectedPage }: IAppSidebarProps) => {
 		<Sidebar variant="sidebar">
 			<SidebarContent>
 				<SidebarGroup>
-					<SidebarGroupLabel>Application</SidebarGroupLabel>
+					<SidebarGroupLabel>Páginas</SidebarGroupLabel>
 					<SidebarGroupContent>
 						<SidebarMenu>
 							{appPages.map((item) => (

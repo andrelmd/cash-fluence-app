@@ -1,9 +1,11 @@
+import { cva } from "class-variance-authority"
 import { ArrowDownCircleIcon, ArrowUpCircleIcon, Edit, Trash } from "lucide-react"
 import { Badge } from "../../components/ui/badge"
 import { Button } from "../../components/ui/button"
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { ColorCircle } from "../../components/ui/color-circle"
 import { Label } from "../../components/ui/label"
+import { formatCurrency } from "../../helpers/balance-card-calculations"
 import { useDeleteTransaction } from "../../hooks/use-delete-transaction"
 import { useFetchOneCategory } from "../../hooks/use-fetch-one-category"
 import { TransactionType } from "../constants/transaction-type"
@@ -13,6 +15,24 @@ interface ITransactionCardProps {
 	transaction: Transaction
 	onEdit?: (transaction: Transaction) => void
 }
+
+const iconContainerVariants = cva("rounded-full text-white p-1.5 dark:text-black", {
+	variants: {
+		type: {
+			[TransactionType.INCOME]: "bg-green-500 dark:bg-green-300",
+			[TransactionType.EXPENSE]: "bg-red-500 dark:bg-red-300",
+		},
+	},
+})
+
+const amountVariants = cva("flex items-center gap-2", {
+	variants: {
+		type: {
+			[TransactionType.INCOME]: "text-green-500 dark:text-green-300",
+			[TransactionType.EXPENSE]: "text-red-500 dark:text-red-300",
+		},
+	},
+})
 
 export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) => {
 	const { amount, categoryId, dueDate, currentInstallment, description, installments, type, paymentDate } =
@@ -36,12 +56,7 @@ export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) 
 			<CardHeader>
 				<CardTitle>
 					<div className="flex gap-4 items-center">
-						<div
-							data-type={type}
-							className="rounded-full text-white data-[type=0]:bg-green data-[type=1]:bg-red p-1.5 dark:text-black"
-						>
-							{transactionIcon}
-						</div>
+						<div className={iconContainerVariants({ type })}>{transactionIcon}</div>
 						<div className="flex flex-col gap-2">
 							<div className="flex gap-2 items-center">
 								{description}
@@ -51,7 +66,7 @@ export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) 
 									</Badge>
 								)}
 							</div>
-							<Label>{dueDate.format("DD/MM/YYYY")}</Label>
+							<Label className="text-muted-foreground">{dueDate.format("DD/MM/YYYY")}</Label>
 						</div>
 					</div>
 				</CardTitle>
@@ -59,7 +74,7 @@ export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) 
 					<Button variant="ghost" onClick={handleOnEdit}>
 						<Edit />
 					</Button>
-					<Button variant="ghost" onClick={handleOnDelete} className="text-red-400 dark:text-red-300">
+					<Button variant="ghost" onClick={handleOnDelete} className="text-red-500 dark:text-red-300">
 						<Trash />
 					</Button>
 				</CardAction>
@@ -77,12 +92,8 @@ export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) 
 							</div>
 						)}
 					</div>
-					<div
-						data-type={type}
-						className="flex items-center gap-2 data-[type=0]:text-green-400 data-[type=1]:text-red-400 dark:data-[type=0]:text-green-300 dark:data-[type=1]:text-red-300"
-					>
-						{type === TransactionType.EXPENSE ? "-" : "+"}
-						{amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+					<div className={amountVariants({ type })}>
+						{`${type === TransactionType.EXPENSE ? "-" : "+"}${formatCurrency(amount)}`}
 					</div>
 				</div>
 			</CardContent>

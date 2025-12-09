@@ -1,25 +1,20 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-	ChartConfig,
-	ChartContainer,
-	ChartLegend,
-	ChartLegendContent,
-	ChartTooltip,
-	ChartTooltipContent,
-} from "@/components/ui/chart"
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Dayjs } from "dayjs"
-import * as React from "react"
-import { Label, Pie, PieChart } from "recharts"
+import { Pie, PieChart } from "recharts"
+import { Skeleton } from "../../components/ui/skeleton"
 import { IExpenseByCategoryChartData } from "../../helpers/expenses-by-category-calculation"
+import { useDelayedLoading } from "../../hooks/use-delayed-loading"
 
 export const description = "A donut chart with text"
 
 interface IExpenseByCategoryChartProps {
 	data: IExpenseByCategoryChartData[]
 	date: Dayjs
+	isLoading?: boolean
 }
 
-export const ExpenseByCategoryChart = ({ data, date }: IExpenseByCategoryChartProps) => {
+export const ExpenseByCategoryChart = ({ data, date, isLoading = false }: IExpenseByCategoryChartProps) => {
 	const chartConfig = data.reduce((acc, curr) => {
 		acc[curr.category] = {
 			label: curr.category,
@@ -30,58 +25,23 @@ export const ExpenseByCategoryChart = ({ data, date }: IExpenseByCategoryChartPr
 
 	const chartData = data.map((item) => ({ ...item, fill: item.color }))
 
-	const totalExpenses = React.useMemo(() => {
-		return data.reduce((acc, curr) => acc + curr.amount, 0)
-	}, [data])
+	const showDelayedSkeleton = useDelayedLoading(isLoading, 500)
+
+	if (showDelayedSkeleton) {
+		return <Skeleton className="h-[368px] w-full" />
+	}
 
 	return (
 		<Card className="flex flex-col">
 			<CardHeader className="items-center">
-				<CardTitle>Gastos por categoria</CardTitle>
+				<CardTitle>Despesas por categoria</CardTitle>
 				<CardDescription>{date.format("MMMM YYYY")}</CardDescription>
 			</CardHeader>
-			<CardContent className="flex-1">
+			<CardContent className="flex-1 pb-0">
 				<ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
-					<PieChart accessibilityLayer>
-						<ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-						<Pie data={chartData} dataKey="amount" nameKey="category" innerRadius={70} strokeWidth={5}>
-							<Label
-								content={({ viewBox }) => {
-									if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-										return (
-											<text
-												x={viewBox.cx}
-												y={viewBox.cy}
-												textAnchor="middle"
-												dominantBaseline="middle"
-											>
-												<tspan
-													x={viewBox.cx}
-													y={viewBox.cy}
-													className="fill-foreground text-xl font-bold"
-												>
-													{totalExpenses.toLocaleString("pt-BR", {
-														style: "currency",
-														currency: "BRL",
-													})}
-												</tspan>
-												<tspan
-													x={viewBox.cx}
-													y={(viewBox.cy || 0) + 24}
-													className="fill-muted-foreground"
-												>
-													Gastos
-												</tspan>
-											</text>
-										)
-									}
-								}}
-							/>
-						</Pie>
-						<ChartLegend
-							content={<ChartLegendContent nameKey="category" />}
-							className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
-						/>
+					<PieChart>
+						<ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel nameKey="category" />} />
+						<Pie data={chartData} dataKey={"amount"} nameKey={"category"} />
 					</PieChart>
 				</ChartContainer>
 			</CardContent>

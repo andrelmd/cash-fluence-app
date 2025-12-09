@@ -1,22 +1,17 @@
 import dayjs from "dayjs"
 import { useMemo } from "react"
+import { usePeriodFilterContext } from "../../contexts/period-filter-context"
 import { useFetchFirstYearTransaction } from "../../hooks/use-fetch-first-year-transaction"
 import { useFetchLastYearTransaction } from "../../hooks/use-fetch-last-year-transaction"
 import { ISelectFieldOptions } from "../../interfaces/select-field-options"
 import { SelectField } from "./select-field"
 
-interface IDateFilterProps {
-	month: number
-	setMoth: (value: number) => void
-	year: number
-	setYear: (value: number) => void
-}
-
-export const DateFilter = ({ month, setMoth, year, setYear }: IDateFilterProps) => {
+export const DateFilter = () => {
 	const monthLabel = "Mês"
 	const monthPlaceholder = "Selecione um mês"
 	const yearLabel = "Ano"
 	const yearPlaceholder = "Selecione um ano"
+	const { month, setMonth, year, setYear } = usePeriodFilterContext()
 
 	const { data: firstYear } = useFetchFirstYearTransaction()
 	const { data: lastYear } = useFetchLastYearTransaction()
@@ -48,7 +43,7 @@ export const DateFilter = ({ month, setMoth, year, setYear }: IDateFilterProps) 
 	}, [firstYear, lastYear])
 
 	return (
-		<div>
+		<div className="flex items-center justify-between">
 			<div className="grid grid-cols-2 gap-4">
 				<SelectField
 					label={monthLabel}
@@ -57,7 +52,7 @@ export const DateFilter = ({ month, setMoth, year, setYear }: IDateFilterProps) 
 					slotProps={{
 						select: {
 							value: String(month),
-							onValueChange: (value) => setMoth(Number(value)),
+							onValueChange: (value) => setMonth(Number(value)),
 						},
 					}}
 				/>

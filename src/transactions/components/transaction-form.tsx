@@ -17,6 +17,7 @@ import {
 	DialogTitle,
 } from "../../components/ui/dialog"
 import { Label } from "../../components/ui/label"
+import { SelectField } from "../../components/ui/select-field"
 import { ShowIf } from "../../components/ui/show-if"
 import { Switch } from "../../components/ui/switch"
 import { TextField } from "../../components/ui/text-field"
@@ -161,7 +162,6 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 									},
 								]}
 							/>
-							<TextField label="Valor (R$)" name="amount" mask={currencyMask} type="number" />
 							<TextField label="Descrição" name="description" />
 							<ControlledSelect
 								label="Categoria"
@@ -170,6 +170,35 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 								options={categoryOptions}
 							/>
 							<ControlledDatePicker name="dueDate" label="Data da transação" />
+							<ShowIf option={transaction} value={null}>
+								<SelectField
+									label="Forma de pagamento"
+									options={[
+										{ label: "A vista", value: "false" },
+										{ label: "Parcelado", value: "true" },
+									]}
+									slotProps={{
+										select: {
+											value: isInstallment.toString(),
+											onValueChange: (value) => setIsInstallment(value === "true" ? true : false),
+										},
+									}}
+								/>
+								<Collapsible open={isInstallment} onOpenChange={handleOnIsInstallmentChange}>
+									<CollapsibleContent className="flex flex-col gap-4">
+										<TextField label={"Valor da parcela"} name="amount" mask={currencyMask} />
+										<div className="flex gap-8">
+											<TextField label="Quantidade de parcelas" name="installments" />
+											<TextField label="Parcela atual" name="currentInstallment" />
+										</div>
+									</CollapsibleContent>
+								</Collapsible>
+							</ShowIf>
+							<Collapsible open={!isInstallment} onOpenChange={handleOnIsInstallmentChange}>
+								<CollapsibleContent>
+									<TextField label={"Valor da transação"} name="amount" mask={currencyMask} />
+								</CollapsibleContent>
+							</Collapsible>
 							<div className="flex items-center justify-between">
 								<Label htmlFor="is-paid">Transação Paga</Label>
 								<Switch id="is-paid" checked={isPaid} onCheckedChange={setIsPaid} />
@@ -179,22 +208,6 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 									<ControlledDatePicker name="paymentDate" label="Data do pagamento" />
 								</CollapsibleContent>
 							</Collapsible>
-							<ShowIf option={transaction} value={null}>
-								<div className="flex items-center justify-between">
-									<Label htmlFor="is-installment">Transação Parcelada</Label>
-									<Switch
-										id="is-installment"
-										checked={isInstallment}
-										onCheckedChange={handleOnIsInstallmentChange}
-									/>
-								</div>
-								<Collapsible open={isInstallment} onOpenChange={handleOnIsInstallmentChange}>
-									<CollapsibleContent>
-										<TextField label="Quantidade de parcelas" name="installments" />
-										<TextField label="Parcela atual" name="currentInstallment" />
-									</CollapsibleContent>
-								</Collapsible>
-							</ShowIf>
 
 							<DialogFooter>
 								<DialogClose asChild>

@@ -1,5 +1,6 @@
 import dayjs from "dayjs"
 import { LessThanOrEqual } from "../../database/operators/query-operators"
+import { Logger } from "../../logger/logger.class"
 import { Transaction } from "../../transactions/entities/transaction"
 import { TransactionsService } from "../../transactions/services/transactions-service"
 import { RecurrencesService } from "./recurrences-service"
@@ -16,6 +17,11 @@ export class RecurrenceProcessor {
 		})
 		for await (const recurrence of recurrences) {
 			const { amount, categoryId, description, dueDate, type, id } = recurrence
+
+			if (!id) {
+				Logger.error("Recurrence id is null")
+				return
+			}
 
 			const originalDueDay = dayjs(dueDate).get("date")
 			const daysInCurrentMonth = today.daysInMonth()
@@ -36,7 +42,7 @@ export class RecurrenceProcessor {
 				id: null,
 			})
 			await this.transactionsService.save(newTransaction)
-			await this.recurrencesService.updateNextExecutionDate(id!)
+			await this.recurrencesService.updateNextExecutionDate(id)
 		}
 	}
 }

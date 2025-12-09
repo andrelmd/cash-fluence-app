@@ -37,6 +37,8 @@ export function calculatePlannedVsActual(
 			.filter((t) => t.paymentDate)
 			.reduce((acc, curr) => acc + curr.amount, 0)
 
+		if (actual === 0) return acc
+
 		acc.push({
 			category: categoryName,
 			planned,

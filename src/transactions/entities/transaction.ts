@@ -25,16 +25,16 @@ export class Transaction {
 		currentInstallment = null,
 		installments = null,
 	}: {
-		id: number | null
 		amount: number
-		createDate?: Dayjs
 		dueDate: Dayjs
-		paymentDate: Dayjs | null
-		type: TransactionType
 		description: string
-		currentInstallment: number | null
-		installments: number | null
 		categoryId: number
+		type: TransactionType
+		id?: number | null
+		createDate?: Dayjs
+		paymentDate?: Dayjs | null
+		currentInstallment?: number | null
+		installments?: number | null
 	}) {
 		this.id = id
 		this.amount = amount
@@ -44,7 +44,7 @@ export class Transaction {
 		this.currentInstallment = currentInstallment
 		this.installments = installments
 		this.categoryId = categoryId
-		this.dueDate = dueDate
-		this.paymentDate = paymentDate
+		this.dueDate = dueDate.startOf("day")
+		this.paymentDate = paymentDate?.endOf("day") || null
 	}
 }

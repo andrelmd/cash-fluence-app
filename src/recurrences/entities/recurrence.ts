@@ -21,13 +21,13 @@ export class Recurrence {
 		id = null,
 		nextExecutionDate = dayjs().add(1, "month").startOf("month").startOf("day"),
 	}: {
-		id: number | null
 		amount: number
-		createDate?: Dayjs
 		dueDate: Dayjs
 		type: TransactionType
 		description: string
 		categoryId: number
+		id?: number | null
+		createDate?: Dayjs
 		nextExecutionDate?: Dayjs
 	}) {
 		this.id = id
@@ -36,7 +36,7 @@ export class Recurrence {
 		this.type = type
 		this.description = description
 		this.categoryId = categoryId
-		this.dueDate = dueDate
-		this.nextExecutionDate = nextExecutionDate
+		this.dueDate = dueDate.startOf("day")
+		this.nextExecutionDate = nextExecutionDate.startOf("day")
 	}
 }
