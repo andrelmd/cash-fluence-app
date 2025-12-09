@@ -79,12 +79,7 @@ export const CategoryForm = ({ category, onOpenChange, open, onClose }: ICategor
 					<form id={"category-form"} onSubmit={methods.handleSubmit(handleOnSubmit)}>
 						<div className="flex flex-col gap-4">
 							<TextField label="Nome" name="name" />
-							<TextField
-								label="Limite mensal (R$)"
-								name="monthlyLimit"
-								mask={currencyMask}
-								type="number"
-							/>
+							<TextField label="Limite mensal (R$)" name="monthlyLimit" mask={currencyMask} />
 							<ControlledColorSelect name="color" label="Cor" />
 						</div>
 						<DialogFooter>
