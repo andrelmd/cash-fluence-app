@@ -1,4 +1,6 @@
-export const currencyMask = (value: string | number) => {
+export const currencyMask = (value: string | number | undefined | null) => {
+	if (!value) return ""
+
 	if (typeof value === "number") {
 		return value.toLocaleString("pt-BR", {
 			minimumFractionDigits: 2,

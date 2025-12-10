@@ -125,7 +125,7 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 		const defaultValues = {
 			id: transaction?.id || null,
 			type: transaction?.type?.toString() ?? null,
-			amount: transaction?.amount.toFixed(2) || "",
+			amount: currencyMask(transaction?.amount),
 			description: transaction?.description || "",
 			categoryId: transaction?.categoryId?.toString() || null,
 			createDate: transaction?.createDate?.toDate() || new Date(),
