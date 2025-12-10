@@ -33,4 +33,4 @@ Se você deseja compilar o aplicativo a partir do código-fonte, siga estes pass
 
 ## 📜 Licença
 
-Este projeto está licenciado sob a Licença MIT - veja o arquivo LICENSE para mais detalhes.
+Este projeto está licenciado sob a Licença GPL-3.0 - veja o arquivo LICENSE para mais detalhes.
