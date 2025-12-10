@@ -17,17 +17,19 @@ export function calculatePaidByCategory(transactions?: Transaction[], categories
 		return []
 	}
 
-	return categories.map((category) => {
-		const transactionsForCategory = transactions.filter((t) => t.categoryId === category.id)
-		const amount = transactionsForCategory
-			.filter((t) => t.type === TransactionType.EXPENSE)
-			.filter((t) => t.paymentDate)
-			.reduce((acc, curr) => acc + curr.amount, 0)
+	return categories
+		.map((category) => {
+			const transactionsForCategory = transactions.filter((t) => t.categoryId === category.id)
+			const amount = transactionsForCategory
+				.filter((t) => t.type === TransactionType.EXPENSE)
+				.filter((t) => t.paymentDate)
+				.reduce((acc, curr) => acc + curr.amount, 0)
 
-		return {
-			category: category.name,
-			amount,
-			color: `var(--${category.color})`,
-		}
-	}, [] as IPaidByCategoryChartData[])
+			return {
+				category: category.name,
+				amount,
+				color: `var(--${category.color})`,
+			}
+		}, [] as IPaidByCategoryChartData[])
+		.filter((item) => item.amount > 0)
 }

@@ -1,7 +1,7 @@
+import { cn } from "@/lib/utils"
 import * as React from "react"
 import * as RechartsPrimitive from "recharts"
-
-import { cn } from "@/lib/utils"
+import { formatCurrency } from "../../utils/formatCurrency"
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const
@@ -199,7 +199,7 @@ function ChartTooltipContent({
 										)}
 										<div
 											className={cn(
-												"flex flex-1 justify-between leading-none",
+												"flex flex-1 gap-2 justify-between leading-none",
 												nestLabel ? "items-end" : "items-center"
 											)}
 										>
@@ -211,10 +211,9 @@ function ChartTooltipContent({
 											</div>
 											{item.value && (
 												<span className="text-foreground font-mono font-medium tabular-nums">
-													{item.value.toLocaleString("pt-BR", {
-														style: "currency",
-														currency: "BRL",
-													})}
+													{Array.isArray(item.value)
+														? item.value.map((value) => formatCurrency(value)).join(", ")
+														: formatCurrency(item.value)}
 												</span>
 											)}
 										</div>

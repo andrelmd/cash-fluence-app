@@ -6,13 +6,6 @@ interface CalculatedValues {
 	projectedValue: number
 }
 
-export const formatCurrency = (amount: number): string => {
-	return amount.toLocaleString("pt-BR", {
-		style: "currency",
-		currency: "BRL",
-	})
-}
-
 export const calculateBalanceCardValues = (
 	transactions: Transaction[] | undefined,
 	type: TransactionType | null
@@ -33,17 +26,17 @@ export const calculateBalanceCardValues = (
 	switch (type) {
 		case TransactionType.INCOME:
 			return {
-				realizedValue: sumAmounts(incomes),
-				projectedValue: sumPaidAmounts(incomes),
+				realizedValue: sumPaidAmounts(incomes),
+				projectedValue: sumAmounts(incomes),
 			}
 		case TransactionType.EXPENSE:
 			return {
-				realizedValue: sumAmounts(expenses),
-				projectedValue: sumPaidAmounts(expenses),
+				realizedValue: sumPaidAmounts(expenses),
+				projectedValue: sumAmounts(expenses),
 			}
 		default:
-			const realizedBalance = sumAmounts(incomes) - sumAmounts(expenses)
-			const projectedBalance = sumPaidAmounts(incomes) - sumPaidAmounts(expenses)
+			const realizedBalance = sumPaidAmounts(incomes) - sumPaidAmounts(expenses)
+			const projectedBalance = sumAmounts(incomes) - sumAmounts(expenses)
 			return {
 				realizedValue: realizedBalance,
 				projectedValue: projectedBalance,

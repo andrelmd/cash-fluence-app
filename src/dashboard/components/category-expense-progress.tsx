@@ -1,7 +1,7 @@
+import { formatCurrency } from "@/utils/formatCurrency"
 import React from "react"
 import { ColorCircle } from "../../components/ui/color-circle"
 import { Progress } from "../../components/ui/progress"
-import { formatCurrency } from "../../helpers/balance-card-calculations"
 import { TColor } from "../../types/color"
 
 interface ICategoryExpenseProgressProps extends React.ComponentPropsWithoutRef<"div"> {

@@ -63,7 +63,7 @@ export const CategoryForm = ({ category, onOpenChange, open, onClose }: ICategor
 			id: category?.id,
 			name: category?.name || "",
 			color: category?.color || "",
-			monthlyLimit: category?.monthlyLimit?.toFixed(2) || "",
+			monthlyLimit: currencyMask(category?.monthlyLimit),
 		}
 		methods.reset(defaultValues)
 	}, [category, methods])

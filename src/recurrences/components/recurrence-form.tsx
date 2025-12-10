@@ -126,7 +126,7 @@ export const RecurrenceForm = ({ onOpenChange, open, recurrence, onClose }: IRec
 		const defaultValues = {
 			id: recurrence?.id || null,
 			type: recurrence?.type?.toString() ?? null,
-			amount: recurrence?.amount.toFixed(2) || "",
+			amount: currencyMask(recurrence?.amount) || "",
 			description: recurrence?.description || "",
 			categoryId: recurrence?.categoryId?.toString() || null,
 			createDate: recurrence?.createDate?.toDate() || new Date(),

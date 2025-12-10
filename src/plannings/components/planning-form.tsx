@@ -82,7 +82,7 @@ export const CategoryForm = ({ planning: planning, onOpenChange, open, onClose }
 	useEffect(() => {
 		const defaultValues = {
 			id: planning?.id,
-			amount: planning?.amount.toFixed(2),
+			amount: currencyMask(planning?.amount),
 			categoryId: planning?.categoryId.toString(),
 			month: planning?.month.toString() || dayjs().month().toString(),
 			year: planning?.year.toString() || dayjs().year().toString(),
