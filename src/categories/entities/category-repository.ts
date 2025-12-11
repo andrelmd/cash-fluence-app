@@ -34,7 +34,7 @@ export class CategoryRepository
 	save(options: TSaveOptionsWithoutTable<Category>): Promise<QueryResult> {
 		return this.source.save({ table: this.table, ...options })
 	}
-	update(options: TUpdateOptionsWithoutTable<Category>): Promise<void> {
+	update(options: TUpdateOptionsWithoutTable<Category>): Promise<QueryResult> {
 		return this.source.update({ table: this.table, ...options })
 	}
 	delete(options: TDeleteOptionsWithoutTable<Category>): Promise<void> {

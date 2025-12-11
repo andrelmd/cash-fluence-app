@@ -5,6 +5,7 @@ import { IDeleteOptions } from "../interfaces/delete-options"
 import { ISaveOptions } from "../interfaces/save-options"
 import { ISelectOptions } from "../interfaces/select-options"
 import { IUpdateOptions } from "../interfaces/update-options"
+import { IUpsertOptions } from "../interfaces/upsert-options"
 
 export class DatabaseService implements IDatabaseService {
 	private databaseAdapter: IDatabaseAdapter
@@ -33,11 +34,11 @@ export class DatabaseService implements IDatabaseService {
 		return await this.databaseAdapter.delete<TEntity>(options)
 	}
 
-	async update<TEntity>(options: IUpdateOptions<TEntity>): Promise<void> {
+	async update<TEntity>(options: IUpdateOptions<TEntity>): Promise<QueryResult> {
 		return await this.databaseAdapter.update<TEntity>(options)
 	}
 
-	async transaction(callback: () => Promise<void>): Promise<void> {
-		return await this.databaseAdapter.transaction(callback)
+	async upsert<TEntity>(options: IUpsertOptions<TEntity>): Promise<QueryResult> {
+		return await this.databaseAdapter.upsert<TEntity>(options)
 	}
 }

@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import { Dayjs } from "dayjs"
 import { useCallback, useMemo } from "react"
 import { UseQueryKeys } from "../constants/use-query-keys"
+import { GreaterThanOrEqual, LessThanOrEqual } from "../database/operators/query-operators"
 import { TransactionType } from "../transactions/constants/transaction-type"
 import { transactionsService } from "../transactions/services/transactions-service-impl"
 
@@ -28,10 +29,7 @@ export function useFetchTransactions(options: IUseFetchTransactionsOptions = {})
 			return () =>
 				transactionsService.getMany({
 					where: {
-						dueDate: {
-							operator: ">=",
-							value: startDate,
-						},
+						dueDate: GreaterThanOrEqual(startDate),
 					},
 				})
 		}
@@ -39,10 +37,7 @@ export function useFetchTransactions(options: IUseFetchTransactionsOptions = {})
 			return () =>
 				transactionsService.getMany({
 					where: {
-						dueDate: {
-							operator: "<=",
-							value: endDate,
-						},
+						dueDate: LessThanOrEqual(endDate),
 					},
 				})
 		}

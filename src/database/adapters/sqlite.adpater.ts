@@ -7,6 +7,7 @@ import { IDeleteOptions } from "../interfaces/delete-options"
 import { ISaveOptions } from "../interfaces/save-options"
 import { ISelectOptions } from "../interfaces/select-options"
 import { IUpdateOptions } from "../interfaces/update-options"
+import { IUpsertOptions } from "../interfaces/upsert-options"
 
 export class SqliteAdapter implements IDatabaseAdapter {
 	private database: Database | null = null
@@ -69,7 +70,7 @@ export class SqliteAdapter implements IDatabaseAdapter {
 		return rawEntities.map((entity) => this.dataMapper.transformToEntity<TEntity>(entity))[0]
 	}
 
-	async update<TEntity>(options: IUpdateOptions<TEntity>): Promise<void> {
+	async update<TEntity>(options: IUpdateOptions<TEntity>): Promise<QueryResult> {
 		const db = this.getDB()
 
 		const rawData = this.dataMapper.trasformToRaw(options.data)
@@ -80,7 +81,7 @@ export class SqliteAdapter implements IDatabaseAdapter {
 			where: rawWhere,
 		})
 
-		await this.executeLoggedMutation(db, query, values)
+		return await this.executeLoggedMutation(db, query, values)
 	}
 
 	async delete<TEntity>(options: IDeleteOptions<TEntity>): Promise<void> {
@@ -128,16 +129,22 @@ export class SqliteAdapter implements IDatabaseAdapter {
 		}
 	}
 
-	async transaction(callback: () => Promise<void>): Promise<void> {
+	async upsert<TEntity>(options: IUpsertOptions<TEntity>): Promise<QueryResult> {
 		const db = this.getDB()
-		await this.executeLoggedMutation(db, "BEGIN TRANSACTION;", [])
-		try {
-			await callback()
-			await this.executeLoggedMutation(db, "COMMIT TRANSACTION;", [])
-		} catch (error) {
-			Logger.error("SqlAdapter: Error executing transaction", error)
-			await this.executeLoggedMutation(db, "ROLLBACK TRANSACTION;", [])
-			throw error
-		}
+
+		const rawData = this.dataMapper.trasformToRaw(options.data)
+		const rawWhere = this.dataMapper.trasformToRaw(options.where)
+		const rawConflictTarget = this.dataMapper.trasformToRaw(
+			options.conflictTarget.reduce((acc, key) => ({ ...acc, [key]: null }), {})
+		)
+
+		const { query, values } = this.queryBuilder.buildUpsertQuery({
+			...options,
+			data: rawData,
+			where: rawWhere,
+			conflictTarget: Object.keys(rawConflictTarget),
+		})
+
+		return await this.executeLoggedMutation(db, query, values)
 	}
 }
