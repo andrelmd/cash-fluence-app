@@ -42,7 +42,7 @@ export const Dashboard = () => {
 					<div className="flex flex-1 w-full">
 						<BalanceChart data={balanceChartData} date={date} isLoading={isLoading} />
 					</div>
-					<div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
+					<div className="grid grid-cols-1 md:flex lg:grid-cols-2 gap-4 w-full">
 						<PendingTransactionsTable />
 						<CategoryExpenseCard data={projectedVsRealizedData} date={date} isLoading={isLoading} />
 					</div>

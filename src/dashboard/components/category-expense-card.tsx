@@ -19,7 +19,7 @@ export const CategoryExpenseCard = ({ data, date, isLoading = false }: ICategory
 	}
 
 	return (
-		<Card>
+		<Card className="w-full">
 			<CardHeader>
 				<CardTitle>Limites de consumo</CardTitle>
 				<CardDescription>{date.format("MMMM YYYY")}</CardDescription>

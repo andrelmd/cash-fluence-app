@@ -59,24 +59,24 @@ export const PendingTransactionsTable = () => {
 		[categories]
 	)
 
-	if (showDelayedSkeleton) return <Skeleton className="h-[368px] w-full" />
+	if (showDelayedSkeleton) return <Skeleton className="h-[368px] w-min-[500px] w-full" />
 
 	if (!transactions || !categories) return null
 
 	return (
-		<Card className="h-[368px] w-full">
+		<Card className="h-[368px] w-min-[500px] w-full">
 			<CardHeader>
 				<CardTitle>Transações Pendentes</CardTitle>
 				<CardDescription>Lista de transações que ainda não foram pagas.</CardDescription>
 			</CardHeader>
-			<CardContent className="relative h-[250px] overflow-auto">
+			<CardContent className="relative h-[250px] w-min-[450px] overflow-y-auto">
 				{transactions.length === 0 && (
 					<div className="flex flex-1 items-center justify-center">Nenhuma transação pendente</div>
 				)}
 				{transactions.length > 0 && (
 					<Table>
-						<TableHeader className="sticky top-0 bg-background ">
-							<TableRow>
+						<TableHeader className="sticky -top-px bg-background w-min-[450px]">
+							<TableRow className="hover:bg-background">
 								<TableHead className="rounded-tl-xl w-[200px]">Situação</TableHead>
 								<TableHead className="w-[200px]">Descrição</TableHead>
 								<TableHead className="w-[200px]">Categoria</TableHead>
