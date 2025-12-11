@@ -1,4 +1,5 @@
 import { AppPage, appPages } from "../layouts/app-layout/constants/app-pages"
+import { UpdateNotification } from "../update-notification"
 import {
 	Sidebar,
 	SidebarContent,
@@ -27,7 +28,7 @@ export const AppSidebar = ({ onSelect, selectedPage }: IAppSidebarProps) => {
 
 	return (
 		<Sidebar variant="sidebar">
-			<SidebarContent>
+			<SidebarContent className="flex flex-1 justify-between">
 				<SidebarGroup>
 					<SidebarGroupLabel>Páginas</SidebarGroupLabel>
 					<SidebarGroupContent>
@@ -46,6 +47,7 @@ export const AppSidebar = ({ onSelect, selectedPage }: IAppSidebarProps) => {
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>
+				<UpdateNotification />
 			</SidebarContent>
 		</Sidebar>
 	)

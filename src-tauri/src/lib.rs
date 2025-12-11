@@ -18,6 +18,7 @@ pub fn run() {
     let db_host = env::var("VITE_DB_HOST").unwrap_or_else(|_| "cash_fluence".to_string());
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(
             tauri_plugin_sql::Builder::new()
