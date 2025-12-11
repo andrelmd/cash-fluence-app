@@ -2,7 +2,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import { useEffect } from "react"
+import { toast } from "sonner"
 import { AppLayout } from "./components/layouts/app-layout/app-layout"
+import { UpdateChecker } from "./components/update-checker"
+import { UpdaterProvider } from "./contexts/updater-context"
 import "./index.css"
 import { lockService } from "./lock/services/lock-service-impl"
 import { Logger } from "./logger/logger.class"
@@ -31,13 +34,20 @@ function App() {
 
 			await recurrenceProcessor.processRecurrences()
 		}
-		process()
+		toast.promise(() => process(), {
+			loading: "Processando recorrências...",
+			success: "Recorrências processadas com sucesso",
+			error: "Erro ao processar recorrências",
+		})
 	}, [])
 
 	return (
-		<QueryClientProvider client={queryClient}>
-			<AppLayout />
-		</QueryClientProvider>
+		<UpdaterProvider>
+			<UpdateChecker />
+			<QueryClientProvider client={queryClient}>
+				<AppLayout />
+			</QueryClientProvider>
+		</UpdaterProvider>
 	)
 }
 

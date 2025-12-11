@@ -11,6 +11,7 @@ import { AppSidebar } from "../../ui/app-sidebar"
 import { ModeToggle } from "../../ui/mode-toggle"
 import { ShowIf } from "../../ui/show-if"
 import { SidebarProvider, SidebarTrigger } from "../../ui/sidebar"
+import { Toaster } from "../../ui/sonner"
 import { AppPage } from "./constants/app-pages"
 
 export const AppLayout = () => {
@@ -52,6 +53,7 @@ export const AppLayout = () => {
 						</PeriodFilterProvider>
 					</div>
 				</div>
+				<Toaster position="top-center" />
 			</SidebarProvider>
 		</ThemeProvider>
 	)
