@@ -1,3 +1,4 @@
+import { SqlOperators } from "../constants/sql-operators"
 import { TEntityValue } from "../types/entity-value"
 import { TWhereOperator } from "../types/where-operator"
 
@@ -6,7 +7,7 @@ import { TWhereOperator } from "../types/where-operator"
  * @example where: { amount: GreaterThan(100) }
  */
 export function GreaterThan<TEntity>(value: TEntityValue<TEntity>): TWhereOperator<TEntity> {
-	return { operator: ">", value }
+	return { operator: SqlOperators.GREATER_THAN, value }
 }
 
 /**
@@ -14,7 +15,7 @@ export function GreaterThan<TEntity>(value: TEntityValue<TEntity>): TWhereOperat
  * @example where: { amount: LessThan(100) }
  */
 export function LessThan<TEntity>(value: TEntityValue<TEntity>): TWhereOperator<TEntity> {
-	return { operator: "<", value }
+	return { operator: SqlOperators.LESS_THAN, value }
 }
 
 /**
@@ -22,7 +23,7 @@ export function LessThan<TEntity>(value: TEntityValue<TEntity>): TWhereOperator<
  * @example where: { amount: LessThanOrEqual(100) }
  */
 export function LessThanOrEqual<TEntity>(value: TEntityValue<TEntity>): TWhereOperator<TEntity> {
-	return { operator: "<=", value }
+	return { operator: SqlOperators.LESS_THAN_OR_EQUAL, value }
 }
 
 /**
@@ -30,7 +31,7 @@ export function LessThanOrEqual<TEntity>(value: TEntityValue<TEntity>): TWhereOp
  * @example where: { amount: GreaterThanOrEqual(100) }
  */
 export function GreaterThanOrEqual<TEntity>(value: TEntityValue<TEntity>): TWhereOperator<TEntity> {
-	return { operator: ">=", value }
+	return { operator: SqlOperators.GREATER_THAN_OR_EQUAL, value }
 }
 
 /**
@@ -39,5 +40,5 @@ export function GreaterThanOrEqual<TEntity>(value: TEntityValue<TEntity>): TWher
  */
 
 export function Between<TEntity>(start: TEntityValue<TEntity>, end: TEntityValue<TEntity>): TWhereOperator<TEntity> {
-	return { operator: "BETWEEN", value: [start, end] }
+	return { operator: SqlOperators.BETWEEN, value: [start, end] }
 }

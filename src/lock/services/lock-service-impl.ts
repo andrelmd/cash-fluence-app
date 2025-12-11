@@ -1,4 +1,4 @@
-import { databaseService } from "../../database/services/database-service-impl"
+import { lockRepository } from "../entities/lock-repository-impl"
 import { LockService } from "./lock-service"
 
-export const lockService = new LockService(databaseService)
+export const lockService = new LockService(lockRepository)

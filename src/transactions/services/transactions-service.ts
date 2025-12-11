@@ -1,4 +1,5 @@
 import dayjs from "dayjs"
+import { Between } from "../../database/operators/query-operators"
 import { TSelectOptionsWithoutTable } from "../../database/types/select-options-without-table"
 import { IEntityServiceDelete } from "../../interfaces/entity-service-delete"
 import { IEntityServiceGetAll } from "../../interfaces/entity-service-get-all"
@@ -100,10 +101,7 @@ export class TransactionsService
 	async getTransactionsByPeriod(startDate: dayjs.Dayjs, endDate: dayjs.Dayjs): Promise<Transaction[]> {
 		return this.getMany({
 			where: {
-				dueDate: {
-					operator: "BETWEEN",
-					value: [startDate, endDate],
-				},
+				dueDate: Between(startDate, endDate),
 			},
 			orderBy: {
 				dueDate: "desc",

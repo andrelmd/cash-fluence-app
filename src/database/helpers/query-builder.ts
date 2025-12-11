@@ -2,6 +2,7 @@ import { IDeleteOptions } from "../interfaces/delete-options"
 import { ISaveOptions } from "../interfaces/save-options"
 import { ISelectOptions } from "../interfaces/select-options"
 import { IUpdateOptions } from "../interfaces/update-options"
+import { IUpsertOptions } from "../interfaces/upsert-options"
 import { TEntityValue } from "../types/entity-value"
 import { TOrderBy } from "../types/order-by"
 import { TQueryWhere } from "../types/query-where"
@@ -65,6 +66,54 @@ export class QueryBuilder {
 		const query = [`DELETE FROM ${table}`, clause].filter(Boolean).join(" ")
 
 		return { query: `${query};`, values: values.flat() }
+	}
+
+	buildUpsertQuery<TEntity>(options: IUpsertOptions<TEntity>): { query: string; values: any[] } {
+		const { table, data, where, conflictTarget } = options
+
+		let conflictColumns: Array<keyof TEntity> = []
+		let whereCondition: TWhere<TEntity> | undefined
+
+		if (conflictTarget && conflictTarget.length > 0) {
+			conflictColumns = conflictTarget
+			whereCondition = where
+		} else {
+			if (!where || Object.keys(where).length === 0) {
+				throw new Error(
+					"UPSERT operation requires a 'where' clause or 'conflictTarget' to identify conflict columns."
+				)
+			}
+			conflictColumns = Object.keys(where) as Array<keyof TEntity>
+		}
+
+		const insertData = conflictTarget && conflictTarget.length > 0 ? data : { ...where, ...data }
+
+		const insertKeys = this.getDefinedKeys(insertData)
+		const insertValues = insertKeys.map((key) => insertData[key as keyof typeof insertData])
+		const insertPlaceholders = insertKeys.map((_, i) => `$${i + 1}`).join(", ")
+
+		const updateKeys = this.getDefinedKeys(data)
+
+		let onConflictClause = "DO NOTHING"
+		let whereValues: any[] = []
+
+		if (updateKeys.length > 0) {
+			const setClauses = updateKeys.map((key) => `${key} = excluded.${key}`).join(", ")
+			onConflictClause = `DO UPDATE SET ${setClauses}`
+
+			if (whereCondition) {
+				const startIndex = insertValues.length + 1
+				const { clause, values } = this.buildClauseWhere(whereCondition, startIndex)
+				if (clause) {
+					onConflictClause += ` ${clause}`
+					whereValues = values
+				}
+			}
+		}
+
+		const query = `INSERT INTO ${table} (${insertKeys.join(", ")}) VALUES (${insertPlaceholders}) ON CONFLICT (${conflictColumns.join(", ")}) ${onConflictClause} RETURNING *;`
+
+		return { query, values: [...insertValues, ...whereValues] }
 	}
 
 	private buildClauseSelect(table: string): string {
