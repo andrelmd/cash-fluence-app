@@ -36,7 +36,7 @@ export class PlanningRepository
 		return this.source.save({ table: this.table, ...options })
 	}
 
-	update(options: TUpdateOptionsWithoutTable<Planning>): Promise<void> {
+	update(options: TUpdateOptionsWithoutTable<Planning>): Promise<QueryResult> {
 		return this.source.update({ table: this.table, ...options })
 	}
 

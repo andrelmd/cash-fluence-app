@@ -28,7 +28,7 @@ export class RecurrenceRepository
 		return this.source.save({ table: this.table, ...entity })
 	}
 
-	update(options: TUpdateOptionsWithoutTable<Recurrence>): Promise<void> {
+	update(options: TUpdateOptionsWithoutTable<Recurrence>): Promise<QueryResult> {
 		return this.source.update({ table: this.table, ...options })
 	}
 	delete(options: TDeleteOptionsWithoutTable<Recurrence>): Promise<void> {
