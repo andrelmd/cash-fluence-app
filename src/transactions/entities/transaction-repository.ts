@@ -29,7 +29,7 @@ export class TransactionRepository
 		return this.source.save({ table: this.table, ...entity })
 	}
 
-	update(options: TUpdateOptionsWithoutTable<Transaction>): Promise<void> {
+	update(options: TUpdateOptionsWithoutTable<Transaction>): Promise<QueryResult> {
 		return this.source.update({ table: this.table, ...options })
 	}
 	delete(options: TDeleteOptionsWithoutTable<Transaction>): Promise<void> {
