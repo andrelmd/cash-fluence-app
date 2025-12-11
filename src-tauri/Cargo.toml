@@ -1,6 +1,6 @@
 [package]
 name = "cash-fluence"
-version = "0.2.3"
+version = "0.3.0"
 description = "Personal finance manager"
 authors = ["André Luís Maldonado Daniel"]
 edition = "2021"
