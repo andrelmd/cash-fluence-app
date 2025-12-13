@@ -17,8 +17,6 @@ export const calculateDailyBalance = (transactions: Transaction[], month: Dayjs)
 	const daysInMonth = month.daysInMonth()
 	const chartData: IChartData[] = []
 
-	// Não é mais necessário ordenar previamente, pois faremos dois loops separados
-
 	let cumulativeProjectedBalance = 0
 	let cumulativeRealizedBalance = 0
 

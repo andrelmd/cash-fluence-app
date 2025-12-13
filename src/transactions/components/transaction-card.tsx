@@ -101,9 +101,15 @@ export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) 
 										</div>
 									)}
 									<span>•</span>
-									<span>
-										{paymentDate ? paymentDate.format("DD/MM/YYYY") : dueDate.format("DD/MM/YYYY")}
-									</span>
+									{paymentDate ? (
+										<span>{paymentDate.format("DD/MM/YYYY")}</span>
+									) : (
+										<>
+											<span>{dueDate.format("DD/MM/YYYY")}</span>
+											<span>•</span>
+											<span>Pago</span>
+										</>
+									)}
 								</div>
 							</div>
 						</div>

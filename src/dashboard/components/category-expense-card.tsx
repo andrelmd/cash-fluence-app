@@ -1,12 +1,12 @@
 import { Dayjs } from "dayjs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import { Skeleton } from "../../components/ui/skeleton"
-import { IPlannedVsActualData } from "../../helpers/planned-vs-actual-calculation"
+import { IProjectedVsRealizedData } from "../../helpers/projected-vs-realized-calculation"
 import { useDelayedLoading } from "../../hooks/use-delayed-loading"
 import { CategoryExpenseProgress } from "./category-expense-progress"
 
 interface ICategoryExpenseCardProps {
-	data: IPlannedVsActualData[]
+	data: IProjectedVsRealizedData[]
 	date: Dayjs
 	isLoading?: boolean
 }

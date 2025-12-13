@@ -2,9 +2,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Dayjs } from "dayjs"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
-import { IPlannedVsActualData } from "../../helpers/planned-vs-actual-calculation"
+import { IProjectedVsRealizedData } from "../../helpers/projected-vs-realized-calculation"
 
-export function PlannedVsActualChart({ data, date }: { data: IPlannedVsActualData[]; date: Dayjs }) {
+export function PlannedVsActualChart({ data, date }: { data: IProjectedVsRealizedData[]; date: Dayjs }) {
 	const chartConfig = {
 		planned: {
 			label: "Planejado",

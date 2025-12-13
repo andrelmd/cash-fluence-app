@@ -1,5 +1,6 @@
 import { formatCurrency } from "@/utils/formatCurrency"
 import React from "react"
+import { Badge } from "../../components/ui/badge"
 import { ColorCircle } from "../../components/ui/color-circle"
 import { Progress } from "../../components/ui/progress"
 import { TColor } from "../../types/color"
@@ -8,19 +9,27 @@ interface ICategoryExpenseProgressProps extends React.ComponentPropsWithoutRef<"
 	category: string
 	percentage: number
 	color: string
-	actual: number
+	projected: number
 	planned: number
 }
 
 export const CategoryExpenseProgress = ({
 	category,
 	percentage,
-	actual,
+	projected,
 	color,
 	planned,
 }: ICategoryExpenseProgressProps) => {
-	const currencyProgress = Number.isFinite(percentage) ? `${percentage.toFixed(2)}% utilizado` : "Sem limite"
-	const actualVsPlanned = planned ? `${formatCurrency(actual)} / ${formatCurrency(planned)}` : formatCurrency(actual)
+	const currencyProgress = Number.isFinite(percentage) ? (
+		`${percentage.toFixed(2)}% utilizado`
+	) : (
+		<Badge variant="secondary" className="text-[10px] h-5 font-normal">
+			Sem limite
+		</Badge>
+	)
+	const actualVsPlanned = planned
+		? `${formatCurrency(projected)} / ${formatCurrency(planned)}`
+		: formatCurrency(projected)
 
 	return (
 		<div className="flex flex-col gap-2">

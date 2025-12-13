@@ -16,4 +16,3 @@ export type TColor =
 	| "fuchsia"
 	| "pink"
 	| "rose"
-	| "primary"

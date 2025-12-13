@@ -3,16 +3,16 @@ import { Planning } from "../plannings/entities/planning"
 import { TransactionType } from "../transactions/constants/transaction-type"
 import { Transaction } from "../transactions/entities/transaction"
 
-export interface IPlannedVsActualData {
+export interface IProjectedVsRealizedData {
 	category: string
 	planned: number
-	actual: number
-	paid: number
+	projected: number
+	realized: number
 	percentage: number
 	color: string
 }
 
-export function calculatePlannedVsActual(
+export function calculateProjectedVsRealized(
 	transactions?: Transaction[],
 	categories?: Category[],
 	plannings?: Planning[]
@@ -28,28 +28,26 @@ export function calculatePlannedVsActual(
 
 		const planned = plannings?.find((p) => p.categoryId === category.id)?.amount || category.monthlyLimit || 0
 
-		const actual = expenseTransactions
+		const projected = expenseTransactions
 			.filter((t) => t.categoryId === category.id)
 			.reduce((acc, curr) => acc + curr.amount, 0)
 
-		const paid = expenseTransactions
+		const realized = expenseTransactions
 			.filter((t) => t.categoryId === category.id)
 			.filter((t) => t.paymentDate)
 			.reduce((acc, curr) => acc + curr.amount, 0)
 
-		if (actual === 0) return acc
-
 		acc.push({
 			category: categoryName,
 			planned,
-			actual,
-			paid,
+			projected,
+			realized,
 			color: category.color,
-			percentage: (actual / planned) * 100,
+			percentage: (projected / planned) * 100,
 		})
 
 		return acc
-	}, [] as IPlannedVsActualData[])
+	}, [] as IProjectedVsRealizedData[])
 
 	return chartData
 }

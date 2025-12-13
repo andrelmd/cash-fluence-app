@@ -17,16 +17,18 @@ export function calculateExpensesByCategory(transactions?: Transaction[], catego
 		return []
 	}
 
-	return categories.map((category) => {
-		const transactionsForCategory = transactions.filter((t) => t.categoryId === category.id)
-		const amount = transactionsForCategory
-			.filter((t) => t.type === TransactionType.EXPENSE)
-			.reduce((acc, curr) => acc + curr.amount, 0)
+	return categories
+		.map((category) => {
+			const transactionsForCategory = transactions.filter((t) => t.categoryId === category.id)
+			const amount = transactionsForCategory
+				.filter((t) => t.type === TransactionType.EXPENSE)
+				.reduce((acc, curr) => acc + curr.amount, 0)
 
-		return {
-			category: category.name,
-			amount,
-			color: `var(--${category.color})`,
-		}
-	}, [] as IExpenseByCategoryChartData[])
+			return {
+				category: category.name,
+				amount,
+				color: `var(--color-${category.color}-500)`,
+			}
+		}, [] as IExpenseByCategoryChartData[])
+		.filter((item) => item.amount > 0)
 }
