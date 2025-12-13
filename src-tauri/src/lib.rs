@@ -16,7 +16,8 @@ use crate::migrations::v3::execute_migration as execute_migration_v3;
 pub fn run() {
     dotenv().ok();
 
-    let db_host = dotenv::var("VITE_DB_HOST").unwrap();
+	let default_db_host = "cash_fluence";
+    let db_host = dotenv::var("VITE_DB_HOST").unwrap_or(default_db_host.to_string());
 
     tauri::Builder::default()
         .plugin(tauri_plugin_process::init())
