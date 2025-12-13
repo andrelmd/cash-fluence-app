@@ -1,5 +1,7 @@
+import { AnimatePresence } from "framer-motion"
 import React from "react"
 import { useDelayedLoading } from "../../hooks/use-delayed-loading"
+import { cn } from "../../lib/utils"
 import { Skeleton } from "./skeleton"
 
 interface ICardListProps<TData> extends React.ComponentProps<"div"> {
@@ -34,10 +36,12 @@ export const CardList = <TData,>({
 	}
 
 	return (
-		<div className={"flex flex-1 flex-col gap-4 overflow-auto" + className} {...props}>
-			{data.map((item) => {
-				return render(item)
-			})}
-		</div>
+		<AnimatePresence>
+			<div className={cn("flex flex-1 flex-col gap-4 overflow-auto", className)} {...props}>
+				{data.map((item) => {
+					return render(item)
+				})}
+			</div>
+		</AnimatePresence>
 	)
 }

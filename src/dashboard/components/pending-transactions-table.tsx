@@ -1,6 +1,7 @@
+import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { formatCurrency } from "@/utils/formatCurrency"
-import { cva, VariantProps } from "class-variance-authority"
+import { cva } from "class-variance-authority"
 import dayjs from "dayjs"
 import { ArrowDownCircleIcon, ArrowUpCircleIcon } from "lucide-react"
 import { useCallback, useMemo } from "react"
@@ -12,25 +13,11 @@ import { useFetchCategories } from "../../hooks/use-fetch-categories"
 import { useFetchTransactions } from "../../hooks/use-fetch-transactions"
 import { TransactionType } from "../../transactions/constants/transaction-type"
 
-const situationCellVariants = cva("max-w-[200px] truncate whitespace-pre-wrap", {
-	variants: {
-		status: {
-			expired: "text-red-500 dark:text-red-300",
-			expiresIn7d: "text-amber-500 dark:text-amber-300",
-			expiresIn15d: "text-green-500 dark:text-green-300",
-			default: "text-muted-foreground",
-		},
-	},
-	defaultVariants: {
-		status: "default",
-	},
-})
-
-const transactionIconVariants = cva("", {
+const transactionIconVariants = cva("w-4 h-4", {
 	variants: {
 		type: {
-			[TransactionType.INCOME]: "text-green-500 dark:text-green-300",
-			[TransactionType.EXPENSE]: "text-red-500 dark:text-red-300",
+			[TransactionType.INCOME]: "text-green-600 dark:text-green-400",
+			[TransactionType.EXPENSE]: "text-red-600 dark:text-red-400",
 		},
 	},
 })
@@ -52,36 +39,38 @@ export const PendingTransactionsTable = () => {
 
 	const getCategoryColor = useCallback(
 		(categoryId: number) => {
-			if (!categories) return "primary"
+			if (!categories) return "amber"
 			const category = categories.find((category) => category.id === categoryId)
-			return category?.color ?? "primary"
+			return category?.color ?? "amber"
 		},
 		[categories]
 	)
 
-	if (showDelayedSkeleton) return <Skeleton className="h-[368px] w-min-[500px] w-full" />
+	if (showDelayedSkeleton) return <Skeleton className="h-[400px] w-min-[500px] w-full" />
 
 	if (!transactions || !categories) return null
 
 	return (
-		<Card className="h-[368px] w-min-[500px] w-full">
+		<Card className="h-[400px] w-min-[500px] w-full flex flex-col shadow-sm">
 			<CardHeader>
 				<CardTitle>Transações Pendentes</CardTitle>
-				<CardDescription>Lista de transações que ainda não foram pagas.</CardDescription>
+				<CardDescription>Lista de transações que vencem este mês e ainda não foram pagas.</CardDescription>
 			</CardHeader>
-			<CardContent className="relative h-[250px] w-min-[450px] overflow-y-auto">
+			<CardContent className="flex-1 overflow-auto p-0">
 				{transactions.length === 0 && (
-					<div className="flex flex-1 items-center justify-center">Nenhuma transação pendente</div>
+					<div className="flex h-full items-center justify-center text-muted-foreground text-sm">
+						Nenhuma transação pendente
+					</div>
 				)}
 				{transactions.length > 0 && (
 					<Table>
-						<TableHeader className="sticky -top-px bg-background w-min-[450px]">
+						<TableHeader className="sticky top-0 bg-background">
 							<TableRow className="hover:bg-background">
-								<TableHead className="rounded-tl-xl w-[200px]">Situação</TableHead>
-								<TableHead className="w-[200px]">Descrição</TableHead>
-								<TableHead className="w-[200px]">Categoria</TableHead>
+								<TableHead>Situação</TableHead>
+								<TableHead>Descrição</TableHead>
+								<TableHead>Categoria</TableHead>
 								<TableHead>Tipo</TableHead>
-								<TableHead className="text-right rounded-tr-xl">Valor</TableHead>
+								<TableHead>Valor</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -89,36 +78,40 @@ export const PendingTransactionsTable = () => {
 								.filter((t) => !t.paymentDate)
 								.sort((a, b) => a.dueDate.diff(b.dueDate))
 								.map((transaction) => {
-									const isExpired = transaction.dueDate.isBefore()
-									const daysToExpire = transaction.dueDate.endOf("day").diff(dayjs(), "day")
+									const isExpired = transaction.dueDate.isBefore(dayjs(), "day")
+									const isToday = transaction.dueDate.isSame(dayjs(), "day")
 
-									const getStatus = (): VariantProps<typeof situationCellVariants>["status"] => {
-										if (isExpired) return "expired"
-										if (daysToExpire <= 7) return "expiresIn7d"
-										if (daysToExpire <= 15) return "expiresIn15d"
-										return "default"
+									let badgeVariant: "default" | "secondary" | "destructive" | "outline" = "secondary"
+									let statusText = `Vence ${transaction.dueDate.fromNow()}`
+
+									if (isExpired) {
+										badgeVariant = "destructive"
+										statusText = "Vencida"
+									} else if (isToday) {
+										badgeVariant = "default"
+										statusText = "Vence hoje"
 									}
 
 									return (
 										<TableRow key={transaction.id}>
-											<TableCell className={situationCellVariants({ status: getStatus() })}>
-												{isExpired
-													? `Vencida ${transaction.dueDate.fromNow()}`
-													: `Vence ${transaction.dueDate.fromNow()}`}
+											<TableCell>
+												<Badge variant={badgeVariant}>{statusText}</Badge>
 											</TableCell>
 											<TableCell className="max-w-[200px] truncate whitespace-pre-wrap">
 												{transaction.description}
 											</TableCell>
-											<TableCell className="max-w-[200px] truncate whitespace-pre-wrap">
+											<TableCell>
 												<div className="flex items-center gap-2">
 													<ColorCircle
-														className="w-3 h-3"
+														className="w-2 h-2"
 														color={getCategoryColor(transaction.categoryId)}
 													/>
-													{getCategoryName(transaction.categoryId)}
+													<span className="text-muted-foreground text-sm">
+														{getCategoryName(transaction.categoryId)}
+													</span>
 												</div>
 											</TableCell>
-											<TableCell>
+											<TableCell className="text-center">
 												{transaction.type === TransactionType.EXPENSE ? (
 													<ArrowDownCircleIcon
 														className={transactionIconVariants({
@@ -133,7 +126,7 @@ export const PendingTransactionsTable = () => {
 													/>
 												)}
 											</TableCell>
-											<TableCell className="text-right">
+											<TableCell className="font-bold">
 												{formatCurrency(transaction.amount)}
 											</TableCell>
 										</TableRow>

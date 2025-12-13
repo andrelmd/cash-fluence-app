@@ -3,7 +3,7 @@ import { usePeriodFilterContext } from "../contexts/period-filter-context"
 import { calculateDailyBalance } from "../helpers/balance-chart-calculation"
 import { calculateExpensesByCategory } from "../helpers/expenses-by-category-calculation"
 import { calculatePaidByCategory } from "../helpers/paid-by-category-calculation"
-import { calculatePlannedVsActual } from "../helpers/planned-vs-actual-calculation"
+import { calculateProjectedVsRealized } from "../helpers/projected-vs-realized-calculation"
 import { useFetchCategories } from "./use-fetch-categories"
 import { useFetchPlanningsByPeriod } from "./use-fetch-plannings-by-period"
 import { useFetchTransactions } from "./use-fetch-transactions"
@@ -24,7 +24,7 @@ export const useDashboardData = () => {
 		[transactions, categories]
 	)
 	const projectedVsRealizedData = useMemo(
-		() => calculatePlannedVsActual(transactions, categories, plannings),
+		() => calculateProjectedVsRealized(transactions, categories, plannings),
 		[transactions, categories, plannings]
 	)
 

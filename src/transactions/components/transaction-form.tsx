@@ -169,7 +169,8 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 								placeholder="Categoria"
 								options={categoryOptions}
 							/>
-							<ControlledDatePicker name="dueDate" label="Data da transação" />
+							<ControlledDatePicker name="createDate" label="Data da transação" />
+							<ControlledDatePicker name="dueDate" label="Data de vencimento" />
 							<ShowIf option={transaction} value={null}>
 								<SelectField
 									label="Forma de pagamento"

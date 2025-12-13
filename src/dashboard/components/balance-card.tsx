@@ -1,9 +1,9 @@
 import { formatCurrency } from "@/utils/formatCurrency"
-import { cva, VariantProps } from "class-variance-authority"
+import { cva } from "class-variance-authority"
 import { Dayjs } from "dayjs"
 import { TrendingDown, TrendingUp, Wallet } from "lucide-react"
 import { useMemo } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { Skeleton } from "../../components/ui/skeleton"
 import { calculateBalanceCardValues } from "../../helpers/balance-card-calculations"
 import { useDelayedLoading } from "../../hooks/use-delayed-loading"
@@ -16,23 +16,33 @@ interface ITransactionSummaryCardProps {
 	transactions?: Transaction[]
 }
 
-const balanceCardVariants = cva("", {
+const iconContainerVariants = cva("rounded-full p-2", {
 	variants: {
 		type: {
-			income: "text-green-500 dark:text-green-300",
-			expense: "text-red-500 dark:text-red-300",
-			balance: "text-blue-400 dark:text-blue-300",
+			income: "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400",
+			expense: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
+			balance: "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400",
+		},
+	},
+})
+
+const valueVariants = cva("text-2xl font-bold", {
+	variants: {
+		type: {
+			income: "text-green-600 dark:text-green-400",
+			expense: "text-red-600 dark:text-red-400",
+			balance: "text-blue-600 dark:text-blue-400",
 		},
 		isNegative: {
-			true: "text-red-500 dark:text-red-300",
-			false: "text-green-500 dark:text-green-300",
+			true: "",
+			false: "",
 		},
 	},
 	compoundVariants: [
 		{
 			type: "balance",
-			isNegative: undefined,
-			className: "text-blue-400 dark:text-blue-300",
+			isNegative: true,
+			className: "text-red-600 dark:text-red-400",
 		},
 	],
 })
@@ -59,11 +69,11 @@ export const BalanceCard = ({
 	const icon = useMemo(() => {
 		switch (type) {
 			case TransactionType.INCOME:
-				return <TrendingUp />
+				return <TrendingUp className="h-4 w-4" />
 			case TransactionType.EXPENSE:
-				return <TrendingDown />
+				return <TrendingDown className="h-4 w-4" />
 			default:
-				return <Wallet />
+				return <Wallet className="h-4 w-4" />
 		}
 	}, [type])
 
@@ -72,41 +82,29 @@ export const BalanceCard = ({
 		[transactions, type]
 	)
 
-	const isRealizedValueNegative = useMemo(() => {
-		return realizedValue < 0
-	}, [realizedValue])
-
-	const variantProps: VariantProps<typeof balanceCardVariants> = useMemo(() => {
-		switch (type) {
-			case TransactionType.INCOME:
-				return { type: "income" }
-			case TransactionType.EXPENSE:
-				return { type: "expense" }
-			default:
-				return { type: "balance", isNegative: isRealizedValueNegative }
-		}
-	}, [type, isRealizedValueNegative])
+	const iconVariant =
+		type === TransactionType.INCOME ? "income" : type === TransactionType.EXPENSE ? "expense" : "balance"
 
 	if (showDelayedSkeleton) {
-		return <Skeleton className="flex-1 h-[170px]" />
+		return <Skeleton className="flex-1 h-[140px]" />
 	}
 
 	return (
-		<Card className="flex-1">
+		<Card className="flex-1 shadow-sm">
 			<CardHeader>
-				<div className="flex items-center justify-between">
-					<CardTitle>{title}</CardTitle>
-					<div className={balanceCardVariants(variantProps)}>{icon}</div>
+				<div className="flex flex-col pb-2">
+					<div className="flex flex-row items-center justify-between">
+						<CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
+						<div className={iconContainerVariants({ type: iconVariant })}>{icon}</div>
+					</div>
+					<div className="text-xs text-muted-foreground mt-1">{date.format("MMMM YYYY")}</div>
 				</div>
-				<CardDescription>{date.format("MMMM YYYY")}</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<div className="flex flex-col">
-					<span className={`font-bold text-lg ${balanceCardVariants(variantProps)}`}>
-						{formatCurrency(realizedValue)}
-					</span>
-					<span className="text-xs text-muted-foreground">Projetado: {formatCurrency(projectedValue)}</span>
+				<div className={valueVariants({ type: iconVariant, isNegative: realizedValue < 0 })}>
+					{formatCurrency(realizedValue)}
 				</div>
+				<p className="text-xs text-muted-foreground mt-1">Projetado: {formatCurrency(projectedValue)}</p>
 			</CardContent>
 		</Card>
 	)

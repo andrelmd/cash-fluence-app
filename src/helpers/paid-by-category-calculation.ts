@@ -28,7 +28,7 @@ export function calculatePaidByCategory(transactions?: Transaction[], categories
 			return {
 				category: category.name,
 				amount,
-				color: `var(--${category.color})`,
+				color: `var(--color-${category.color}-500)`,
 			}
 		}, [] as IPaidByCategoryChartData[])
 		.filter((item) => item.amount > 0)

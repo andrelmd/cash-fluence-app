@@ -9,24 +9,23 @@ interface IColorCircleProps extends React.ComponentProps<"div">, VariantProps<ty
 }
 
 const colorVariants: Record<TColor, string> = {
-	red: "bg-red",
-	orange: "bg-orange",
-	amber: "bg-amber",
-	yellow: "bg-yellow",
-	lime: "bg-lime",
-	green: "bg-green",
-	emerald: "bg-emerald",
-	teal: "bg-teal",
-	cyan: "bg-cyan",
-	sky: "bg-sky",
-	blue: "bg-blue",
-	indigo: "bg-indigo",
-	violet: "bg-violet",
-	purple: "bg-purple",
-	fuchsia: "bg-fuchsia",
-	pink: "bg-pink",
-	rose: "bg-rose",
-	primary: "bg-primary",
+	red: "bg-red-500",
+	orange: "bg-orange-500",
+	amber: "bg-amber-500",
+	yellow: "bg-yellow-500",
+	lime: "bg-lime-500",
+	green: "bg-green-500",
+	emerald: "bg-emerald-500",
+	teal: "bg-teal-500",
+	cyan: "bg-cyan-500",
+	sky: "bg-sky-500",
+	blue: "bg-blue-500",
+	indigo: "bg-indigo-500",
+	violet: "bg-violet-500",
+	purple: "bg-purple-500",
+	fuchsia: "bg-fuchsia-500",
+	pink: "bg-pink-500",
+	rose: "bg-rose-500",
 }
 
 const colorCircleVariants = cva("rounded-full w-8 h-8", {
@@ -34,7 +33,7 @@ const colorCircleVariants = cva("rounded-full w-8 h-8", {
 		color: colorVariants,
 	},
 	defaultVariants: {
-		color: "primary",
+		color: "red",
 	},
 })
 
