@@ -1,4 +1,5 @@
 import dayjs from "dayjs"
+import { v4 as uuid } from "uuid"
 import { Between } from "../../database/operators/query-operators"
 import { TSelectOptionsWithoutTable } from "../../database/types/select-options-without-table"
 import { IEntityServiceDelete } from "../../interfaces/entity-service-delete"
@@ -50,12 +51,14 @@ export class TransactionsService
 
 	private createInstallmentTransaction(
 		transaction: Transaction,
+		transcationCode: string,
 		currentInstallment: number,
 		installmentNumber: number
 	): Transaction {
-		const { amount, dueDate } = transaction
+		const { amount, dueDate, createDate } = transaction
 		const monthOffset = installmentNumber - currentInstallment
 		const newDueDate = dayjs(dueDate).add(monthOffset, "month")
+		const newCreateDate = dayjs(createDate).add(monthOffset, "month")
 
 		return new Transaction({
 			...transaction,
@@ -63,6 +66,8 @@ export class TransactionsService
 			currentInstallment: installmentNumber,
 			amount,
 			dueDate: newDueDate,
+			createDate: newCreateDate,
+			installmentCode: transcationCode,
 		})
 	}
 
@@ -72,8 +77,10 @@ export class TransactionsService
 			throw new Error("Transactions must have installments")
 		}
 
+		const transactionCode = uuid()
+
 		const transactionsToSave = Array.from({ length: installments - currentInstallment + 1 }, (_, i) =>
-			this.createInstallmentTransaction(transaction, currentInstallment, i + currentInstallment)
+			this.createInstallmentTransaction(transaction, transactionCode, currentInstallment, i + currentInstallment)
 		)
 
 		return Promise.all(transactionsToSave.map((t) => this.save(t)))
@@ -101,7 +108,7 @@ export class TransactionsService
 	async getTransactionsByPeriod(startDate: dayjs.Dayjs, endDate: dayjs.Dayjs): Promise<Transaction[]> {
 		return this.getMany({
 			where: {
-				dueDate: Between(startDate, endDate),
+				dueDate: Between(startDate.startOf("day"), endDate.endOf("day")),
 			},
 			orderBy: {
 				dueDate: "desc",
@@ -137,5 +144,13 @@ export class TransactionsService
 		}
 
 		return dayjs(lastTransaction.dueDate).year()
+	}
+
+	async getByInstallmentCode(installmentCode: string) {
+		return this.getMany({
+			where: {
+				installmentCode,
+			},
+		})
 	}
 }

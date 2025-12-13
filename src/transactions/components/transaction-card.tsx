@@ -1,102 +1,141 @@
 import { formatCurrency } from "@/utils/formatCurrency"
 import { cva } from "class-variance-authority"
+import { motion } from "framer-motion"
 import { ArrowDownCircleIcon, ArrowUpCircleIcon, Edit, Trash } from "lucide-react"
+import { useState } from "react"
 import { Badge } from "../../components/ui/badge"
 import { Button } from "../../components/ui/button"
-import { Card, CardAction, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
+import { Card, CardHeader, CardTitle } from "../../components/ui/card"
 import { ColorCircle } from "../../components/ui/color-circle"
-import { Label } from "../../components/ui/label"
 import { useDeleteTransaction } from "../../hooks/use-delete-transaction"
 import { useFetchOneCategory } from "../../hooks/use-fetch-one-category"
 import { TransactionType } from "../constants/transaction-type"
 import { Transaction } from "../entities/transaction"
+import { TrnasactionDeleteInstallmentsDialog } from "./transaction-delete-installments-dialog"
 
 interface ITransactionCardProps {
 	transaction: Transaction
 	onEdit?: (transaction: Transaction) => void
 }
 
-const iconContainerVariants = cva("rounded-full text-white p-1.5 dark:text-black", {
+const iconContainerVariants = cva("rounded-full p-2", {
 	variants: {
 		type: {
-			[TransactionType.INCOME]: "bg-green-500 dark:bg-green-300",
-			[TransactionType.EXPENSE]: "bg-red-500 dark:bg-red-300",
+			[TransactionType.INCOME]: "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400",
+			[TransactionType.EXPENSE]: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
 		},
 	},
 })
 
-const amountVariants = cva("flex items-center gap-2", {
+const amountVariants = cva("font-bold text-base", {
 	variants: {
 		type: {
-			[TransactionType.INCOME]: "text-green-500 dark:text-green-300",
-			[TransactionType.EXPENSE]: "text-red-500 dark:text-red-300",
+			[TransactionType.INCOME]: "text-green-600 dark:text-green-400",
+			[TransactionType.EXPENSE]: "text-red-600 dark:text-red-400",
 		},
 	},
 })
 
 export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) => {
-	const { amount, categoryId, dueDate, currentInstallment, description, installments, type, paymentDate } =
-		transaction
-	const transactionIcon = type === TransactionType.EXPENSE ? <ArrowDownCircleIcon /> : <ArrowUpCircleIcon />
+	const {
+		amount,
+		categoryId,
+		dueDate,
+		currentInstallment,
+		description,
+		installments,
+		type,
+		paymentDate,
+		installmentCode,
+	} = transaction
+	const transactionIcon =
+		type === TransactionType.EXPENSE ? (
+			<ArrowDownCircleIcon className="w-5 h-5" />
+		) : (
+			<ArrowUpCircleIcon className="w-5 h-5" />
+		)
 
 	const { data: category } = useFetchOneCategory(categoryId)
 	const { mutateAsync: deleteFn } = useDeleteTransaction()
+	const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
 
-	const handleOnDelete = async () => {
+	const handleOnDelete = async (e: React.MouseEvent) => {
+		e.stopPropagation()
 		if (!transaction.id) return
+
+		if (installmentCode) return setOpenDeleteDialog(true)
 		await deleteFn(transaction)
 	}
 
-	const handleOnEdit = () => {
+	const handleOnEdit = (e: React.MouseEvent) => {
+		e.stopPropagation()
 		if (onEdit) onEdit(transaction)
 	}
 
 	return (
-		<Card>
-			<CardHeader>
-				<CardTitle>
-					<div className="flex gap-4 items-center">
-						<div className={iconContainerVariants({ type })}>{transactionIcon}</div>
-						<div className="flex flex-col gap-2">
-							<div className="flex gap-2 items-center">
-								{description}
-								{installments && installments > 0 && (
-									<Badge variant={"outline"}>
-										{currentInstallment}/{installments}x
-									</Badge>
-								)}
+		<motion.div
+			layout
+			initial={{ opacity: 0, y: 20, scale: 0.98 }}
+			animate={{ opacity: 1, y: 0, scale: 1 }}
+			exit={{ opacity: 0, height: 0, marginBottom: 0, padding: 0, transition: { duration: 0.2 } }}
+		>
+			<Card className="group hover:shadow-md transition-all duration-200">
+				<CardHeader className="p-4">
+					<div className="flex items-center justify-between">
+						<div className="flex items-center gap-4">
+							<div className={iconContainerVariants({ type })}>{transactionIcon}</div>
+							<div className="flex flex-col gap-1">
+								<div className="flex gap-2 items-center">
+									<CardTitle className="text-sm font-semibold leading-none">{description}</CardTitle>
+									{installments && installments > 0 && (
+										<Badge variant="secondary" className="text-[10px] px-1.5 h-5 font-normal">
+											{currentInstallment}/{installments}x
+										</Badge>
+									)}
+								</div>
+								<div className="flex items-center gap-2 text-xs text-muted-foreground">
+									{category && (
+										<div className="flex items-center gap-1.5">
+											<ColorCircle className="w-2 h-2" color={category.color} />
+											<span>{category.name}</span>
+										</div>
+									)}
+									<span>•</span>
+									<span>
+										{paymentDate ? paymentDate.format("DD/MM/YYYY") : dueDate.format("DD/MM/YYYY")}
+									</span>
+								</div>
 							</div>
-							<Label className="text-muted-foreground">{dueDate.format("DD/MM/YYYY")}</Label>
+						</div>
+
+						<div className="flex items-center gap-4">
+							<span className={amountVariants({ type })}>
+								{type === TransactionType.EXPENSE ? "-" : "+"}
+								{formatCurrency(amount)}
+							</span>
+
+							<div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+								<Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleOnEdit}>
+									<Edit className="w-4 h-4" />
+								</Button>
+								<Button
+									variant="ghost"
+									size="icon"
+									className="h-8 w-8 text-muted-foreground hover:text-destructive"
+									onClick={handleOnDelete}
+								>
+									<Trash className="w-4 h-4" />
+								</Button>
+							</div>
 						</div>
 					</div>
-				</CardTitle>
-				<CardAction>
-					<Button variant="ghost" onClick={handleOnEdit}>
-						<Edit />
-					</Button>
-					<Button variant="ghost" onClick={handleOnDelete} className="text-red-500 dark:text-red-300">
-						<Trash />
-					</Button>
-				</CardAction>
-			</CardHeader>
-			<CardContent>
-				<div className="flex justify-between">
-					<div className="flex flex-col gap-2">
-						<div className="flex gap-2 items-center">
-							{category && <ColorCircle className="w-4 h-4" color={category.color} />}
-							<p>{category?.name}</p>
-						</div>
-						{paymentDate && (
-							<div className="text-muted-foreground text-xs">
-								Pago em {paymentDate.format("DD/MM/YYYY")}
-							</div>
-						)}
-					</div>
-					<div className={amountVariants({ type })}>
-						{`${type === TransactionType.EXPENSE ? "-" : "+"}${formatCurrency(amount)}`}
-					</div>
-				</div>
-			</CardContent>
-		</Card>
+				</CardHeader>
+			</Card>
+			<TrnasactionDeleteInstallmentsDialog
+				transaction={transaction}
+				open={openDeleteDialog}
+				onOpenChange={setOpenDeleteDialog}
+			/>
+		</motion.div>
 	)
 }

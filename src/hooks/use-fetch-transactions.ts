@@ -10,13 +10,14 @@ interface IUseFetchTransactionsOptions {
 	type?: TransactionType
 	startDate?: Dayjs
 	endDate?: Dayjs
+	installmentCode?: string
 }
 
 export function useFetchTransactions(options: IUseFetchTransactionsOptions = {}) {
 	const queryKey = useMemo(() => [UseQueryKeys.TRANSACTIONS, options], [options])
 
 	const getFetchFn = useCallback(() => {
-		const { type, startDate, endDate } = options
+		const { type, startDate, endDate, installmentCode } = options
 		if (type !== undefined) {
 			return () => transactionsService.getByType(type)
 		}
@@ -40,6 +41,10 @@ export function useFetchTransactions(options: IUseFetchTransactionsOptions = {})
 						dueDate: LessThanOrEqual(endDate),
 					},
 				})
+		}
+
+		if (installmentCode) {
+			return () => transactionsService.getByInstallmentCode(installmentCode)
 		}
 
 		return () => transactionsService.getAll()

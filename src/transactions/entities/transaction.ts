@@ -12,6 +12,7 @@ export class Transaction {
 	currentInstallment: number | null
 	installments: number | null
 	categoryId: number
+	installmentCode: string | null
 
 	constructor({
 		amount,
@@ -24,6 +25,7 @@ export class Transaction {
 		id = null,
 		currentInstallment = null,
 		installments = null,
+		installmentCode = null,
 	}: {
 		amount: number
 		dueDate: Dayjs
@@ -35,10 +37,11 @@ export class Transaction {
 		paymentDate?: Dayjs | null
 		currentInstallment?: number | null
 		installments?: number | null
+		installmentCode?: string | null
 	}) {
 		this.id = id
 		this.amount = amount
-		this.createDate = createDate
+		this.createDate = createDate.startOf("day")
 		this.type = type
 		this.description = description
 		this.currentInstallment = currentInstallment
@@ -46,5 +49,6 @@ export class Transaction {
 		this.categoryId = categoryId
 		this.dueDate = dueDate.startOf("day")
 		this.paymentDate = paymentDate?.endOf("day") || null
+		this.installmentCode = installmentCode || null
 	}
 }
