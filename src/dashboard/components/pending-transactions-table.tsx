@@ -1,9 +1,10 @@
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { formatCurrency } from "@/utils/formatCurrency"
 import { cva } from "class-variance-authority"
 import dayjs from "dayjs"
-import { ArrowDownCircleIcon, ArrowUpCircleIcon } from "lucide-react"
+import { ArrowDownCircleIcon, ArrowUpCircleIcon, Check } from "lucide-react"
 import { useCallback, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import { ColorCircle } from "../../components/ui/color-circle"
@@ -11,7 +12,9 @@ import { Skeleton } from "../../components/ui/skeleton"
 import { useDelayedLoading } from "../../hooks/use-delayed-loading"
 import { useFetchCategories } from "../../hooks/use-fetch-categories"
 import { useFetchTransactions } from "../../hooks/use-fetch-transactions"
+import { useUpdateTransaction } from "../../hooks/use-update-transaction"
 import { TransactionType } from "../../transactions/constants/transaction-type"
+import { Transaction } from "../../transactions/entities/transaction"
 
 const transactionIconVariants = cva("w-4 h-4", {
 	variants: {
@@ -26,6 +29,7 @@ export const PendingTransactionsTable = () => {
 	const { data: categories } = useFetchCategories()
 	const endDate = useMemo(() => dayjs().endOf("month"), [])
 	const { data: transactions, isLoading } = useFetchTransactions({ endDate })
+	const { mutateAsync: updateTransaction } = useUpdateTransaction()
 	const showDelayedSkeleton = useDelayedLoading(isLoading, 500)
 
 	const getCategoryName = useCallback(
@@ -44,6 +48,17 @@ export const PendingTransactionsTable = () => {
 			return category?.color ?? "amber"
 		},
 		[categories]
+	)
+
+	const handleMarkAsPaid = useCallback(
+		async (transaction: Transaction) => {
+			const updatedTransaction = new Transaction({
+				...transaction,
+				paymentDate: dayjs(),
+			})
+			await updateTransaction({ transaction: updatedTransaction, saveInInstallments: false })
+		},
+		[updateTransaction]
 	)
 
 	if (showDelayedSkeleton) return <Skeleton className="h-[400px] w-min-[500px] w-full" />
@@ -71,6 +86,7 @@ export const PendingTransactionsTable = () => {
 								<TableHead>Categoria</TableHead>
 								<TableHead>Tipo</TableHead>
 								<TableHead>Valor</TableHead>
+								<TableHead>Ações</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -128,6 +144,17 @@ export const PendingTransactionsTable = () => {
 											</TableCell>
 											<TableCell className="font-bold">
 												{formatCurrency(transaction.amount)}
+											</TableCell>
+											<TableCell>
+												<Button
+													variant="ghost"
+													size="icon"
+													className="h-8 w-8 text-muted-foreground hover:text-primary"
+													onClick={() => handleMarkAsPaid(transaction)}
+													title="Marcar como pago"
+												>
+													<Check className="w-4 h-4" />
+												</Button>
 											</TableCell>
 										</TableRow>
 									)
