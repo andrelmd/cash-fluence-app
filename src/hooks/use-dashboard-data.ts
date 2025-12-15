@@ -1,8 +1,7 @@
 import { useMemo } from "react"
 import { usePeriodFilterContext } from "../contexts/period-filter-context"
 import { calculateDailyBalance } from "../helpers/balance-chart-calculation"
-import { calculateExpensesByCategory } from "../helpers/expenses-by-category-calculation"
-import { calculatePaidByCategory } from "../helpers/paid-by-category-calculation"
+import { calculateExpenseRealizedByCategory } from "../helpers/expenses-by-category-calculation"
 import { calculateProjectedVsRealized } from "../helpers/projected-vs-realized-calculation"
 import { useFetchCategories } from "./use-fetch-categories"
 import { useFetchPlanningsByPeriod } from "./use-fetch-plannings-by-period"
@@ -20,17 +19,12 @@ export const useDashboardData = () => {
 	const balanceChartData = useMemo(() => calculateDailyBalance(transactions || [], date), [transactions, date])
 
 	const expenseByCategoryData = useMemo(
-		() => calculateExpensesByCategory(transactions, categories),
+		() => calculateExpenseRealizedByCategory(transactions, categories),
 		[transactions, categories]
 	)
 	const projectedVsRealizedData = useMemo(
 		() => calculateProjectedVsRealized(transactions, categories, plannings),
 		[transactions, categories, plannings]
-	)
-
-	const paidByCategoryData = useMemo(
-		() => calculatePaidByCategory(transactions, categories),
-		[transactions, categories]
 	)
 
 	return {
@@ -44,6 +38,5 @@ export const useDashboardData = () => {
 		balanceChartData,
 		expenseByCategoryData,
 		projectedVsRealizedData,
-		paidByCategoryData,
 	}
 }

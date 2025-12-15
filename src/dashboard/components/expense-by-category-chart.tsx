@@ -1,61 +1,75 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-	ChartConfig,
-	ChartContainer,
-	ChartLegend,
-	ChartLegendContent,
-	ChartTooltip,
-	ChartTooltipContent,
-} from "@/components/ui/chart"
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Dayjs } from "dayjs"
-import { RadialBar, RadialBarChart } from "recharts"
+import { useMemo } from "react"
+import { Bar, BarChart, XAxis, YAxis } from "recharts"
 import { Skeleton } from "../../components/ui/skeleton"
-import { categoryToKebabCase } from "../../helpers/category-to-kebab-case"
-import { IExpenseByCategoryChartData } from "../../helpers/expenses-by-category-calculation"
+import { IExpenseRealizedByCategoryChartData } from "../../helpers/expenses-by-category-calculation"
 import { useDelayedLoading } from "../../hooks/use-delayed-loading"
 
-export const description = "A donut chart with text"
-
-interface IExpenseByCategoryChartProps {
-	data: IExpenseByCategoryChartData[]
+interface IExpenseRealizedByCategoryChartProps {
+	data: IExpenseRealizedByCategoryChartData[]
 	date: Dayjs
 	isLoading?: boolean
 }
 
-export const ExpenseByCategoryChart = ({ data, date, isLoading = false }: IExpenseByCategoryChartProps) => {
-	const chartConfig = data.reduce((acc, curr) => {
-		acc[categoryToKebabCase(curr.category)] = {
-			label: curr.category,
-			color: curr.color,
-		}
-		return acc
-	}, {} as ChartConfig) satisfies ChartConfig
+const chartConfig = {
+	projected: {
+		label: "Projetado",
+		color: "var(--muted-foreground)",
+	},
+	realized: {
+		label: "Realizado",
+		color: "var(--foreground)",
+	},
+} satisfies ChartConfig
 
-	const chartData = data.map((item) => ({
-		category: categoryToKebabCase(item.category),
-		amount: item.amount,
-		fill: categoryToKebabCase(`var(--color-${item.category})`),
-	}))
-
+export const ExpenseByCategoryChart = ({ data, date, isLoading = false }: IExpenseRealizedByCategoryChartProps) => {
 	const showDelayedSkeleton = useDelayedLoading(isLoading, 500)
+
+	const allValues = useMemo(() => data.flatMap((item) => [item.realized, item.projected]), [data])
+	const maxBalance = allValues.length > 0 ? Math.max(...allValues) : 0
+	const minBalance = allValues.length > 0 ? Math.min(...allValues) : 0
 
 	if (showDelayedSkeleton) {
 		return <Skeleton className="h-[589px] w-full" />
 	}
 
+	if (data.length === 0) {
+		return (
+			<Card>
+				<CardHeader>
+					<CardTitle>Despesas por Categoria</CardTitle>
+					<CardDescription>{date.format("MMMM YYYY")}</CardDescription>
+				</CardHeader>
+				<CardContent className="h-[400px] flex items-center justify-center">
+					<p className="text-muted-foreground">Nenhuma despesa para o período.</p>
+				</CardContent>
+			</Card>
+		)
+	}
+
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Despesas por categoria</CardTitle>
+				<CardTitle>Despesas por Categoria</CardTitle>
 				<CardDescription>{date.format("MMMM YYYY")}</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[400px]">
-					<RadialBarChart startAngle={-90} endAngle={380} data={chartData} innerRadius={30} outerRadius={110}>
-						<ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel nameKey="category" />} />
-						<RadialBar data={chartData} dataKey={"amount"} background />
-						<ChartLegend content={<ChartLegendContent nameKey="category" />} />
-					</RadialBarChart>
+				<ChartContainer config={chartConfig} className="h-[400px] w-full">
+					<BarChart accessibilityLayer data={data} layout="vertical">
+						<XAxis type="number" dataKey={"realized"} hide domain={[minBalance * -1.1, maxBalance * 1.1]} />
+						<XAxis
+							type="number"
+							dataKey={"projected"}
+							hide
+							domain={[minBalance * -1.1, maxBalance * 1.1]}
+						/>
+						<YAxis type="category" dataKey={"category"} tickLine={false} tickMargin={10} axisLine={false} />
+						<ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+						<Bar dataKey="realized" fill="var(--color-realized)" radius={5} />
+						<Bar dataKey="projected" fill="var(--color-projected)" radius={5} />
+					</BarChart>
 				</ChartContainer>
 			</CardContent>
 		</Card>

@@ -5,19 +5,11 @@ import { BalanceCard } from "../components/balance-card"
 import { BalanceChart } from "../components/balance-chart"
 import { CategoryExpenseCard } from "../components/category-expense-card"
 import { ExpenseByCategoryChart } from "../components/expense-by-category-chart"
-import { PaidByCategoryChart } from "../components/paid-by-category-chart"
 import { PendingTransactionsTable } from "../components/pending-transactions-table"
 
 export const Dashboard = () => {
-	const {
-		date,
-		transactions,
-		isLoading,
-		balanceChartData,
-		expenseByCategoryData,
-		projectedVsRealizedData,
-		paidByCategoryData,
-	} = useDashboardData()
+	const { date, transactions, isLoading, balanceChartData, projectedVsRealizedData, expenseByCategoryData } =
+		useDashboardData()
 
 	return (
 		<>
@@ -42,15 +34,11 @@ export const Dashboard = () => {
 					<div className="flex flex-1 w-full">
 						<BalanceChart data={balanceChartData} date={date} isLoading={isLoading} />
 					</div>
-					<div className="grid grid-cols-1 md:flex lg:grid-cols-2 gap-4 w-full">
+					<div className="grid grid-cols-1 xs:flex lg:grid-cols-2 gap-4 w-full">
 						<PendingTransactionsTable />
 						<CategoryExpenseCard data={projectedVsRealizedData} date={date} isLoading={isLoading} />
 					</div>
-
-					<div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
-						<PaidByCategoryChart data={paidByCategoryData} date={date} isLoading={isLoading} />
-						<ExpenseByCategoryChart data={expenseByCategoryData} date={date} isLoading={isLoading} />
-					</div>
+					<ExpenseByCategoryChart data={expenseByCategoryData} date={date} isLoading={isLoading} />
 				</div>
 			</div>
 		</>
