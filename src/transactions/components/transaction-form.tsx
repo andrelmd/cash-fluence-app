@@ -121,6 +121,8 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 	useEffect(() => {
 		const hasInstallments = !!transaction?.installments && transaction.installments > 0
 		setIsInstallment(hasInstallments)
+		const hasPaymentDate = !!transaction?.paymentDate
+		setIsPaid(hasPaymentDate)
 
 		const defaultValues = {
 			id: transaction?.id || null,
