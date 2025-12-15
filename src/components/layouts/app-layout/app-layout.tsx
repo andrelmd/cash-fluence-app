@@ -23,7 +23,7 @@ export const AppLayout = () => {
 
 	return (
 		<ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-			<SidebarProvider>
+			<SidebarProvider defaultChecked={false}>
 				<AppSidebar onSelect={handleOnSelect} selectedPage={selectedPage} />
 				<div className="flex flex-col p-2 h-dvh w-dvw">
 					<div className="flex w-full justify-between items-center p-4">
