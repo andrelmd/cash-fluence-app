@@ -22,11 +22,11 @@ export class LockService {
 		})
 
 		if (result.rowsAffected > 0) {
-			Logger.log(`LockService: Lock for key '${key}' acquired successfully.`)
+			Logger.info(`LockService: Lock for key '${key}' acquired successfully.`)
 			return true
 		}
 
-		Logger.log(`LockService: Lock for key '${key}' is still valid for today. Not acquiring.`)
+		Logger.info(`LockService: Lock for key '${key}' is still valid for today. Not acquiring.`)
 		return false
 	}
 }

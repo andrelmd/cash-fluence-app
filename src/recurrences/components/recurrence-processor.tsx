@@ -11,7 +11,7 @@ export const RecurrenceProcessor = () => {
 				const hasLock = await lockService.acquireLock("recurrence_processor")
 
 				if (!hasLock) {
-					Logger.log(
+					Logger.info(
 						"Could not acquire lock for recurrence processing. Another instance may be running or already processed today."
 					)
 					return

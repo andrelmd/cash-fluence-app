@@ -2,6 +2,7 @@ import { relaunch } from "@tauri-apps/plugin-process"
 import { check, Update } from "@tauri-apps/plugin-updater"
 import { createContext, ReactNode, useCallback, useContext, useState } from "react"
 import { Logger } from "../logger/logger.class"
+import { formatBytes } from "../utils/format-bytes"
 
 interface UpdaterContextData {
 	updateAvailable: boolean
@@ -63,6 +64,7 @@ export const UpdaterProvider = ({ children }: { children: ReactNode }) => {
 					case "Progress":
 						downloaded += event.data.chunkLength
 						setProgress(downloaded)
+						Logger.info(`Downloaded ${formatBytes(downloaded)} of ${formatBytes(contentLength)}`)
 						break
 					case "Finished":
 						break

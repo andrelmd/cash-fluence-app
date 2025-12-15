@@ -22,10 +22,10 @@ function App() {
 
 	return (
 		<UpdaterProvider>
-			<UpdateChecker />
 			<RecurrenceProcessor />
 			<QueryClientProvider client={queryClient}>
 				<AppLayout />
+				<UpdateChecker />
 			</QueryClientProvider>
 		</UpdaterProvider>
 	)

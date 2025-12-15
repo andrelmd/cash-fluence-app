@@ -17,9 +17,9 @@ export class SqliteAdapter implements IDatabaseAdapter {
 	async init(): Promise<void> {
 		const startTime = Date.now()
 		const database_path = import.meta.env.VITE_DB_HOST || "cash_fluence"
-		Logger.log(`Initializing sqlite connection to ${database_path}`)
+		Logger.info(`Initializing sqlite connection to ${database_path}`)
 		this.database = await Database.load(`sqlite:${database_path}.db`)
-		Logger.log(`Sqlite connection initialized in ${Date.now() - startTime}ms`)
+		Logger.info(`Sqlite connection initialized in ${Date.now() - startTime}ms`)
 	}
 
 	async find<TEntity>(options: ISelectOptions<TEntity>): Promise<TEntity[]> {
@@ -104,8 +104,8 @@ export class SqliteAdapter implements IDatabaseAdapter {
 	}
 
 	private logQuery(query: string, values: any[]): void {
-		Logger.log(`Executing query: ${query}`)
-		Logger.log(`With values: ${JSON.stringify(values)}\n`)
+		Logger.info(`Executing query: ${query}`)
+		Logger.info(`With values: ${JSON.stringify(values)}\n`)
 	}
 
 	private async executeLoggedQuery<T>(db: Database, query: string, values: any[]): Promise<T> {
