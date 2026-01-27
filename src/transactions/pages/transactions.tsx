@@ -2,18 +2,21 @@ import { useCallback, useState } from "react"
 import { Button } from "../../components/ui/button"
 import { CardList } from "../../components/ui/card-list"
 import { DateFilter } from "../../components/ui/date-filter"
+import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group"
 import { usePeriodFilterContext } from "../../contexts/period-filter-context"
 import { useFetchTransactions } from "../../hooks/use-fetch-transactions"
 import { TransactionCard } from "../components/transaction-card"
 import { TransactionForm } from "../components/transaction-form"
+import { TransactionFilterType } from "../constants/transaction-filter-type"
 import { Transaction } from "../entities/transaction"
 
 export const Transactions = () => {
 	const [isFormOpen, setIsFormOpen] = useState(false)
 	const [transaction, setTransaction] = useState<Transaction | null>(null)
-	const { startDate, endDate } = usePeriodFilterContext()
+	const [filterType, setFilterType] = useState<TransactionFilterType>(TransactionFilterType.ALL)
+	const { startDate, endDate, date } = usePeriodFilterContext()
 
-	const { data, isLoading } = useFetchTransactions({ startDate, endDate })
+	const { data, isLoading } = useFetchTransactions({ startDate, endDate, filterType })
 
 	const handleOnEdit = useCallback((transaction: Transaction) => {
 		setTransaction(transaction)
@@ -29,11 +32,36 @@ export const Transactions = () => {
 		setIsFormOpen(true)
 	}, [])
 
+	const handleFilterChange = (value: string) => {
+		if (value) setFilterType(Number(value) as TransactionFilterType)
+	}
+
 	return (
 		<>
 			<div className="flex flex-1 flex-col gap-4 overflow-auto">
 				<div className="flex items-center justify-between">
-					<DateFilter />
+					<div className="flex items-center gap-4">
+						<DateFilter />
+						<ToggleGroup
+							type="single"
+							value={filterType.toString()}
+							onValueChange={handleFilterChange}
+							className="border rounded-md"
+						>
+							<ToggleGroupItem value={TransactionFilterType.ALL.toString()} className="text-xs px-3">
+								Todas
+							</ToggleGroupItem>
+							<ToggleGroupItem value={TransactionFilterType.DUE_DATE.toString()} className="text-xs px-3">
+								Vencem
+							</ToggleGroupItem>
+							<ToggleGroupItem
+								value={TransactionFilterType.CREATE_DATE.toString()}
+								className="text-xs px-3"
+							>
+								Compras
+							</ToggleGroupItem>
+						</ToggleGroup>
+					</div>
 
 					<Button onClick={handleOnOpen}>Criar nova transação</Button>
 				</div>
@@ -42,7 +70,15 @@ export const Transactions = () => {
 						noContentText="Nenhuma transação encontrada"
 						data={data}
 						isLoading={isLoading}
-						render={(item) => <TransactionCard transaction={item} key={item.id} onEdit={handleOnEdit} />}
+						render={(item) => (
+							<TransactionCard
+								transaction={item}
+								key={item.id}
+								onEdit={handleOnEdit}
+								filterDate={date}
+								filterType={filterType}
+							/>
+						)}
 					/>
 				</div>
 			</div>

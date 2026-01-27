@@ -105,10 +105,46 @@ export class TransactionsService
 		return updatedTransaction
 	}
 
-	async getTransactionsByPeriod(startDate: dayjs.Dayjs, endDate: dayjs.Dayjs): Promise<Transaction[]> {
+	async getTransactionsByDueDate(startDate: dayjs.Dayjs, endDate: dayjs.Dayjs): Promise<Transaction[]> {
 		return this.getMany({
 			where: {
 				dueDate: Between(startDate.startOf("day"), endDate.endOf("day")),
+			},
+			orderBy: {
+				dueDate: "desc",
+			},
+		})
+	}
+
+	async getTransactionsByPaymentDate(startDate: dayjs.Dayjs, endDate: dayjs.Dayjs): Promise<Transaction[]> {
+		return this.getMany({
+			where: {
+				paymentDate: Between(startDate.startOf("day"), endDate.endOf("day")),
+			},
+			orderBy: {
+				dueDate: "desc",
+			},
+		})
+	}
+
+	async getTransactionsByDueDateOrCreationDate(startDate: dayjs.Dayjs, endDate: dayjs.Dayjs): Promise<Transaction[]> {
+		return this.getMany({
+			where: {
+				$or: [
+					{ dueDate: Between(startDate.startOf("day"), endDate.endOf("day")) },
+					{ createDate: Between(startDate.startOf("day"), endDate.endOf("day")) },
+				],
+			},
+			orderBy: {
+				dueDate: "desc",
+			},
+		})
+	}
+
+	async getTransactionByCreationDate(startDate: dayjs.Dayjs, endDate: dayjs.Dayjs): Promise<Transaction[]> {
+		return this.getMany({
+			where: {
+				createDate: Between(startDate.startOf("day"), endDate.endOf("day")),
 			},
 			orderBy: {
 				dueDate: "desc",

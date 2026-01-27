@@ -1,14 +1,17 @@
 import { formatCurrency } from "@/utils/formatCurrency"
 import { cva } from "class-variance-authority"
+import { Dayjs } from "dayjs"
 import { motion } from "framer-motion"
-import { ArrowDownCircleIcon, ArrowUpCircleIcon, Edit, Trash } from "lucide-react"
-import { useState } from "react"
+import { ArrowDownCircleIcon, ArrowUpCircleIcon, Calendar, CalendarCheck, Edit, Trash } from "lucide-react"
+import { useMemo, useState } from "react"
 import { Badge } from "../../components/ui/badge"
 import { Button } from "../../components/ui/button"
 import { Card, CardHeader, CardTitle } from "../../components/ui/card"
 import { ColorCircle } from "../../components/ui/color-circle"
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../components/ui/tooltip"
 import { useDeleteTransaction } from "../../hooks/use-delete-transaction"
-import { useFetchOneCategory } from "../../hooks/use-fetch-one-category"
+import { useFetchCategories } from "../../hooks/use-fetch-categories"
+import { TransactionFilterType } from "../constants/transaction-filter-type"
 import { TransactionType } from "../constants/transaction-type"
 import { Transaction } from "../entities/transaction"
 import { TrnasactionDeleteInstallmentsDialog } from "./transaction-delete-installments-dialog"
@@ -16,6 +19,8 @@ import { TrnasactionDeleteInstallmentsDialog } from "./transaction-delete-instal
 interface ITransactionCardProps {
 	transaction: Transaction
 	onEdit?: (transaction: Transaction) => void
+	filterDate?: Dayjs
+	filterType?: TransactionFilterType
 }
 
 const iconContainerVariants = cva("rounded-full p-2", {
@@ -36,10 +41,15 @@ const amountVariants = cva("font-bold text-base", {
 	},
 })
 
-export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) => {
+export const TransactionCard = ({
+	transaction,
+	onEdit,
+	filterDate,
+	filterType = TransactionFilterType.ALL,
+}: ITransactionCardProps) => {
 	const {
 		amount,
-		categoryId,
+		categoryIds,
 		dueDate,
 		currentInstallment,
 		description,
@@ -47,6 +57,7 @@ export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) 
 		type,
 		paymentDate,
 		installmentCode,
+		paymentMethod,
 	} = transaction
 	const transactionIcon =
 		type === TransactionType.EXPENSE ? (
@@ -55,9 +66,29 @@ export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) 
 			<ArrowUpCircleIcon className="w-5 h-5" />
 		)
 
-	const { data: category } = useFetchOneCategory(categoryId)
+	const { data: categories } = useFetchCategories()
+	const transactionCategories = useMemo(() => {
+		if (!categories || !categoryIds) return []
+		return categories.filter((c) => categoryIds.includes(c.id!))
+	}, [categories, categoryIds])
+
 	const { mutateAsync: deleteFn } = useDeleteTransaction()
 	const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+
+	const inclusionType = useMemo(() => {
+		if (!filterDate) return null
+		const dueDateInMonth =
+			transaction.dueDate.month() === filterDate.month() && transaction.dueDate.year() === filterDate.year()
+		const createDateInMonth =
+			transaction.createDate &&
+			transaction.createDate.month() === filterDate.month() &&
+			transaction.createDate.year() === filterDate.year()
+
+		if (dueDateInMonth && createDateInMonth) return "both"
+		if (dueDateInMonth) return "dueDate"
+		if (createDateInMonth) return "createDate"
+		return null
+	}, [filterDate, transaction.dueDate, transaction.createDate])
 
 	const handleOnDelete = async (e: React.MouseEvent) => {
 		e.stopPropagation()
@@ -94,13 +125,21 @@ export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) 
 									)}
 								</div>
 								<div className="flex items-center gap-2 text-xs text-muted-foreground">
-									{category && (
-										<div className="flex items-center gap-1.5">
-											<ColorCircle className="w-2 h-2" color={category.color} />
-											<span>{category.name}</span>
-										</div>
+									<div className="flex items-center gap-2 flex-wrap">
+										{transactionCategories.map((category: any) => (
+											<div key={category.id} className="flex items-center gap-1.5">
+												<ColorCircle className="w-2 h-2" color={category.color} />
+												<span>{category.name}</span>
+											</div>
+										))}
+									</div>
+									{transactionCategories.length > 0 && <span>•</span>}
+									{paymentMethod && (
+										<>
+											<span>{paymentMethod}</span>
+											<span>•</span>
+										</>
 									)}
-									<span>•</span>
 									{paymentDate ? (
 										<>
 											<span>{paymentDate.format("DD/MM/YYYY")}</span>
@@ -110,6 +149,26 @@ export const TransactionCard = ({ transaction, onEdit }: ITransactionCardProps) 
 									) : (
 										<span>{dueDate.format("DD/MM/YYYY")}</span>
 									)}
+									{filterType === TransactionFilterType.ALL &&
+										inclusionType &&
+										inclusionType !== "both" && (
+											<Tooltip>
+												<TooltipTrigger asChild>
+													{inclusionType === "createDate" ? (
+														<CalendarCheck className="w-3.5 h-3.5 text-blue-500 ml-1 cursor-help" />
+													) : (
+														<Calendar className="w-3.5 h-3.5 text-gray-500 ml-1 cursor-help" />
+													)}
+												</TooltipTrigger>
+												<TooltipContent>
+													<p>
+														{inclusionType === "createDate"
+															? "Incluída por data de compra"
+															: "Incluída por data de vencimento"}
+													</p>
+												</TooltipContent>
+											</Tooltip>
+										)}
 								</div>
 							</div>
 						</div>

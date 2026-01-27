@@ -2,11 +2,12 @@ import { formatCurrency } from "@/utils/formatCurrency"
 import { cva } from "class-variance-authority"
 import { motion } from "framer-motion"
 import { Edit, RefreshCcw, Trash } from "lucide-react"
+import { useMemo } from "react"
 import { Button } from "../../components/ui/button"
 import { Card, CardHeader, CardTitle } from "../../components/ui/card"
 import { ColorCircle } from "../../components/ui/color-circle"
 import { useDeleteRecurrence } from "../../hooks/use-delete-recurrence"
-import { useFetchOneCategory } from "../../hooks/use-fetch-one-category"
+import { useFetchCategories } from "../../hooks/use-fetch-categories"
 import { TransactionType } from "../../transactions/constants/transaction-type"
 import { Recurrence } from "../entities/recurrence"
 
@@ -34,10 +35,15 @@ const amountVariants = cva("font-bold text-base", {
 })
 
 export const RecurrenceCard = ({ recurrence, onEdit }: IRecurrenceCardProps) => {
-	const { amount, categoryId, dueDate, description, type } = recurrence
+	const { amount, categoryIds, dueDate, description, type } = recurrence
 
-	const { data: category } = useFetchOneCategory(categoryId)
+	const { data: allCategories } = useFetchCategories()
 	const { mutateAsync: deleteFn } = useDeleteRecurrence()
+
+	const categories = useMemo(() => {
+		if (!allCategories || !categoryIds) return []
+		return allCategories.filter((cat) => cat.id && categoryIds.includes(cat.id))
+	}, [allCategories, categoryIds])
 
 	const handleOnDelete = async (e: React.MouseEvent) => {
 		e.stopPropagation()
@@ -66,14 +72,18 @@ export const RecurrenceCard = ({ recurrence, onEdit }: IRecurrenceCardProps) => 
 							</div>
 							<div className="flex flex-col gap-1">
 								<CardTitle className="text-sm font-semibold leading-none">{description}</CardTitle>
-								<div className="flex items-center gap-2 text-xs text-muted-foreground">
-									{category && (
-										<div className="flex items-center gap-1.5">
-											<ColorCircle className="w-2 h-2" color={category.color} />
-											<span>{category.name}</span>
-										</div>
+								<div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+									{categories.length > 0 && (
+										<>
+											{categories.map((category) => (
+												<div key={category.id} className="flex items-center gap-1.5">
+													<ColorCircle className="w-2 h-2" color={category.color} />
+													<span>{category.name}</span>
+												</div>
+											))}
+											<span>•</span>
+										</>
 									)}
-									<span>•</span>
 									<span>Todo dia {dueDate.format("D")}</span>
 								</div>
 							</div>

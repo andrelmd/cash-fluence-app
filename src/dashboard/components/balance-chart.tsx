@@ -1,5 +1,5 @@
 import { Dayjs } from "dayjs"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import {
 	ChartConfig,
@@ -45,7 +45,7 @@ export const BalanceChart = ({ data, date, isLoading = false }: IBalanceChartPro
 			</CardHeader>
 			<CardContent className="p-8">
 				<ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
-					<AreaChart data={data}>
+					<AreaChart data={data} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
 						<defs>
 							<linearGradient id={"fillRealizedBalance"} x1="0" y1="0" x2="0" y2="1">
 								<stop offset={"50%"} stopColor="var(--color-realizedBalance)" stopOpacity={0.8} />
@@ -58,6 +58,7 @@ export const BalanceChart = ({ data, date, isLoading = false }: IBalanceChartPro
 						</defs>
 						<CartesianGrid vertical={false} />
 						<XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} minTickGap={32} />
+						<YAxis hide domain={["dataMin - 100", "dataMax + 100"]} />
 						<ChartTooltip
 							cursor={false}
 							content={

@@ -16,7 +16,7 @@ export class RecurrenceProcessor {
 			where: { nextExecutionDate: LessThanOrEqual(today) },
 		})
 		for await (const recurrence of recurrences) {
-			const { amount, categoryId, description, dueDate, type, id } = recurrence
+			const { amount, categoryIds, description, dueDate, type, id } = recurrence
 
 			if (!id) {
 				Logger.error("Recurrence id is null")
@@ -31,7 +31,7 @@ export class RecurrenceProcessor {
 
 			const newTransaction = new Transaction({
 				amount,
-				categoryId,
+				categoryIds,
 				createDate: today,
 				description,
 				dueDate: newDueDate,

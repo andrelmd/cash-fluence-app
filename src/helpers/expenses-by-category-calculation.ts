@@ -16,7 +16,10 @@ export function calculateExpenseRealizedByCategory(transactions?: Transaction[],
 	return categories
 		.map((category) => {
 			const transactionsForCategory = transactions.filter(
-				(t) => t.categoryId === category.id && t.type === TransactionType.EXPENSE
+				(t) =>
+					category.id !== undefined &&
+					t.categoryIds.includes(category.id) &&
+					t.type === TransactionType.EXPENSE
 			)
 
 			if (transactionsForCategory.length === 0) return null
