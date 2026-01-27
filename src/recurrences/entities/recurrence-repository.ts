@@ -24,22 +24,87 @@ export class RecurrenceRepository
 		private readonly source: IDatabaseService,
 		private readonly table: Tables
 	) {}
-	save(entity: TSaveOptionsWithoutTable<Recurrence>): Promise<QueryResult> {
-		return this.source.save({ table: this.table, ...entity })
+
+	async save(entity: TSaveOptionsWithoutTable<Recurrence>): Promise<QueryResult> {
+		const { categoryIds, ...recurrenceData } = entity.data
+		const result = await this.source.save({ table: this.table, data: recurrenceData as Recurrence })
+
+		if (categoryIds && categoryIds.length > 0) {
+			await Promise.all(
+				categoryIds.map((categoryId) =>
+					this.source.save({
+						table: Tables.RECURRENCE_CATEGORIES,
+						data: { recurrenceId: result.lastInsertId, categoryId } as any,
+					})
+				)
+			)
+		}
+
+		return result
 	}
 
-	update(options: TUpdateOptionsWithoutTable<Recurrence>): Promise<QueryResult> {
-		return this.source.update({ table: this.table, ...options })
+	async update(options: TUpdateOptionsWithoutTable<Recurrence>): Promise<QueryResult> {
+		const { categoryIds, ...recurrenceData } = options.data
+		const result = await this.source.update({
+			table: this.table,
+			data: recurrenceData as Recurrence,
+			where: options.where,
+		})
+
+		const recurrenceId = options.where?.id as number
+		if (recurrenceId && categoryIds !== undefined) {
+			await this.source.delete({
+				table: Tables.RECURRENCE_CATEGORIES,
+				where: { recurrenceId } as any,
+			})
+
+			await Promise.all(
+				categoryIds.map((categoryId) =>
+					this.source.save({
+						table: Tables.RECURRENCE_CATEGORIES,
+						data: { recurrenceId, categoryId } as any,
+					})
+				)
+			)
+		}
+
+		return result
 	}
+
 	delete(options: TDeleteOptionsWithoutTable<Recurrence>): Promise<void> {
 		return this.source.delete({ table: this.table, ...options })
 	}
 
-	getMany(options?: TSelectOptionsWithoutTable<Recurrence>): Promise<Recurrence[]> {
-		return this.source.find<Recurrence>({ table: this.table, ...options })
+	async getMany(options?: TSelectOptionsWithoutTable<Recurrence>): Promise<Recurrence[]> {
+		const recurrences = await this.source.find<Recurrence>({ table: this.table, ...options })
+		const categories = await this.source.find<{ recurrenceId: number; categoryId: number }>({
+			table: Tables.RECURRENCE_CATEGORIES,
+			where: { recurrenceId: recurrences.map((recurrence) => recurrence.id).filter((id) => id !== null) },
+		})
+
+		return recurrences.map((recurrence) => {
+			return new Recurrence({
+				...recurrence,
+				categoryIds: categories
+					.filter((category) => category.recurrenceId === recurrence.id)
+					.map((category) => category.categoryId),
+			})
+		})
 	}
 
-	getOne(options: TSelectOptionsWithoutTable<Recurrence>): Promise<Recurrence | null> {
-		return this.source.findOne<Recurrence>({ table: this.table, ...options })
+	async getOne(options: TSelectOptionsWithoutTable<Recurrence>): Promise<Recurrence | null> {
+		const recurrence = await this.source.findOne<Recurrence>({ table: this.table, ...options })
+
+		if (!recurrence) return null
+
+		const categories = await this.source.find<{ recurrenceId: number; categoryId: number }>({
+			table: Tables.RECURRENCE_CATEGORIES,
+			where: { recurrenceId: recurrence.id! },
+		})
+
+		return new Recurrence({
+			...recurrence,
+			categoryIds: categories.map((category) => category.categoryId),
+		})
 	}
 }

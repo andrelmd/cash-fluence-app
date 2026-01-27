@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import dayjs from "dayjs"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
 import z from "zod"
 import { Button } from "../../components/ui/button"
@@ -17,11 +17,11 @@ import {
 	DialogTitle,
 } from "../../components/ui/dialog"
 import { Label } from "../../components/ui/label"
+import { MultiSelectCategories } from "../../components/ui/multi-select-categories"
 import { SelectField } from "../../components/ui/select-field"
 import { ShowIf } from "../../components/ui/show-if"
 import { Switch } from "../../components/ui/switch"
 import { TextField } from "../../components/ui/text-field"
-import { useFetchCategories } from "../../hooks/use-fetch-categories"
 import { useUpdateTransaction } from "../../hooks/use-update-transaction"
 import { currencyMask } from "../../utils/currency-mask"
 import { currencyMaskToNumber } from "../../utils/currency-mask-to-number"
@@ -36,7 +36,8 @@ const formSchema = z.object({
 		.transform(currencyMaskToNumber)
 		.pipe(z.number("Digite um valor válido").min(1, "Valor inválido")),
 	description: z.string("Digite uma descrição válida"),
-	categoryId: z.coerce.number("Selecione uma categoria válida").min(1, "Categoria inválida"),
+	categoryIds: z.array(z.coerce.number()).default([]),
+	paymentMethod: z.string().nullable().optional(),
 	createDate: z.date("Digite uma data válida").transform((value: Date) => dayjs(value)),
 	dueDate: z.date("Digite uma data válida").transform((value: Date) => dayjs(value)),
 	paymentDate: z
@@ -61,18 +62,9 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 	const [isInstallment, setIsInstallment] = useState(false)
 	const [isPaid, setIsPaid] = useState(false)
 	const { mutateAsync: updateFn } = useUpdateTransaction()
-	const { data: categories } = useFetchCategories()
 	const methods = useForm<SchemaInput, any, SchemaOutput>({
 		resolver: zodResolver(formSchema),
 	})
-
-	const categoryOptions = useMemo(() => {
-		if (!categories) return []
-		return categories.map((category) => ({
-			label: category.name,
-			value: String(category.id),
-		}))
-	}, [categories])
 
 	const handleOnIsInstallmentChange = (open: boolean) => {
 		setIsInstallment(open)
@@ -129,7 +121,8 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 			type: transaction?.type?.toString() ?? null,
 			amount: currencyMask(transaction?.amount),
 			description: transaction?.description || "",
-			categoryId: transaction?.categoryId?.toString() || null,
+			categoryIds: transaction?.categoryIds || [],
+			paymentMethod: transaction?.paymentMethod || null,
 			createDate: transaction?.createDate?.toDate() || new Date(),
 			dueDate: transaction?.dueDate?.toDate() || new Date(),
 			paymentDate: transaction?.paymentDate?.toDate() || null,
@@ -166,11 +159,17 @@ export const TransactionForm = ({ onOpenChange, open, transaction, onClose }: IT
 							/>
 							<TextField label="Descrição" name="description" />
 							<ControlledSelect
-								label="Categoria"
-								name="categoryId"
-								placeholder="Categoria"
-								options={categoryOptions}
+								label="Meio de pagamento"
+								name="paymentMethod"
+								placeholder="Selecione um meio de pagamento"
+								options={[
+									{ label: "PIX", value: "PIX" },
+									{ label: "Cartão de Crédito", value: "Cartão de crédito" },
+									{ label: "Cartão de Débito", value: "Cartão de débito" },
+									{ label: "Boleto", value: "Boleto" },
+								]}
 							/>
+							<MultiSelectCategories name="categoryIds" label="Categorias" />
 							<ControlledDatePicker name="createDate" label="Data da transação" />
 							<ControlledDatePicker name="dueDate" label="Data de vencimento" />
 							<ShowIf option={transaction} value={null}>

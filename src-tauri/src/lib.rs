@@ -4,6 +4,7 @@ pub mod migrations {
     pub mod v1;
     pub mod v2;
 	pub mod v3;
+	pub mod v4;
 }
 
 pub mod logger;
@@ -11,6 +12,7 @@ pub mod logger;
 use crate::migrations::v1::execute_migration as execute_migration_v1;
 use crate::migrations::v2::execute_migration as execute_migration_v2;
 use crate::migrations::v3::execute_migration as execute_migration_v3;
+use crate::migrations::v4::execute_migration as execute_migration_v4;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -26,7 +28,12 @@ pub fn run() {
             tauri_plugin_sql::Builder::new()
                 .add_migrations(
                     &format!("sqlite:{}.db", db_host),
-                    vec![execute_migration_v1(), execute_migration_v2(), execute_migration_v3()],
+                    vec![
+                        execute_migration_v1(),
+                        execute_migration_v2(),
+                        execute_migration_v3(),
+                        execute_migration_v4(),
+                    ],
                 )
                 .build(),
         )

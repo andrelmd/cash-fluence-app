@@ -65,7 +65,14 @@ export const ExpenseByCategoryChart = ({ data, date, isLoading = false }: IExpen
 							hide
 							domain={[minBalance * -1.1, maxBalance * 1.1]}
 						/>
-						<YAxis type="category" dataKey={"category"} tickLine={false} tickMargin={10} axisLine={false} />
+						<YAxis
+							type="category"
+							dataKey={"category"}
+							tickLine={false}
+							tickMargin={10}
+							axisLine={false}
+							width={120}
+						/>
 						<ChartTooltip cursor={false} content={<ChartTooltipContent />} />
 						<Bar dataKey="realized" fill="var(--color-realized)" radius={5} />
 						<Bar dataKey="projected" fill="var(--color-projected)" radius={5} />

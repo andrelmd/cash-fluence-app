@@ -15,9 +15,9 @@ import {
 	DialogTitle,
 } from "../../components/ui/dialog"
 import { LabelledSwitch } from "../../components/ui/labelled-switch"
+import { MultiSelectCategories } from "../../components/ui/multi-select-categories"
 import { ShowIf } from "../../components/ui/show-if"
 import { TextField } from "../../components/ui/text-field"
-import { useFetchCategories } from "../../hooks/use-fetch-categories"
 import { useUpdateRecurrence } from "../../hooks/use-update-recurrences"
 import { useUpdateTransaction } from "../../hooks/use-update-transaction"
 import { ISelectFieldOptions } from "../../interfaces/select-field-options"
@@ -35,7 +35,7 @@ const formSchema = z.object({
 		.transform(currencyMaskToNumber)
 		.pipe(z.number("Digite um valor válido").min(1, "Valor inválido")),
 	description: z.string("Digite uma descrição válida"),
-	categoryId: z.coerce.number("Selecione uma categoria válida").min(1, "Categoria inválida"),
+	categoryIds: z.array(z.coerce.number()).default([]),
 	createDate: z.date("Digite uma data válida").transform((value: Date) => dayjs(value)),
 	month: z.coerce.number("Selecione um mês válido").min(0, "Mês inválido"),
 	day: z.coerce.number("Selecione um dia válido").min(1, "Dia inválido"),
@@ -54,7 +54,6 @@ interface IRecurrenceFormProps {
 export const RecurrenceForm = ({ onOpenChange, open, recurrence, onClose }: IRecurrenceFormProps) => {
 	const { mutateAsync: updateFn } = useUpdateRecurrence()
 	const { mutateAsync: createTransactionFn } = useUpdateTransaction()
-	const { data: categories } = useFetchCategories()
 	const [createTransaction, setCreateTransaction] = useState(false)
 
 	const methods = useForm<SchemaInput, any, SchemaOutput>({
@@ -62,14 +61,6 @@ export const RecurrenceForm = ({ onOpenChange, open, recurrence, onClose }: IRec
 	})
 
 	const watchMonth = methods.watch("month")
-
-	const categoryOptions = useMemo(() => {
-		if (!categories) return []
-		return categories.map((category) => ({
-			label: category.name,
-			value: String(category.id),
-		}))
-	}, [categories])
 
 	const MonthOptions: ISelectFieldOptions[] = useMemo(
 		() =>
@@ -128,7 +119,7 @@ export const RecurrenceForm = ({ onOpenChange, open, recurrence, onClose }: IRec
 			type: recurrence?.type?.toString() ?? null,
 			amount: currencyMask(recurrence?.amount) || "",
 			description: recurrence?.description || "",
-			categoryId: recurrence?.categoryId?.toString() || null,
+			categoryIds: recurrence?.categoryIds || [],
 			createDate: recurrence?.createDate?.toDate() || new Date(),
 			month: recurrence?.dueDate?.month().toString() || dayjs().month().toString(),
 			day: recurrence?.dueDate?.date().toString() || dayjs().date().toString(),
@@ -163,12 +154,7 @@ export const RecurrenceForm = ({ onOpenChange, open, recurrence, onClose }: IRec
 							/>
 							<TextField label="Valor (R$)" name="amount" mask={currencyMask} />
 							<TextField label="Descrição" name="description" />
-							<ControlledSelect
-								label="Categoria"
-								name="categoryId"
-								placeholder="Categoria"
-								options={categoryOptions}
-							/>
+							<MultiSelectCategories name="categoryIds" label="Categorias" />
 							<div className="flex w-fit gap-4">
 								<ControlledSelect label="Dia" name="day" placeholder="Dia" options={dayOptions} />
 								<ControlledSelect label="Mês" name="month" placeholder="Mês" options={MonthOptions} />

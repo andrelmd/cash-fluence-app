@@ -29,9 +29,14 @@ export class DataMapper {
 
 		for (const key in entity) {
 			if (Object.prototype.hasOwnProperty.call(entity, key)) {
-				const snakeCaseKey = cameCaseToSnakeCase(key)
-				let value = entity[key as keyof TData]
-				rawEntity[snakeCaseKey] = value
+				// Tratar $or especialmente - processar cada condição no array
+				if (key === "$or" && Array.isArray(entity[key])) {
+					rawEntity["$or"] = (entity[key] as any[]).map((condition) => this.trasformToRaw(condition))
+				} else {
+					const snakeCaseKey = cameCaseToSnakeCase(key)
+					let value = entity[key as keyof TData]
+					rawEntity[snakeCaseKey] = value
+				}
 			}
 		}
 		return rawEntity

@@ -32,24 +32,6 @@ export const PendingTransactionsTable = () => {
 	const { mutateAsync: updateTransaction } = useUpdateTransaction()
 	const showDelayedSkeleton = useDelayedLoading(isLoading, 500)
 
-	const getCategoryName = useCallback(
-		(categoryId: number) => {
-			if (!categories) return ""
-			const category = categories.find((category) => category.id === categoryId)
-			return category?.name ?? ""
-		},
-		[categories]
-	)
-
-	const getCategoryColor = useCallback(
-		(categoryId: number) => {
-			if (!categories) return "amber"
-			const category = categories.find((category) => category.id === categoryId)
-			return category?.color ?? "amber"
-		},
-		[categories]
-	)
-
 	const handleMarkAsPaid = useCallback(
 		async (transaction: Transaction) => {
 			const updatedTransaction = new Transaction({
@@ -117,14 +99,20 @@ export const PendingTransactionsTable = () => {
 												{transaction.description}
 											</TableCell>
 											<TableCell>
-												<div className="flex items-center gap-2">
-													<ColorCircle
-														className="w-2 h-2"
-														color={getCategoryColor(transaction.categoryId)}
-													/>
-													<span className="text-muted-foreground text-sm">
-														{getCategoryName(transaction.categoryId)}
-													</span>
+												<div className="flex items-center gap-2 flex-wrap text-xs text-muted-foreground">
+													{transaction.categoryIds?.map((id) => {
+														const category = categories.find((c) => c.id === id)
+														if (!category) return null
+														return (
+															<div key={id} className="flex items-center gap-1.5">
+																<ColorCircle
+																	className="w-2 h-2"
+																	color={category.color}
+																/>
+																<span>{category.name}</span>
+															</div>
+														)
+													})}
 												</div>
 											</TableCell>
 											<TableCell className="text-center">

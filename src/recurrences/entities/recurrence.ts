@@ -9,7 +9,7 @@ export class Recurrence {
 	createDate: Dayjs
 	dueDate: Dayjs
 	nextExecutionDate: Dayjs
-	categoryId: number
+	categoryIds: number[]
 
 	constructor({
 		amount,
@@ -17,7 +17,7 @@ export class Recurrence {
 		dueDate,
 		type,
 		description,
-		categoryId,
+		categoryIds = [],
 		id = null,
 		nextExecutionDate = dayjs().add(1, "month").startOf("month").startOf("day"),
 	}: {
@@ -25,7 +25,7 @@ export class Recurrence {
 		dueDate: Dayjs
 		type: TransactionType
 		description: string
-		categoryId: number
+		categoryIds?: number[]
 		id?: number | null
 		createDate?: Dayjs
 		nextExecutionDate?: Dayjs
@@ -35,7 +35,7 @@ export class Recurrence {
 		this.createDate = createDate
 		this.type = type
 		this.description = description
-		this.categoryId = categoryId
+		this.categoryIds = categoryIds
 		this.dueDate = dueDate.startOf("day")
 		this.nextExecutionDate = nextExecutionDate.startOf("day")
 	}

@@ -4,4 +4,6 @@ export enum Tables {
 	PLANNINGS = "plannings",
 	RECURRENCES = "recurrences",
 	LOCKS = "locks",
+	TRANSACTION_CATEGORIES = "transaction_categories",
+	RECURRENCE_CATEGORIES = "recurrence_categories",
 }

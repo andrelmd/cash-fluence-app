@@ -229,28 +229,76 @@ export class QueryBuilder {
 			return { clause: "", values: [] }
 		}
 
-		const definedWhere = Object.entries(where).filter(([, value]) => value !== undefined) as [
+		const paramIndex = { value: startIndex }
+		const allConditions: string[] = []
+		const allValues: TEntityValue<TEntity>[] = []
+
+		const andEntries = Object.entries(where).filter(([key, value]) => key !== "$or" && value !== undefined) as [
 			keyof TWhere<TEntity>,
 			TEntityValue<TEntity>,
 		][]
 
-		if (definedWhere.length === 0) {
+		if (andEntries.length > 0) {
+			const andConditions = andEntries.map(([key, value]) => this.buildWhereCondition(key, value, paramIndex))
+			allConditions.push(...andConditions)
+
+			andEntries.forEach(([, value]) => {
+				if (this.isIWhereOperator(value)) {
+					if (Array.isArray(value.value)) {
+						allValues.push(...value.value)
+					} else {
+						allValues.push(value.value)
+					}
+				} else if (Array.isArray(value)) {
+					allValues.push(...value)
+				} else {
+					allValues.push(value)
+				}
+			})
+		}
+
+		const orConditions = where.$or
+		if (orConditions && orConditions.length > 0) {
+			const orParts: string[] = []
+
+			orConditions.forEach((orCondition) => {
+				const orEntries = Object.entries(orCondition).filter(([, value]) => value !== undefined) as [
+					keyof TWhere<TEntity>,
+					TEntityValue<TEntity>,
+				][]
+
+				if (orEntries.length > 0) {
+					const conditions = orEntries.map(([key, value]) => this.buildWhereCondition(key, value, paramIndex))
+					orParts.push(`(${conditions.join(" AND ")})`)
+
+					orEntries.forEach(([, value]) => {
+						if (this.isIWhereOperator(value)) {
+							if (Array.isArray(value.value)) {
+								allValues.push(...value.value)
+							} else {
+								allValues.push(value.value)
+							}
+						} else if (Array.isArray(value)) {
+							allValues.push(...value)
+						} else {
+							allValues.push(value)
+						}
+					})
+				}
+			})
+
+			if (orParts.length > 0) {
+				allConditions.push(`(${orParts.join(" OR ")})`)
+			}
+		}
+
+		if (allConditions.length === 0) {
 			return { clause: "", values: [] }
 		}
 
-		const paramIndex = { value: startIndex }
-		const conditions = definedWhere.map(([key, value]) => this.buildWhereCondition(key, value, paramIndex))
-
-		const values = definedWhere.flatMap(([, value]) => {
-			if (this.isIWhereOperator(value)) {
-				return Array.isArray(value.value) ? value.value : [value.value]
-			}
-			return value
-		})
-
 		return {
-			clause: `WHERE ${conditions.join(" AND ")}`,
-			values,
+			clause: `WHERE ${allConditions.join(" AND ")}`,
+			values: allValues,
 		}
 	}
 }

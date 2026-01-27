@@ -29,11 +29,11 @@ export function calculateProjectedVsRealized(
 		const planned = plannings?.find((p) => p.categoryId === category.id)?.amount || category.monthlyLimit || 0
 
 		const projected = expenseTransactions
-			.filter((t) => t.categoryId === category.id)
+			.filter((t) => category.id !== undefined && t.categoryIds.includes(category.id))
 			.reduce((acc, curr) => acc + curr.amount, 0)
 
 		const realized = expenseTransactions
-			.filter((t) => t.categoryId === category.id)
+			.filter((t) => category.id !== undefined && t.categoryIds.includes(category.id))
 			.filter((t) => t.paymentDate)
 			.reduce((acc, curr) => acc + curr.amount, 0)
 

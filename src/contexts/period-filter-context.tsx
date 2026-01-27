@@ -9,6 +9,8 @@ interface PeriodFilterContextData {
 	date: Dayjs
 	startDate: Dayjs
 	endDate: Dayjs
+	navigateToPreviousMonth: () => void
+	navigateToNextMonth: () => void
 }
 
 const PeriodFilterContext = createContext<PeriodFilterContextData | undefined>(undefined)
@@ -21,7 +23,29 @@ export const PeriodFilterProvider: React.FC<{ children: React.ReactNode }> = ({ 
 	const startDate = useMemo(() => date.startOf("month"), [date])
 	const endDate = useMemo(() => date.endOf("month"), [date])
 
-	const value = { month, setMonth, year, setYear, date, startDate, endDate }
+	const navigateToPreviousMonth = () => {
+		const previousDate = date.subtract(1, "month")
+		setMonth(previousDate.month())
+		setYear(previousDate.year())
+	}
+
+	const navigateToNextMonth = () => {
+		const nextDate = date.add(1, "month")
+		setMonth(nextDate.month())
+		setYear(nextDate.year())
+	}
+
+	const value = {
+		month,
+		setMonth,
+		year,
+		setYear,
+		date,
+		startDate,
+		endDate,
+		navigateToPreviousMonth,
+		navigateToNextMonth,
+	}
 
 	return <PeriodFilterContext.Provider value={value}>{children}</PeriodFilterContext.Provider>
 }
